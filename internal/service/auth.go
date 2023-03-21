@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/mail"
 
-	"forum/internal/model"
+	"forum/internal/models"
 	"forum/internal/repository"
 )
 
@@ -19,9 +19,9 @@ var (
 )
 
 type AuthService interface {
-	CreateUser(*model.User) error
-	GenerateToken(username, password string) (*model.User, error)
-	ParseToken(token string) (*model.User, error)
+	CreateUser(*models.User) error
+	GenerateToken(username, password string) (*models.User, error)
+	ParseToken(token string) (*models.User, error)
 	DeleteToken(token string) error
 }
 
@@ -35,7 +35,7 @@ func NewAuthService(repository repository.AuthRepository) AuthService {
 	}
 }
 
-func (s *authService) CreateUser(user *model.User) error {
+func (s *authService) CreateUser(user *models.User) error {
 	if _, err := s.Repository.GetUser(user.Name); err == nil {
 		return fmt.Errorf("service: CreateUser: get user: %W", err)
 	}
@@ -43,11 +43,11 @@ func (s *authService) CreateUser(user *model.User) error {
 	return nil
 }
 
-func (s *authService) GenerateToken(username, password string) (*model.User, error) {
+func (s *authService) GenerateToken(username, password string) (*models.User, error) {
 	return nil, nil
 }
 
-func (s *authService) ParseToken(token string) (*model.User, error) {
+func (s *authService) ParseToken(token string) (*models.User, error) {
 	return nil, nil
 }
 
@@ -55,7 +55,7 @@ func (s *authService) DeleteToken(token string) error {
 	return nil
 }
 
-func checkUser(user model.User) error {
+func checkUser(user models.User) error {
 	_, err := mail.ParseAddress(user.Email)
 	if err != nil {
 		return fmt.Errorf("service: CreateUser: checkUser err: %w", ErrInvalidEmail)

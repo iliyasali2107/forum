@@ -3,17 +3,17 @@ package repository
 import (
 	"database/sql"
 
-	"forum/internal/model"
+	"forum/internal/models"
 )
 
 type PostRepository interface {
-	CreatePost(*model.Post) (int, error)
-	GetAllPosts() (*[]model.Post, error)
-	GetPostsByCategory(...int) (*[]model.Post, error)
-	GetPost(int) (*model.Post, error)
-	GetAllPostsOfUser(int) (*[]model.Post, error)
-	UpdatePost(*model.Post) (*model.Post, error) // may be don't need
-	DeletePost(int) error                        // may be don't need
+	CreatePost(*models.Post) (int, error)
+	GetAllPosts() (*[]models.Post, error)
+	GetPostsByCategory(...int) (*[]models.Post, error)
+	GetPost(int) (*models.Post, error)
+	GetAllPostsOfUser(int) (*[]models.Post, error)
+	UpdatePost(*models.Post) (*models.Post, error) // may be don't need
+	DeletePost(int) error                          // may be don't need
 }
 
 type postRepo struct {
@@ -26,7 +26,7 @@ func NewPostRepository(db *sql.DB) PostRepository {
 	}
 }
 
-func (r *postRepo) CreatePost(post *model.Post) (int, error) {
+func (r *postRepo) CreatePost(post *models.Post) (int, error) {
 	query := `INSERT INTO posts(user_id, title, content, created) VALUES (?, ?, ?, ?)`
 	row, err := r.db.Exec(query, post.User.ID, post.Title, post.Content, post.Created)
 	if err != nil {
@@ -41,16 +41,16 @@ func (r *postRepo) CreatePost(post *model.Post) (int, error) {
 	return int(id), nil
 }
 
-func (r *postRepo) GetAllPosts() (*[]model.Post, error) {
+func (r *postRepo) GetAllPosts() (*[]models.Post, error) {
 	query := `SELECT * FROM posts`
 	rows, err := r.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 
-	posts := []model.Post{}
+	posts := []models.Post{}
 	for rows.Next() {
-		post := model.Post{}
+		post := models.Post{}
 		if err := rows.Scan(&post.ID, &post.User.ID, &post.Title, &post.Content, &post.Created); err != nil {
 			return nil, err
 		}
@@ -60,7 +60,7 @@ func (r *postRepo) GetAllPosts() (*[]model.Post, error) {
 	return &posts, nil
 }
 
-func (r *postRepo) GetPostsByCategory(ids ...int) (*[]model.Post, error) {
+func (r *postRepo) GetPostsByCategory(ids ...int) (*[]models.Post, error) {
 	query := `SELECT * FROM posts WHERE id IN (?`
 	for i := 0; i < len(ids); i++ {
 		query += `,?`
@@ -70,9 +70,9 @@ func (r *postRepo) GetPostsByCategory(ids ...int) (*[]model.Post, error) {
 	if err != nil {
 		return nil, err
 	}
-	posts := []model.Post{}
+	posts := []models.Post{}
 	for rows.Next() {
-		post := model.Post{}
+		post := models.Post{}
 		if err := rows.Scan(&post.ID, &post.User.ID, &post.Title, &post.Content, &post.Created); err != nil {
 			return nil, err
 		}
@@ -82,14 +82,14 @@ func (r *postRepo) GetPostsByCategory(ids ...int) (*[]model.Post, error) {
 	return &posts, nil
 }
 
-func (r *postRepo) GetPost(id int) (*model.Post, error) {
+func (r *postRepo) GetPost(id int) (*models.Post, error) {
 	query := `SELECT * FROM posts WHERE id = ?`
 	row := r.db.QueryRow(query, id)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
 
-	post := model.Post{}
+	post := models.Post{}
 	if err := row.Scan(&post.ID, &post.User.ID, &post.Title, &post.Content, &post.Created); err != nil {
 		return nil, err
 	}
@@ -97,16 +97,16 @@ func (r *postRepo) GetPost(id int) (*model.Post, error) {
 	return &post, nil
 }
 
-func (r *postRepo) GetAllPostsOfUser(user_id int) (*[]model.Post, error) {
+func (r *postRepo) GetAllPostsOfUser(user_id int) (*[]models.Post, error) {
 	query := `SELECT * FROM posts WHERE user_id = ?`
 	rows, err := r.db.Query(query, user_id)
 	if err != nil {
 		return nil, err
 	}
 
-	posts := []model.Post{}
+	posts := []models.Post{}
 	for rows.Next() {
-		post := model.Post{}
+		post := models.Post{}
 		if err := rows.Scan(&post.ID, &post.User.ID, &post.Title, &post.Content, &post.Created); err != nil {
 			return nil, err
 		}
@@ -116,7 +116,7 @@ func (r *postRepo) GetAllPostsOfUser(user_id int) (*[]model.Post, error) {
 	return &posts, nil
 }
 
-func (r *postRepo) UpdatePost(post *model.Post) (*model.Post, error) {
+func (r *postRepo) UpdatePost(post *models.Post) (*models.Post, error) {
 	return nil, nil
 }
 

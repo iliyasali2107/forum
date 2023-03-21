@@ -3,18 +3,18 @@ package repository
 import (
 	"database/sql"
 
-	"forum/internal/model"
+	"forum/internal/models"
 )
 
 type CommentRepository interface {
-	CreateCommentWithParent(*model.Comment) (int, error)
-	CreateCommentWithoutParent(*model.Comment) (int, error)
-	GetComment(int) (*model.Comment, error)
-	GetPostComments(int) (*[]model.Comment, error)
-	GetUserComments(int) (*[]model.Comment, error)
-	GetAllComments() (*[]model.Comment, error)            // may be don't need
-	UpdateComment(*model.Comment) (*model.Comment, error) // may be don't need
-	DeleteComment(int) error                              // may be don't need
+	CreateCommentWithParent(*models.Comment) (int, error)
+	CreateCommentWithoutParent(*models.Comment) (int, error)
+	GetComment(int) (*models.Comment, error)
+	GetPostComments(int) (*[]models.Comment, error)
+	GetUserComments(int) (*[]models.Comment, error)
+	GetAllComments() (*[]models.Comment, error)             // may be don't need
+	UpdateComment(*models.Comment) (*models.Comment, error) // may be don't need
+	DeleteComment(int) error                                // may be don't need
 }
 
 type commentRepo struct {
@@ -27,7 +27,7 @@ func NewCommentRepository(db *sql.DB) CommentRepository {
 	}
 }
 
-func (r *commentRepo) CreateCommentWithParent(comment *model.Comment) (int, error) {
+func (r *commentRepo) CreateCommentWithParent(comment *models.Comment) (int, error) {
 	query := `INSERT INTO comments (user_id, post_id, content, parent_id) VALUES (?, ?, ?, ?)`
 	row, err := r.db.Exec(query, comment.User.ID, comment.Post.ID, comment.Content, comment.Parent.ID)
 	if err != nil {
@@ -42,7 +42,7 @@ func (r *commentRepo) CreateCommentWithParent(comment *model.Comment) (int, erro
 	return int(id), nil
 }
 
-func (r *commentRepo) CreateCommentWithoutParent(comment *model.Comment) (int, error) {
+func (r *commentRepo) CreateCommentWithoutParent(comment *models.Comment) (int, error) {
 	query := `INSERT INTO comments (user_id, post_id, content) VALUES (?, ?, ?)`
 	row, err := r.db.Exec(query, comment.User.ID, comment.Post.ID, comment.Content)
 	if err != nil {
@@ -55,30 +55,30 @@ func (r *commentRepo) CreateCommentWithoutParent(comment *model.Comment) (int, e
 	return int(id), nil
 }
 
-func (r *commentRepo) GetComment(id int) (*model.Comment, error) {
+func (r *commentRepo) GetComment(id int) (*models.Comment, error) {
 	query := `SELECT * FROM comments WHERE id = ?`
 	row := r.db.QueryRow(query, id)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
 
-	comment := model.Comment{}
+	comment := models.Comment{}
 	if err := row.Scan(&comment.ID, &comment.User.ID, &comment.Post.ID, &comment.Parent.ID); err != nil {
 		return nil, err
 	}
 	return &comment, nil
 }
 
-func (r *commentRepo) GetAllComments() (*[]model.Comment, error) {
+func (r *commentRepo) GetAllComments() (*[]models.Comment, error) {
 	query := `SELECT * FROM comments`
 	rows, err := r.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 
-	comments := []model.Comment{}
+	comments := []models.Comment{}
 	for rows.Next() {
-		comment := model.Comment{}
+		comment := models.Comment{}
 		if err := rows.Scan(&comment.ID, &comment.User.ID, &comment.Post.ID, &comment.Content, &comment.Parent.ID); err != nil {
 			return nil, err
 		}
@@ -88,16 +88,16 @@ func (r *commentRepo) GetAllComments() (*[]model.Comment, error) {
 	return &comments, nil
 }
 
-func (r *commentRepo) GetPostComments(post_id int) (*[]model.Comment, error) {
+func (r *commentRepo) GetPostComments(post_id int) (*[]models.Comment, error) {
 	query := `SELECT * FROM comments WHERE post_id = ?`
 	rows, err := r.db.Query(query, post_id)
 	if err != nil {
 		return nil, err
 	}
 
-	comments := []model.Comment{}
+	comments := []models.Comment{}
 	for rows.Next() {
-		comment := model.Comment{}
+		comment := models.Comment{}
 		if err := rows.Scan(&comment.ID, &comment.User.ID, &comment.Post.ID, &comment.Content, &comment.Parent.ID); err != nil {
 			return nil, err
 		}
@@ -107,16 +107,16 @@ func (r *commentRepo) GetPostComments(post_id int) (*[]model.Comment, error) {
 	return &comments, nil
 }
 
-func (r *commentRepo) GetUserComments(user_id int) (*[]model.Comment, error) {
+func (r *commentRepo) GetUserComments(user_id int) (*[]models.Comment, error) {
 	query := `SELECT * FROM comments WHERE user_id = ?`
 	rows, err := r.db.Query(query, user_id)
 	if err != nil {
 		return nil, err
 	}
 
-	comments := []model.Comment{}
+	comments := []models.Comment{}
 	for rows.Next() {
-		comment := model.Comment{}
+		comment := models.Comment{}
 		if err := rows.Scan(&comment.ID, &comment.User.ID, &comment.Post.ID, &comment.Content, &comment.Parent.ID); err != nil {
 			return nil, err
 		}
@@ -126,7 +126,7 @@ func (r *commentRepo) GetUserComments(user_id int) (*[]model.Comment, error) {
 	return &comments, nil
 }
 
-func (r *commentRepo) UpdateComment(*model.Comment) (*model.Comment, error) {
+func (r *commentRepo) UpdateComment(*models.Comment) (*models.Comment, error) {
 	return nil, nil
 }
 

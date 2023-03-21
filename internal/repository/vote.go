@@ -3,12 +3,12 @@ package repository
 import (
 	"database/sql"
 
-	"forum/internal/model"
+	"forum/internal/models"
 )
 
 type VoteRepository interface {
-	CreateCommentVote(*model.Vote) (int, error)
-	CreatePostVote(*model.Vote) (int, error)
+	CreateCommentVote(*models.Vote) (int, error)
+	CreatePostVote(*models.Vote) (int, error)
 	GetPostUpvotes(int) (int, error)
 	GetPostDownvotes(int) (int, error)
 	GetCommentUpvotes(int) (int, error)
@@ -27,7 +27,7 @@ func NewVoteRepository(db *sql.DB) VoteRepository {
 	}
 }
 
-func (r *voteRepo) CreateCommentVote(vote *model.Vote) (int, error) {
+func (r *voteRepo) CreateCommentVote(vote *models.Vote) (int, error) {
 	query := `INSERT INTO votes_comments (comment_id, user_id, type) VALUES (?, ?, ?)`
 	row, err := r.db.Exec(query, vote.Comment.ID, vote.User.ID, vote.Type)
 	if err != nil {
@@ -42,7 +42,7 @@ func (r *voteRepo) CreateCommentVote(vote *model.Vote) (int, error) {
 	return int(id), err
 }
 
-func (r *voteRepo) CreatePostVote(vote *model.Vote) (int, error) {
+func (r *voteRepo) CreatePostVote(vote *models.Vote) (int, error) {
 	query := `INSERT INTO votes_posts (post_id, user_id, type) VALUES (?, ?, ?)`
 	row, err := r.db.Exec(query, vote.Post.ID, vote.User.ID, vote.Type)
 	if err != nil {

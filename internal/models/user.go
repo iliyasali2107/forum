@@ -1,4 +1,4 @@
-package model
+package models
 
 import "time"
 
@@ -10,3 +10,5 @@ type User struct {
 	Token    string
 	Expires  time.Time
 }
+
+var AnonymousUser = &User{}
