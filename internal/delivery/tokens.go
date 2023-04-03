@@ -24,7 +24,7 @@ type Token struct {
 	Scope     string    `json:"-"`
 }
 
-func generateToken(userID int64, ttl time.Duration, scope string) (*Token, error) {
+func GenerateToken(userID int64, ttl time.Duration, scope string) (*Token, error) {
 	token := &Token{
 		UserID: userID,
 		Expiry: time.Now().Add(ttl).Add(ttl),
@@ -55,7 +55,7 @@ type TokenModel struct {
 }
 
 func (m TokenModel) New(userID int64, ttl time.Duration, scope string) (*Token, error) {
-	token, err := generateToken(userID, ttl, scope)
+	token, err := GenerateToken(userID, ttl, scope)
 	if err != nil {
 		return nil, err
 	}

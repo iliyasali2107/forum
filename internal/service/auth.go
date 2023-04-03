@@ -2,20 +2,22 @@ package service
 
 import (
 	"errors"
-	"fmt"
-	"net/mail"
 
 	"forum/internal/models"
 	"forum/internal/repository"
+	"forum/pkg/validator"
 )
 
 var (
 	ErrInvalidEmail        = errors.New("invalid email format")
+	ErrInvalidPassword     = errors.New("invalid password")
+	ErrInvalidUsername     = errors.New("invalid username")
 	ErrInvalidUsernameLen  = errors.New("username length out of range 32")
 	ErrInvalidUsernameChar = errors.New("invalid username characters")
-	ErrConfirmPassword     = errors.New("password doesn't match")
-	ErrUserNotFound        = errors.New("user not found")
-	ErrUserExist           = errors.New("user already exists")
+
+	ErrConfirmPassword = errors.New("password doesn't match")
+	ErrUserNotFound    = errors.New("user not found")
+	ErrUserExist       = errors.New("user already exists")
 )
 
 type AuthService interface {
@@ -26,20 +28,18 @@ type AuthService interface {
 }
 
 type authService struct {
-	Repository repository.AuthRepository
+	authRepository repository.AuthRepository
+	userRepository repository.UserRepository
 }
 
-func NewAuthService(repository repository.AuthRepository) AuthService {
+func NewAuthService(authRepo repository.AuthRepository, userRepo repository.UserRepository) AuthService {
 	return &authService{
-		Repository: repository,
+		authRepository: authRepo,
+		userRepository: userRepo,
 	}
 }
 
 func (s *authService) CreateUser(user *models.User) error {
-	if _, err := s.Repository.GetUser(user.Name); err == nil {
-		return fmt.Errorf("service: CreateUser: get user: %W", err)
-	}
-
 	return nil
 }
 
@@ -55,25 +55,58 @@ func (s *authService) DeleteToken(token string) error {
 	return nil
 }
 
-func checkUser(user models.User) error {
-	_, err := mail.ParseAddress(user.Email)
-	if err != nil {
-		return fmt.Errorf("service: CreateUser: checkUser err: %w", ErrInvalidEmail)
+func (s *authService) Signup(v *validator.Validator, user *models.User) error {
+	_, err := s.userRepository.GetUserByEmail(user.Email)
+	if err == nil {
+		return ErrUserExist
 	}
 
-	for _, char := range user.Name {
-		if char < 32 || char > 126 {
-			return fmt.Errorf("service: CreateUser: checkUser err: %w", ErrInvalidUsernameChar)
+	if ValidateUser(v, user); !v.Valid() {
+		if _, ok := v.Errors["name"]; ok {
+			return ErrInvalidUsername
+		}
+
+		if _, ok := v.Errors["email"]; ok {
+			return ErrInvalidEmail
+		}
+
+		if _, ok := v.Errors["password"]; ok {
+			return ErrInvalidPassword
 		}
 	}
+	
+	// TODO: ADD: user.Password.Hash
 
-	if len(user.Name) < 1 || len(user.Name) >= 36 {
-		return fmt.Errorf("service: CreateUser: checkUser err: %w", ErrInvalidUsernameLen)
+	_, err = s.authRepository.CreateUser(user)
+	if err != nil {
+		return err
 	}
 
-	// if user.Password != user.ConfirmPassword {
-	// 	return fmt.Errorf("service: CreateUser: checkUser err: %w", ErrConfirmPassword)
-	// }
-	// return nil
 	return nil
+}
+
+func ValidateEmail(v *validator.Validator, email string) {
+	v.Check(email != "", "email", "must be provided")
+	v.Check(validator.Matches(email, validator.EmailRX), "email", "must be provided a valid email address")
+}
+
+func ValidatePasswordPlaintext(v *validator.Validator, password string) {
+	v.Check(password != "", "password", "must be provided")
+	v.Check(len(password) >= 8, "password", "must be at least 8 bytes long")
+	v.Check(len(password) <= 72, "password", "must not be more than 500 bytes long")
+}
+
+func ValidateUser(v *validator.Validator, user *models.User) {
+	v.Check(user.Name != "", "name", "must be provided")
+	v.Check(len(user.Name) <= 500, "name", "must not be more than 500 bytes long")
+
+	ValidateEmail(v, user.Email)
+
+	if user.Password.Plaintext != nil {
+		ValidatePasswordPlaintext(v, *user.Password.Plaintext)
+	}
+
+	if user.Password.Hash == nil {
+		panic("missing password hash for user")
+	}
 }

@@ -6,9 +6,12 @@ type User struct {
 	ID       int
 	Name     string
 	Email    string
-	Password string
+	Password Password
 	Token    string
 	Expires  time.Time
 }
 
-var AnonymousUser = &User{}
+type Password struct {
+	Plaintext *string
+	Hash      *[]byte
+}

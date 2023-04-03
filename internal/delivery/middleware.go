@@ -3,20 +3,13 @@ package delivery
 import (
 	"context"
 	"errors"
-	"expvar"
 	"fmt"
-	"net"
 	"net/http"
-	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"forum/internal/models"
 	"forum/pkg/validator"
-
-	"github.com/felixge/httpsnoop"
-	"golang.org/x/time/rate"
 )
 
 const ctxKeyUser ctxKey = "user"
@@ -60,62 +53,9 @@ func (h *Handler) recoverPanic(next http.Handler) http.Handler {
 			if err := recover(); err != nil {
 				w.Header().Set("Connection", "close")
 
-				h.serverErrorResponse(w, r, fmt.Errorf("%s", err))
+				h.ServerErrorResponse(w, r, fmt.Errorf("%s", err))
 			}
 		}()
-		next.ServeHTTP(w, r)
-	})
-}
-
-func (h *Handler) rateLimit(next http.Handler) http.Handler {
-	type client struct {
-		limiter  *rate.Limiter
-		lastSeen time.Time
-	}
-
-	var (
-		mu      sync.Mutex
-		clients = make(map[string]*client)
-	)
-
-	go func() {
-		for {
-			time.Sleep(time.Minute)
-			mu.Lock()
-
-			for ip, client := range clients {
-				if time.Since(client.lastSeen) > 3*time.Minute {
-					delete(clients, ip)
-				}
-			}
-
-			mu.Unlock()
-		}
-	}()
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if h.config.limiter.enabled {
-			ip, _, err := net.SplitHostPort(r.RemoteAddr)
-			if err != nil {
-				h.serverErrorResponse(w, r, err)
-			}
-
-			mu.Lock()
-			if _, found := clients[ip]; !found {
-				clients[ip] = &client{limiter: rate.NewLimiter(rate.Limit(h.config.limiter.rps), h.config.limiter.burst)}
-			}
-
-			clients[ip].lastSeen = time.Now()
-
-			if !clients[ip].limiter.Allow() {
-				mu.Unlock()
-				h.rateLimitExceededResponse(w, r)
-				return
-			}
-
-			mu.Unlock()
-		}
-
 		next.ServeHTTP(w, r)
 	})
 }
@@ -230,21 +170,21 @@ func (h *Handler) enableCORS(next http.Handler) http.Handler {
 	})
 }
 
-func (h *Handler) metrics(next http.Handler) http.Handler {
-	totalRequestsReceived := expvar.NewInt("total_requests_received")
-	totalResponsesSent := expvar.NewInt("total_responses_sent")
-	totalProcessingTimeMicroseconds := expvar.NewInt("total_processing_time_Ms")
-	totalResponsesSentByStatus := expvar.NewMap("total_responses_sent_by_status")
+// func (h *Handler) metrics(next http.Handler) http.Handler {
+// 	totalRequestsReceived := expvar.NewInt("total_requests_received")
+// 	totalResponsesSent := expvar.NewInt("total_responses_sent")
+// 	totalProcessingTimeMicroseconds := expvar.NewInt("total_processing_time_Ms")
+// 	totalResponsesSentByStatus := expvar.NewMap("total_responses_sent_by_status")
 
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		totalRequestsReceived.Add(1)
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		totalRequestsReceived.Add(1)
 
-		metrics := httpsnoop.CaptureMetrics(next, w, r)
+// 		metrics := httpsnoop.CaptureMetrics(next, w, r)
 
-		totalResponsesSent.Add(1)
+// 		totalResponsesSent.Add(1)
 
-		totalProcessingTimeMicroseconds.Add(metrics.Duration.Microseconds())
+// 		totalProcessingTimeMicroseconds.Add(metrics.Duration.Microseconds())
 
-		totalResponsesSentByStatus.Add(strconv.Itoa(metrics.Code), 1)
-	})
-}
+// 		totalResponsesSentByStatus.Add(strconv.Itoa(metrics.Code), 1)
+// 	})
+// }
