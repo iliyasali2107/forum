@@ -28,35 +28,33 @@ type AuthService interface {
 }
 
 type authService struct {
-	authRepository repository.AuthRepository
-	userRepository repository.UserRepository
+	ur repository.UserRepository
 }
 
 func NewAuthService(authRepo repository.AuthRepository, userRepo repository.UserRepository) AuthService {
 	return &authService{
-		authRepository: authRepo,
-		userRepository: userRepo,
+		ur: userRepo,
 	}
 }
 
-func (s *authService) CreateUser(user *models.User) error {
+func (as *authService) CreateUser(user *models.User) error {
 	return nil
 }
 
-func (s *authService) GenerateToken(username, password string) (*models.User, error) {
+func (as *authService) GenerateToken(username, password string) (*models.User, error) {
 	return nil, nil
 }
 
-func (s *authService) ParseToken(token string) (*models.User, error) {
+func (as *authService) ParseToken(token string) (*models.User, error) {
 	return nil, nil
 }
 
-func (s *authService) DeleteToken(token string) error {
+func (as *authService) DeleteToken(token string) error {
 	return nil
 }
 
 func (s *authService) Signup(v *validator.Validator, user *models.User) error {
-	_, err := s.userRepository.GetUserByEmail(user.Email)
+	_, err := s.ur.GetUserByEmail(user.Email)
 	if err == nil {
 		return ErrUserExist
 	}
@@ -74,10 +72,10 @@ func (s *authService) Signup(v *validator.Validator, user *models.User) error {
 			return ErrInvalidPassword
 		}
 	}
-	
+
 	// TODO: ADD: user.Password.Hash
 
-	_, err = s.authRepository.CreateUser(user)
+	_, err = s.ur.CreateUser(user)
 	if err != nil {
 		return err
 	}
@@ -102,8 +100,8 @@ func ValidateUser(v *validator.Validator, user *models.User) {
 
 	ValidateEmail(v, user.Email)
 
-	if user.Password.Plaintext != nil {
-		ValidatePasswordPlaintext(v, *user.Password.Plaintext)
+	if user.Password.Plaintext != "" {
+		ValidatePasswordPlaintext(v, user.Password.Plaintext)
 	}
 
 	if user.Password.Hash == nil {

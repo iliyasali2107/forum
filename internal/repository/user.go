@@ -10,6 +10,7 @@ type UserRepository interface {
 	CreateUser(*models.User) (int, error)
 	GetUser(int) (*models.User, error)
 	GetUserByEmail(string) (*models.User, error)
+	GetUserByToken(token string) (*models.User, error)
 	GetAllUsers() (*[]models.User, error)          // may be don't need
 	UpdateUser(*models.User) (*models.User, error) // may be don't need
 	DeleteUser(int) error                          // may be don't need
@@ -25,9 +26,9 @@ func NewUserRepository(db *sql.DB) UserRepository {
 	}
 }
 
-func (r *userRepo) CreateUser(user *models.User) (int, error) {
+func (ur *userRepo) CreateUser(user *models.User) (int, error) {
 	query := `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`
-	row, err := r.db.Exec(query, user.Name, user.Email, user.Password)
+	row, err := ur.db.Exec(query, user.Name, user.Email, user.Password.Hash)
 	if err != nil {
 		return 0, err
 	}
@@ -40,9 +41,9 @@ func (r *userRepo) CreateUser(user *models.User) (int, error) {
 	return int(id), nil
 }
 
-func (r *userRepo) GetUser(id int) (*models.User, error) {
+func (ur *userRepo) GetUser(id int) (*models.User, error) {
 	query := `SELECT * FROM users WHERE id = ?`
-	row := r.db.QueryRow(query, id)
+	row := ur.db.QueryRow(query, id)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
@@ -55,9 +56,9 @@ func (r *userRepo) GetUser(id int) (*models.User, error) {
 	return &user, nil
 }
 
-func (r *userRepo) GetAllUsers() (*[]models.User, error) {
+func (ur *userRepo) GetAllUsers() (*[]models.User, error) {
 	query := `SELECT * FROM users`
-	rows, err := r.db.Query(query)
+	rows, err := ur.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +66,7 @@ func (r *userRepo) GetAllUsers() (*[]models.User, error) {
 	users := []models.User{}
 	for rows.Next() {
 		user := models.User{}
-		if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Password); err != nil {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Password.Hash); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
@@ -74,25 +75,29 @@ func (r *userRepo) GetAllUsers() (*[]models.User, error) {
 	return &users, nil
 }
 
-func (r *userRepo) DeleteUser(id int) error {
+func (ur *userRepo) DeleteUser(id int) error {
 	return nil
 }
 
-func (r *userRepo) GetUserByEmail(email string) (*models.User, error) {
+func (ur *userRepo) GetUserByEmail(email string) (*models.User, error) {
 	query := `SELECT * FROM users WHERE email = ?`
-	row := r.db.QueryRow(query, email)
+	row := ur.db.QueryRow(query, email)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
 
 	user := models.User{}
-	if err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password); err != nil {
+	if err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password.Hash); err != nil {
 		return nil, err
 	}
 
 	return &user, nil
 }
 
-func (r *userRepo) UpdateUser(*models.User) (*models.User, error) {
+func (ur *userRepo) UpdateUser(*models.User) (*models.User, error) {
+	return nil, nil
+}
+
+func (ur *userRepo) GetUserByToken(token string) (*models.User, error) {
 	return nil, nil
 }

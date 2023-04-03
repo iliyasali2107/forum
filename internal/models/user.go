@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 type User struct {
 	ID       int
@@ -12,6 +16,27 @@ type User struct {
 }
 
 type Password struct {
-	Plaintext *string
-	Hash      *[]byte
+	Plaintext string
+	Hash      []byte
+}
+
+func (p *Password) Set(plaintextPassword string) error {
+	hash, err := bcrypt.GenerateFromPassword([]byte(plaintextPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	p.Plaintext = plaintextPassword
+	p.Hash = hash
+
+	return nil
+}
+
+func (p *Password) Matches(plaintextPassword string) (bool, error) {
+	err := bcrypt.CompareHashAndPassword(p.Hash, []byte(plaintextPassword))
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
