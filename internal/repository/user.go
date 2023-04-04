@@ -1,7 +1,9 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
+	"time"
 
 	models "forum/internal/models"
 )
@@ -11,9 +13,12 @@ type UserRepository interface {
 	GetUser(int) (*models.User, error)
 	GetUserByEmail(string) (*models.User, error)
 	GetUserByToken(token string) (*models.User, error)
-	GetAllUsers() (*[]models.User, error)          // may be don't need
-	UpdateUser(*models.User) (*models.User, error) // may be don't need
-	DeleteUser(int) error                          // may be don't need
+	GetAllUsers() ([]models.User, error)           // may be no need
+	UpdateUser(*models.User) (*models.User, error) // may be no need
+	DeleteUser(int) error                          // may be no need
+
+	SaveToken(*models.User) error  // from Auth Repository
+	DeleteToken(user_id int) error // from Auth Repository
 }
 
 type userRepo struct {
@@ -56,7 +61,7 @@ func (ur *userRepo) GetUser(id int) (*models.User, error) {
 	return &user, nil
 }
 
-func (ur *userRepo) GetAllUsers() (*[]models.User, error) {
+func (ur *userRepo) GetAllUsers() ([]models.User, error) {
 	query := `SELECT * FROM users`
 	rows, err := ur.db.Query(query)
 	if err != nil {
@@ -72,7 +77,7 @@ func (ur *userRepo) GetAllUsers() (*[]models.User, error) {
 		users = append(users, user)
 	}
 
-	return &users, nil
+	return users, nil
 }
 
 func (ur *userRepo) DeleteUser(id int) error {
@@ -100,4 +105,32 @@ func (ur *userRepo) UpdateUser(*models.User) (*models.User, error) {
 
 func (ur *userRepo) GetUserByToken(token string) (*models.User, error) {
 	return nil, nil
+}
+
+func (ur *userRepo) SaveToken(user *models.User) error {
+	query := `UPDATE users 
+		SET token = ?,
+		    expires = ?
+		WHERE user.ID = ?;`
+
+	args := []interface{}{user.Token, user.Expires, user.ID}
+	// TODO: change *ctx* to be an argument to *repository* function
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	_, err := ur.db.ExecContext(ctx, query, args...)
+	return err
+}
+
+func (ur *userRepo) DeleteToken(user_id int) error {
+	query := `UPDATE users
+		SET token = NULL,
+		    expires = NULL
+		WHERE id = ?`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	_, err := ur.db.ExecContext(ctx, query, user_id)
+	return err
 }

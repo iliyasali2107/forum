@@ -1,7 +1,7 @@
 package repository
 
 type Repository struct {
-	AuthRepository
+	//AuthRepository
 	CommentRepository
 	PostRepository
 	UserRepository
