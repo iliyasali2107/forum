@@ -11,8 +11,8 @@ type User struct {
 	Name     string
 	Email    string
 	Password Password
-	Token    string
-	Expires  time.Time
+	Token    *string
+	Expires  *time.Time
 }
 
 type Password struct {

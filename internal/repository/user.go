@@ -17,8 +17,8 @@ type UserRepository interface {
 	UpdateUser(*models.User) (*models.User, error) // may be no need
 	DeleteUser(int) error                          // may be no need
 
-	SaveToken(*models.User) error  // from Auth Repository
-	DeleteToken(user_id int) error // from Auth Repository
+	SaveToken(*models.User) error   // from Auth Repository
+	DeleteToken(token string) error // from Auth Repository
 }
 
 type userRepo struct {
@@ -92,7 +92,7 @@ func (ur *userRepo) GetUserByEmail(email string) (*models.User, error) {
 	}
 
 	user := models.User{}
-	if err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password.Hash); err != nil {
+	if err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password.Hash, &user.Token, &user.Expires); err != nil {
 		return nil, err
 	}
 
@@ -110,8 +110,8 @@ func (ur *userRepo) GetUserByToken(token string) (*models.User, error) {
 func (ur *userRepo) SaveToken(user *models.User) error {
 	query := `UPDATE users 
 		SET token = ?,
-		    expires = ?
-		WHERE user.ID = ?;`
+		    expiry = ?
+		WHERE id = ?;`
 
 	args := []interface{}{user.Token, user.Expires, user.ID}
 	// TODO: change *ctx* to be an argument to *repository* function
@@ -122,15 +122,15 @@ func (ur *userRepo) SaveToken(user *models.User) error {
 	return err
 }
 
-func (ur *userRepo) DeleteToken(user_id int) error {
+func (ur *userRepo) DeleteToken(token string) error {
 	query := `UPDATE users
 		SET token = NULL,
-		    expires = NULL
-		WHERE id = ?`
+		    expiry = NULL
+		WHERE token = ?`
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	_, err := ur.db.ExecContext(ctx, query, user_id)
+	_, err := ur.db.ExecContext(ctx, query, token)
 	return err
 }

@@ -196,7 +196,7 @@ func (h *Handler) background(fn func()) {
 		// Recover from any panic
 		defer func() {
 			if err := recover(); err != nil {
-				h.logger.PrintError(fmt.Errorf("%s", err), nil)
+				h.logger.PrintError("Error: error while recovering")
 			}
 		}()
 

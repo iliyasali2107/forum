@@ -47,24 +47,24 @@ func NewLogger(out io.Writer, minLevel Level) *Logger {
 	}
 }
 
-func (l *Logger) PrintInfo(message string, properties map[string]string) {
-	l.print(LevelInfo, message, properties)
+func (l *Logger) PrintInfo(message string) {
+	l.print(LevelInfo, message)
 }
 
-func (l *Logger) PrintDebug(message string, properties map[string]string) {
-	l.print(LevelDebug, message, properties)
+func (l *Logger) PrintDebug(message string) {
+	l.print(LevelDebug, message)
 }
 
-func (l *Logger) PrintError(err error, properties map[string]string) {
-	l.print(LevelError, err.Error(), properties)
+func (l *Logger) PrintError(errorString string) {
+	l.print(LevelError, errorString)
 }
 
-func (l *Logger) PrintFatal(err error, properties map[string]string) {
-	l.print(LevelFatal, err.Error(), properties)
+func (l *Logger) PrintFatal(errorString string, properties map[string]string) {
+	l.print(LevelFatal, errorString)
 	os.Exit(1)
 }
 
-func (l *Logger) print(level Level, message string, properties map[string]string) (int, error) {
+func (l *Logger) print(level Level, message string) (int, error) {
 	if level < l.minLevel {
 		return 0, nil
 	}
@@ -76,10 +76,9 @@ func (l *Logger) print(level Level, message string, properties map[string]string
 		Properties map[string]string `json:"properties,omitempty"`
 		Trace      string            `json:"trace,omitempty"`
 	}{
-		Level:      level.String(),
-		Time:       time.Now().UTC().Format(time.RFC3339),
-		Message:    message,
-		Properties: properties,
+		Level:   level.String(),
+		Time:    time.Now().UTC().Format(time.RFC3339),
+		Message: message,
 	}
 
 	if level >= LevelError {
@@ -100,5 +99,5 @@ func (l *Logger) print(level Level, message string, properties map[string]string
 }
 
 func (l *Logger) Write(message []byte) (n int, err error) {
-	return l.print(LevelError, string(message), nil)
+	return l.print(LevelError, string(message))
 }

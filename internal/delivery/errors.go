@@ -28,10 +28,7 @@ func (h *Handler) errorPage(w http.ResponseWriter, code int, errorText string) {
 }
 
 func (h *Handler) logError(r *http.Request, err error) {
-	h.logger.PrintError(err, map[string]string{
-		"request_method": r.Method,
-		"request_url":    r.URL.String(),
-	})
+	h.logger.PrintError(err.Error())
 }
 
 func (h *Handler) errorResponse(w http.ResponseWriter, r *http.Request, status int, message interface{}) {

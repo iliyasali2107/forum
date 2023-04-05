@@ -18,7 +18,7 @@ func (h *Handler) userIdentity(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user *models.User
 		var err error
-		c, err := r.Cookie("session_token")
+		c, err := r.Cookie("access_token")
 		if err != nil {
 			if errors.Is(err, http.ErrNoCookie) {
 				next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyUser, models.User{})))
