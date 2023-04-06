@@ -35,13 +35,15 @@ func NewHandler(service *service.Service) *Handler {
 func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 	err := h.tmpl.ExecuteTemplate(w, "index.html", nil)
 	if err != nil {
-		h.logger.PrintError(err.Error())
+		h.logger.PrintError("handler:home: " + err.Error())
+		h.ResponseServerError(w)
 	}
 }
 
 func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/auth/signup" {
 		fmt.Println("error: not found")
+		h.ResponseNotFound(w)
 		return
 	}
 
@@ -49,7 +51,9 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		err := h.tmpl.ExecuteTemplate(w, "signup.html", nil)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("handler:signup: " + err.Error())
+			h.ResponseServerError(w)
+			return
 		}
 	case http.MethodPost:
 		user := &models.User{}
@@ -61,16 +65,18 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(errs)
 		if len(errs) > 0 && errs[0] == service.ErrUserExists {
 			h.logger.PrintError(http.StatusText(http.StatusConflict))
+			h.ResponseServerError(w)
 			return
 		}
 
 		if len(errs) > 0 && errs[len(errs)-1] == service.ErrInternalServer {
 			h.logger.PrintError(http.StatusText(http.StatusInternalServerError))
+			h.ResponseServerError(w)
 			return
 		}
 
 		if len(errs) > 1 {
-			//TODO: should render form with each error on its own field
+			//TODO: should render form with each error on its own field !!!!!!!!!!!!!!!!!!!!!!!
 			h.logger.PrintError("signup: invalid form")
 			return
 		}
@@ -79,13 +85,15 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 
 	default:
 		h.logger.PrintError("signup: method not allowed")
-		//TODO: errorHandler
+		h.ResponseMethodNotAllowed(w)
+		return
 	}
 }
 
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/auth/login" {
 		fmt.Println("handler.login: not found")
+		h.ResponseNotFound(w)
 		return
 	}
 
@@ -93,7 +101,8 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		err := h.tmpl.ExecuteTemplate(w, "login.html", nil)
 		if err != nil {
-			fmt.Println(err)
+			h.ResponseServerError(w)
+			return
 		}
 	case http.MethodPost:
 		user := &models.User{}
@@ -105,12 +114,15 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 			switch err {
 			case service.ErrUserNotFound:
 				fmt.Println("handler:login: user not found")
+				h.ResponseBadRequest(w)
 				return
 			case service.ErrInvalidPassword:
 				fmt.Println("handler:login: password is not correct")
+				h.ResponseBadRequest(w)
 				return
 			default:
 				fmt.Println(err)
+				h.ResponseServerError(w)
 				return
 			}
 		}
@@ -122,7 +134,6 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		cookie.Path = "/"
 		cookie.HttpOnly = true
 		http.SetCookie(w, &cookie)
-		fmt.Println(r.Cookie("access_token"))
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }
@@ -130,24 +141,26 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/auth/logout" {
 		fmt.Println("handler:logout: not found")
+		h.ResponseNotFound(w)
 		return
 	}
 
 	c, err := r.Cookie("access_token")
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {
-			//TODO: errorHandler()
 			fmt.Println("handler:logout: unauthorized")
+			h.errorPage(w, http.StatusUnauthorized)
 			return
 		}
-		//TODO: handle error with correct status code
 		fmt.Println("handler:logout: " + err.Error())
+		h.ResponseServerError(w)
 		return
 
 	}
 	err = h.Service.AuthService.DeleteToken(c.Value)
 	if err != nil {
 		fmt.Println("handler:logout: couldn't delete token" + err.Error())
+		h.ResponseServerError(w)
 		return
 	}
 

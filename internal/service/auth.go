@@ -47,8 +47,13 @@ func (as *authService) GenerateToken(username, password string) (*models.User, e
 	return nil, nil
 }
 
+// TODO:
 func (as *authService) ParseToken(token string) (*models.User, error) {
-	return nil, nil
+	user, err := as.ur.GetUserByToken(token)
+	if err != nil {
+		return nil, ErrUserNotFound
+	}
+	return user, nil
 }
 
 func (as *authService) DeleteToken(token string) error {

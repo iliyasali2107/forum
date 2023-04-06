@@ -53,12 +53,12 @@ func (ur *userRepo) GetUser(id int) (*models.User, error) {
 		return nil, row.Err()
 	}
 
-	user := models.User{}
+	user := &models.User{}
 	if err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password); err != nil {
 		return nil, err
 	}
 
-	return &user, nil
+	return user, nil
 }
 
 func (ur *userRepo) GetAllUsers() ([]models.User, error) {
@@ -91,12 +91,12 @@ func (ur *userRepo) GetUserByEmail(email string) (*models.User, error) {
 		return nil, row.Err()
 	}
 
-	user := models.User{}
+	user := &models.User{}
 	if err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password.Hash, &user.Token, &user.Expires); err != nil {
 		return nil, err
 	}
 
-	return &user, nil
+	return user, nil
 }
 
 func (ur *userRepo) UpdateUser(*models.User) (*models.User, error) {
@@ -104,7 +104,19 @@ func (ur *userRepo) UpdateUser(*models.User) (*models.User, error) {
 }
 
 func (ur *userRepo) GetUserByToken(token string) (*models.User, error) {
-	return nil, nil
+	query := `SELECT * FROM users WHERE token = ?`
+	row := ur.db.QueryRow(query, token)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	user := &models.User{}
+
+	if err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password.Hash, &user.Token, &user.Expires); err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (ur *userRepo) SaveToken(user *models.User) error {
