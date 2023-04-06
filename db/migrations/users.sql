@@ -1,6 +1,8 @@
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL
+    password TEXT NOT NULL,
+    token TEXT,
+    expiry DATETIME
 );

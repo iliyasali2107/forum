@@ -33,7 +33,7 @@ func (v *Validator) Check(ok bool, key, message string) {
 	}
 }
 
-// In returns true if a specific value in alist of strings.
+// In returns true if a specific value in a list of strings.
 func In(value string, list ...string) bool {
 	for i := range list {
 		if value == list[i] {
