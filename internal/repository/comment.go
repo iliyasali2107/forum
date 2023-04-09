@@ -88,9 +88,9 @@ func (r *commentRepo) GetAllComments() (*[]models.Comment, error) {
 	return &comments, nil
 }
 
-func (r *commentRepo) GetPostComments(post_id int) (*[]models.Comment, error) {
+func (r *commentRepo) GetPostComments(postID int) (*[]models.Comment, error) {
 	query := `SELECT * FROM comments WHERE post_id = ?`
-	rows, err := r.db.Query(query, post_id)
+	rows, err := r.db.Query(query, postID)
 	if err != nil {
 		return nil, err
 	}
@@ -107,9 +107,9 @@ func (r *commentRepo) GetPostComments(post_id int) (*[]models.Comment, error) {
 	return &comments, nil
 }
 
-func (r *commentRepo) GetUserComments(user_id int) (*[]models.Comment, error) {
+func (r *commentRepo) GetUserComments(userID int) (*[]models.Comment, error) {
 	query := `SELECT * FROM comments WHERE user_id = ?`
-	rows, err := r.db.Query(query, user_id)
+	rows, err := r.db.Query(query, userID)
 	if err != nil {
 		return nil, err
 	}

@@ -28,7 +28,7 @@ func NewHandler(service *service.Service) *Handler {
 		tmpl:      template.Must(template.ParseGlob("./templates/*")),
 		Service:   service,
 		validator: validator.NewValidator(),
-		logger:    logger.NewLogger(os.Stdout, 0),
+		logger:    logger.NewLogger(os.Stdout, logger.LevelInfo),
 	}
 }
 
@@ -61,27 +61,25 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 		user.Email = r.FormValue("email")
 		user.Password.Plaintext = r.FormValue("password")
 
-		errs := h.Service.AuthService.Signup(h.validator, user)
-		fmt.Println(errs)
-		if len(errs) > 0 && errs[0] == service.ErrUserExists {
-			h.logger.PrintError(http.StatusText(http.StatusConflict))
-			h.ResponseServerError(w)
+		err := h.Service.AuthService.Signup(h.validator, user)
+
+		if err == service.ErrUserExists {
+			h.ResponseEditConflict(w)
 			return
 		}
 
-		if len(errs) > 0 && errs[len(errs)-1] == service.ErrInternalServer {
-			h.logger.PrintError(http.StatusText(http.StatusInternalServerError))
+		if err == service.ErrInternalServer {
 			h.ResponseServerError(w)
 			return
 		}
-
-		if len(errs) > 1 {
-			//TODO: should render form with each error on its own field !!!!!!!!!!!!!!!!!!!!!!!
-			h.logger.PrintError("signup: invalid form")
+		fmt.Println(h.validator.Errors)
+		if err == service.ErrFormValidation {
+			h.render(w, "signup.html", h.validator)
+			h.validator.Errors = map[string]string{}
 			return
 		}
 		fmt.Println(user)
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
 
 	default:
 		h.logger.PrintError("signup: method not allowed")
@@ -109,7 +107,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		user.Email = r.FormValue("email")
 		user.Password.Plaintext = r.FormValue("password")
 
-		err := h.Service.AuthService.Login(h.validator, user)
+		err := h.Service.AuthService.Login(user)
 		if err != nil {
 			switch err {
 			case service.ErrUserNotFound:
@@ -173,4 +171,80 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, cookie)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// PostsHandler TODO: invalid field messages for each field
+func (h *Handler) PostsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/posts" {
+		h.ResponseNotFound(w)
+		return
+	}
+
+	user := h.contextGetUser(r)
+
+	switch r.Method {
+	case http.MethodGet:
+		categories, err := h.Service.PostService.GetAllCategories()
+
+		data := struct {
+			Errors     map[string]string
+			Categories []*models.Category
+		}{
+			Categories: categories,
+		}
+
+		if err != nil {
+			h.ResponseServerError(w)
+			return
+		}
+
+		err = h.tmpl.ExecuteTemplate(w, "create_post.html", data)
+		if err != nil {
+			fmt.Println(err)
+			h.ResponseServerError(w)
+			return
+		}
+	case http.MethodPost:
+		err := r.ParseForm()
+		if err != nil {
+			h.logger.PrintError(err.Error())
+			h.ResponseBadRequest(w)
+			return
+		}
+		post := &models.Post{}
+		post.Categories = r.Form["category"]
+		post.Title = r.FormValue("title")
+		post.Content = r.FormValue("content")
+		post.User = user
+
+		err = h.Service.PostService.CreatePost(h.validator, post)
+		if err != nil {
+			if err == service.ErrFormValidation {
+				categories, err := h.Service.PostService.GetAllCategories()
+				if err != nil {
+					h.ResponseServerError(w)
+					return
+				}
+
+				data := struct {
+					Errors     map[string]string
+					Categories []*models.Category
+				}{
+					Errors:     h.validator.Errors,
+					Categories: categories,
+				}
+				h.render(w, "create_post.html", data)
+				return
+			}
+			//TODO: ------------------
+			h.logger.PrintError(err.Error())
+			h.ResponseBadRequest(w)
+			return
+		}
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
+}
+
+func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
+
 }

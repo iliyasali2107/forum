@@ -8,8 +8,8 @@ func (h *Handler) InitRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/auth/login", h.Login)
 	mux.HandleFunc("/auth/logout", h.userIdentity(h.authorized(h.Logout)))
 
-	//post
-	//mux.HandleFunc("post")
+	mux.HandleFunc("/posts", h.userIdentity(h.authorized(h.PostsHandler)))
+	mux.HandleFunc("/posts/", h.PostHandler)
 
 	//comment
 	//likes

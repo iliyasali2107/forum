@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"time"
 
-	models "forum/internal/models"
+	"forum/internal/models"
 )
 
 type UserRepository interface {

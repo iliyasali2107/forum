@@ -1,20 +1,17 @@
 package delivery
 
 import (
-	"errors"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"forum/pkg/validator"
-
-	"github.com/julienschmidt/httprouter"
 )
 
 type envelope map[string]interface{}
 
-func (h *Handler) readIdParam(r *http.Request) (int64, error) {
+/*func (h *Handler) readIdParam(r *http.Request) (int64, error) {
 	params := httprouter.ParamsFromContext(r.Context())
 
 	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
@@ -23,23 +20,23 @@ func (h *Handler) readIdParam(r *http.Request) (int64, error) {
 	}
 
 	return id, nil
-}
+}*/
 
 // The readString() helper returns value from the query string, or the provided
 // default value if no matching key could be found.
-func (h *Handler) readString(qs url.Values, key string, defaultValue string) string {
+/*func (h *Handler) readString(qs url.Values, key string, defaultValue string) string {
 	// Extract the value for a given key from the query string. If no key exists
 	// this will return the empty string "".
 	s := qs.Get(key)
 
-	// If no keys exists (or the value is empty) then return the default value.
+	// If no keys exist (or the value is empty) then return the default value.
 	if s == "" {
 		return defaultValue
 	}
 
 	// Otherwise return the string
 	return s
-}
+}*/
 
 // The readCSV() helper reads a string value from the query string and then splits it
 // into a slice on the comma character. If no matching key could be found, it returns
@@ -100,7 +97,7 @@ func (h *Handler) background(fn func()) {
 	}()
 }
 
-func (h *Handler) render(w http.ResponseWriter, name string, td *any) {
+func (h *Handler) render(w http.ResponseWriter, name string, td any) {
 	err := h.tmpl.ExecuteTemplate(w, name, td)
 	if err != nil {
 		h.logger.PrintInfo("render: " + err.Error())

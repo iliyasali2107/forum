@@ -10,10 +10,6 @@ import (
 	"forum/internal/models"
 )
 
-const ctxKeyUser ctxKey = "user"
-
-type ctxKey string
-
 func (h *Handler) userIdentity(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user *models.User
@@ -21,7 +17,7 @@ func (h *Handler) userIdentity(next http.HandlerFunc) http.HandlerFunc {
 		c, err := r.Cookie("access_token")
 		if err != nil {
 			if errors.Is(err, http.ErrNoCookie) {
-				next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyUser, &models.User{})))
+				next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyUser, nil)))
 				return
 			}
 			h.ResponseBadRequest(w)
@@ -30,7 +26,7 @@ func (h *Handler) userIdentity(next http.HandlerFunc) http.HandlerFunc {
 
 		user, err = h.Service.ParseToken(c.Value)
 		if err != nil {
-			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyUser, &models.User{})))
+			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyUser, nil)))
 			return
 		}
 		if user.Expires.Before(time.Now()) {
@@ -38,7 +34,7 @@ func (h *Handler) userIdentity(next http.HandlerFunc) http.HandlerFunc {
 				h.ResponseServerError(w)
 				return
 			}
-			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyUser, &models.User{})))
+			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyUser, nil)))
 			return
 		}
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyUser, user)))
@@ -60,13 +56,16 @@ func (h *Handler) recoverPanic(next http.Handler) http.Handler {
 
 func (h *Handler) authorized(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		user := r.Context().Value(ctxKeyUser).(*models.User)
+		//user := r.Context().Value(ctxKeyUser).(*models.User)
+		u := r.Context().Value(ctxKeyUser)
 
-		if user.Email == "" {
+		if u == nil {
 			fmt.Println("middleware:authorized: user is not authorized")
-			h.ResponseUnauthorizedRequire(w)
+			h.ResponseUnauthorized(w)
 			return
 		}
+
+		//user := u.(*models.User)
 
 		next.ServeHTTP(w, r)
 

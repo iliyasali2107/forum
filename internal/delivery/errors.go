@@ -67,7 +67,7 @@ func (h *Handler) ResponseInvalidAuthenticationToken(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusUnauthorized)
 }
 
-func (h *Handler) ResponseUnauthorizedRequire(w http.ResponseWriter) {
+func (h *Handler) ResponseUnauthorized(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusUnauthorized)
 }
 
