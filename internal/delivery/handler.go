@@ -3,13 +3,14 @@ package delivery
 import (
 	"errors"
 	"fmt"
-	"forum/internal/models"
-	"forum/internal/service"
-	"forum/pkg/validator"
 	"html/template"
 	"net/http"
 	"os"
 	"sync"
+
+	"forum/internal/models"
+	"forum/internal/service"
+	"forum/pkg/validator"
 
 	"forum/pkg/logger"
 )
@@ -236,7 +237,7 @@ func (h *Handler) PostsHandler(w http.ResponseWriter, r *http.Request) {
 				h.render(w, "create_post.html", data)
 				return
 			}
-			//TODO: ------------------
+			// TODO: ------------------
 			h.logger.PrintError(err.Error())
 			h.ResponseBadRequest(w)
 			return
@@ -246,5 +247,4 @@ func (h *Handler) PostsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
-
 }
