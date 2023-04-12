@@ -41,8 +41,8 @@ func (h *Handler) userIdentity(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func (h *Handler) recoverPanic(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) recoverPanic(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
 				w.Header().Set("Connection", "close")
@@ -51,7 +51,7 @@ func (h *Handler) recoverPanic(next http.Handler) http.Handler {
 			}
 		}()
 		next.ServeHTTP(w, r)
-	})
+	}
 }
 
 func (h *Handler) authorized(next http.HandlerFunc) http.HandlerFunc {

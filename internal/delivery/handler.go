@@ -6,6 +6,8 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 	"sync"
 
 	"forum/internal/models"
@@ -34,7 +36,13 @@ func NewHandler(service *service.Service) *Handler {
 }
 
 func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
-	err := h.tmpl.ExecuteTemplate(w, "index.html", nil)
+	posts, err := h.Service.PostService.GetAllPosts()
+	if err != nil {
+		fmt.Println(err)
+		h.ResponseServerError(w)
+		return
+	}
+	err = h.tmpl.ExecuteTemplate(w, "index.html", posts)
 	if err != nil {
 		h.logger.PrintError("handler:home: " + err.Error())
 		h.ResponseServerError(w)
@@ -175,8 +183,8 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 // PostsHandler TODO: invalid field messages for each field
-func (h *Handler) PostsHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/posts" {
+func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/posts/create" {
 		h.ResponseNotFound(w)
 		return
 	}
@@ -212,6 +220,7 @@ func (h *Handler) PostsHandler(w http.ResponseWriter, r *http.Request) {
 			h.ResponseBadRequest(w)
 			return
 		}
+
 		post := &models.Post{}
 		post.Categories = r.Form["category"]
 		post.Title = r.FormValue("title")
@@ -242,9 +251,133 @@ func (h *Handler) PostsHandler(w http.ResponseWriter, r *http.Request) {
 			h.ResponseBadRequest(w)
 			return
 		}
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/posts", http.StatusSeeOther)
 	}
 }
 
+func (h *Handler) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/posts" {
+		h.ResponseNotFound(w)
+		return
+	}
+
+	user := h.contextGetUser(r)
+
+	queryMap := r.URL.Query()
+	filter, ok := queryMap["filter"]
+	if !ok {
+		posts, err := h.Service.PostService.GetAllPosts()
+		if err != nil {
+			fmt.Println(err)
+			h.ResponseServerError(w)
+			return
+		}
+		err = h.tmpl.ExecuteTemplate(w, "show_posts.html", posts)
+		if err != nil {
+			h.logger.PrintError("handler:home: " + err.Error())
+			h.ResponseServerError(w)
+			return
+		}
+		return
+	}
+
+	if user == nil {
+		h.ResponseUnauthorized(w)
+		return
+	}
+
+	switch filter[0] {
+	case "created":
+		posts, err := h.Service.PostService.GetCreatedPosts(user.ID)
+		if err != nil {
+			h.ResponseServerError(w)
+			return
+		}
+
+		err = h.tmpl.ExecuteTemplate(w, "show_posts.html", posts)
+		if err != nil {
+			h.logger.PrintError("handler:ListPostsHandler: " + err.Error())
+			h.ResponseServerError(w)
+			return
+		}
+	case "liked":
+		posts, err := h.Service.PostService.GetLikedPosts(user.ID)
+		if err != nil {
+			h.ResponseServerError(w)
+			return
+		}
+
+		err = h.tmpl.ExecuteTemplate(w, "show_posts.html", posts)
+		if err != nil {
+			h.logger.PrintError("handler:ListPostsHandler: " + err.Error())
+			h.ResponseServerError(w)
+			return
+		}
+	case "disliked":
+		posts, err := h.Service.PostService.GetDislikedPosts(user.ID)
+		if err != nil {
+			h.ResponseServerError(w)
+			return
+		}
+
+		err = h.tmpl.ExecuteTemplate(w, "show_posts.html", posts)
+		if err != nil {
+			h.logger.PrintError("handler:ListPostHandler" + err.Error())
+			h.ResponseServerError(w)
+			return
+		}
+	default:
+		h.ResponseBadRequest(w)
+		return
+	}
+
+}
+
 func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "qwerwqrqwe")
+}
+
+func (h *Handler) LikePost(w http.ResponseWriter, r *http.Request) {
+	id, err := GetIdFromURL(r.URL.Path)
+	if err != nil {
+		h.ResponseNotFound(w)
+		return
+	}
+
+	post, err := h.Service.PostService.GetPost(id)
+	if err != nil {
+		h.ResponseServerError(w)
+		return
+	}
+	user := h.contextGetUser(r)
+
+	reaction := &models.Reaction{User: user, Post: post, Type: models.LikeType}
+
+	err = h.Service.ReactionService.LikePost(reaction)
+	if err != nil {
+		h.ResponseServerError(w)
+		return
+	}
+}
+
+func (h *Handler) DislikePost(w http.ResponseWriter, r *http.Request) {
+	return
+}
+
+func GetIdFromURL(path string) (int, error) {
+	s := strings.Split(path, "/")
+	if len(s) <= 3 {
+		return 0, fmt.Errorf("%s", "invalid url")
+	}
+
+	if len(s[3:]) > 1 {
+		return 0, fmt.Errorf("%s", "invalid url")
+	}
+
+	id, err := strconv.Atoi(s[3])
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }

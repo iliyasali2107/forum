@@ -11,16 +11,16 @@ import (
 
 type envelope map[string]interface{}
 
-/*func (h *Handler) readIdParam(r *http.Request) (int64, error) {
-	params := httprouter.ParamsFromContext(r.Context())
-
-	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
-	if err != nil || id < 1 {
-		return 0, errors.New("invalid id parameter")
-	}
-
-	return id, nil
-}*/
+//func (h *Handler) readIdParam(r *http.Request) (int64, error) {
+//	params := httprouter.ParamsFromContext(r.Context())
+//
+//	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
+//	if err != nil || id < 1 {
+//		return 0, errors.New("invalid id parameter")
+//	}
+//
+//	return id, nil
+//}
 
 // The readString() helper returns value from the query string, or the provided
 // default value if no matching key could be found.

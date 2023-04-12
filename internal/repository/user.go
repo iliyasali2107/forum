@@ -54,7 +54,7 @@ func (ur *userRepo) GetUser(id int) (*models.User, error) {
 	}
 
 	user := &models.User{}
-	if err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password); err != nil {
+	if err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password.Hash, &user.Token, &user.Expires); err != nil {
 		return nil, err
 	}
 

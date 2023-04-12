@@ -19,7 +19,7 @@ func (h *Handler) contextSetUser(r *http.Request, user *models.User) *http.Reque
 func (h *Handler) contextGetUser(r *http.Request) *models.User {
 	user, ok := r.Context().Value(ctxKeyUser).(*models.User)
 	if !ok {
-		panic("missing user value in request context")
+		return nil
 	}
 
 	return user

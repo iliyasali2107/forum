@@ -10,6 +10,7 @@ type CategoryRepository interface {
 	AddCategory(postID, categoryID int) error
 	GetCategory(name string) (*models.Category, error)
 	GetAllCategories() ([]*models.Category, error)
+	GetCategoriesForPost(post *models.Post) error
 }
 
 type categoryRepo struct {
@@ -72,4 +73,27 @@ func (r *categoryRepo) GetAllCategories() ([]*models.Category, error) {
 	}
 
 	return categories, nil
+}
+
+func (r *categoryRepo) GetCategoriesForPost(post *models.Post) error {
+	query := `SELECT name
+			FROM categories
+			INNER JOIN categories_posts
+			ON categories.id = categories_posts.category_id
+			WHERE post_id = ?;`
+
+	rows, err := r.db.Query(query, post.ID)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		category := ""
+
+		if err = rows.Scan(&category); err != nil {
+			return err
+		}
+
+		post.Categories = append(post.Categories, category)
+	}
+	return nil
 }

@@ -21,12 +21,14 @@ type PostService interface {
 type postService struct {
 	pr repository.PostRepository
 	cr repository.CategoryRepository
+	ur repository.UserRepository
 }
 
-func NewPostService(postRepository repository.PostRepository, categoryRepository repository.CategoryRepository) PostService {
+func NewPostService(postRepository repository.PostRepository, categoryRepository repository.CategoryRepository, userRepository repository.UserRepository) PostService {
 	return &postService{
 		pr: postRepository,
 		cr: categoryRepository,
+		ur: userRepository,
 	}
 }
 
@@ -72,6 +74,39 @@ func (ps *postService) GetAllPosts() ([]*models.Post, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	for _, post := range posts {
+		user, err := ps.ur.GetUser(post.User.ID)
+		if err != nil {
+			return nil, err
+		}
+		post.User = user
+		err = ps.cr.GetCategoriesForPost(post)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return posts, nil
+}
+
+func (ps *postService) GetCreatedPosts(userID int) ([]*models.Post, error) {
+	posts, err := ps.pr.GetAllPostsOfUser(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, post := range posts {
+		user, err := ps.ur.GetUser(post.User.ID)
+		if err != nil {
+			return nil, err
+		}
+		post.User = user
+		err = ps.cr.GetCategoriesForPost(post)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return posts, nil
 }
 
@@ -80,10 +115,6 @@ func (ps *postService) GetLikedPosts(userID int) ([]*models.Post, error) {
 }
 
 func (ps *postService) GetDislikedPosts(userID int) ([]*models.Post, error) {
-	return nil, nil
-}
-
-func (ps *postService) GetCreatedPosts(userID int) ([]*models.Post, error) {
 	return nil, nil
 }
 

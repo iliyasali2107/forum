@@ -9,15 +9,15 @@ type Service struct {
 	PostService
 	CommentService
 	UserService
-	VoteService
+	ReactionService
 }
 
 func NewService(repository *repository.Repository) *Service {
 	return &Service{
-		AuthService:    NewAuthService(repository.UserRepository),
-		CommentService: NewCommentService(repository.CommentRepository),
-		PostService:    NewPostService(repository.PostRepository, repository.CategoryRepository),
-		UserService:    NewUserService(repository.UserRepository),
-		VoteService:    NewVoteService(repository.VoteRepository),
+		AuthService:     NewAuthService(repository.UserRepository),
+		CommentService:  NewCommentService(repository.CommentRepository),
+		PostService:     NewPostService(repository.PostRepository, repository.CategoryRepository, repository.UserRepository),
+		UserService:     NewUserService(repository.UserRepository),
+		ReactionService: NewReactionService(repository.ReactionRepository),
 	}
 }

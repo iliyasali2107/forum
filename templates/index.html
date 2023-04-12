@@ -11,5 +11,32 @@
     <a href="/auth/signup">signup</a>
     <a href="/auth/login">login</a>
     <a href="/auth/logout">logout</a>
+
+
+<div>
+    <hr>
+    {{ range . }}
+        <p>
+            author: {{ .User.Name }}
+        </p>
+        <p>
+            title: {{ .Title}}
+        </p>
+        <p>
+            Content: {{ .Content }}
+        </p>
+        <p>
+            Created: {{ .Created }}
+        </p>
+        <p>
+            Categories:
+            {{ range .Categories }}
+                {{ . }}
+            {{ end }}
+    <hr>
+    {{ end }}
+    </p>
+
+</div>
 </body>
 </html>

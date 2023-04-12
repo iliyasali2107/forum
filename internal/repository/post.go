@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 
 	"forum/internal/models"
 )
@@ -11,9 +12,9 @@ type PostRepository interface {
 	GetAllPosts() ([]*models.Post, error)
 	GetPostsByCategory(...int) (*[]models.Post, error)
 	GetPost(int) (*models.Post, error)
-	GetAllPostsOfUser(int) (*[]models.Post, error)
-	UpdatePost(*models.Post) (*models.Post, error) // may be don't need
-	DeletePost(int) error                          // may be don't need
+	GetAllPostsOfUser(int) ([]*models.Post, error)
+	UpdatePost(*models.Post) (*models.Post, error)
+	DeletePost(int) error
 }
 
 type postRepo struct {
@@ -52,8 +53,9 @@ func (r *postRepo) GetAllPosts() ([]*models.Post, error) {
 
 	posts := []*models.Post{}
 	for rows.Next() {
-		post := &models.Post{}
+		post := &models.Post{User: &models.User{}}
 		if err := rows.Scan(&post.ID, &post.User.ID, &post.Title, &post.Content, &post.Created); err != nil {
+			fmt.Println(err)
 			return nil, err
 		}
 		posts = append(posts, post)
@@ -91,31 +93,31 @@ func (r *postRepo) GetPost(id int) (*models.Post, error) {
 		return nil, row.Err()
 	}
 
-	post := models.Post{}
+	post := &models.Post{}
 	if err := row.Scan(&post.ID, &post.User.ID, &post.Title, &post.Content, &post.Created); err != nil {
 		return nil, err
 	}
 
-	return &post, nil
+	return post, nil
 }
 
-func (r *postRepo) GetAllPostsOfUser(userID int) (*[]models.Post, error) {
+func (r *postRepo) GetAllPostsOfUser(userID int) ([]*models.Post, error) {
 	query := `SELECT * FROM posts WHERE user_id = ?`
 	rows, err := r.db.Query(query, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	posts := []models.Post{}
+	posts := []*models.Post{}
 	for rows.Next() {
-		post := models.Post{}
+		post := &models.Post{User: &models.User{}}
 		if err := rows.Scan(&post.ID, &post.User.ID, &post.Title, &post.Content, &post.Created); err != nil {
 			return nil, err
 		}
 		posts = append(posts, post)
 	}
 
-	return &posts, nil
+	return posts, nil
 }
 
 func (r *postRepo) UpdatePost(post *models.Post) (*models.Post, error) {
