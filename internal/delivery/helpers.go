@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -88,7 +89,7 @@ func (h *Handler) background(fn func()) {
 		// Recover from any panic
 		defer func() {
 			if err := recover(); err != nil {
-				h.logger.PrintError("Error: error while recovering")
+				h.logger.PrintError(fmt.Errorf("error: error while recovering"))
 			}
 		}()
 
@@ -104,4 +105,40 @@ func (h *Handler) render(w http.ResponseWriter, name string, td any) {
 		h.ResponseServerError(w)
 		return
 	}
+}
+
+func GetIdFromURL(path string) (int, error) {
+	s := strings.Split(path, "/")
+	if len(s) <= 3 {
+		return 0, fmt.Errorf("%s", "invalid url")
+	}
+
+	if len(s[3:]) > 1 {
+		return 0, fmt.Errorf("%s", "invalid url")
+	}
+
+	id, err := strconv.Atoi(s[3])
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func GetIdFromShortURL(path string) (int, error) {
+	s := strings.Split(path, "/")
+	if len(s) <= 2 {
+		return 0, fmt.Errorf("%s", "invalid url")
+	}
+
+	if len(s[2:]) > 1 {
+		return 0, fmt.Errorf("%s", "invalid url")
+	}
+
+	id, err := strconv.Atoi(s[2])
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }

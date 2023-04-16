@@ -7,15 +7,19 @@ import (
 )
 
 type ReactionRepository interface {
-	CreateCommentVote(reaction *models.Reaction) (int, error)
+	// post
 	CreatePostReaction(reaction *models.Reaction) error
+	GetPostReaction(reaction *models.Reaction) (*models.Reaction, error)
+	UpdatePostReaction(reaction *models.Reaction) error
+	DeletePostReaction(reaction *models.Reaction) error
 	GetPostLikes(int) (int, error)
 	GetPostDislikes(int) (int, error)
+
+	// comment
+	CreateCommentReaction(reaction *models.Reaction) (int, error)
+	DeleteCommentReaction(int) error
 	GetCommentLikes(int) (int, error)
 	GetCommentDislikes(int) (int, error)
-	DeleteCommentReaction(int) error
-	DeletePostReaction(reaction *models.Reaction) error
-	GetReactionOfPost(reaction *models.Reaction) (*models.Reaction, error)
 }
 
 type reactionRepo struct {
@@ -28,21 +32,7 @@ func NewReactionRepository(db *sql.DB) ReactionRepository {
 	}
 }
 
-func (r *reactionRepo) CreateCommentVote(reaction *models.Reaction) (int, error) {
-	query := `INSERT INTO reactions_comments (comment_id, user_id, type) VALUES (?, ?, ?)`
-	row, err := r.db.Exec(query, reaction.Comment.ID, reaction.User.ID, reaction.Type)
-	if err != nil {
-		return 0, nil
-	}
-
-	id, err := row.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
-
-	return int(id), err
-}
-
+// post
 func (r *reactionRepo) CreatePostReaction(reaction *models.Reaction) error {
 	query := `INSERT INTO reactions_posts (post_id, user_id, type) VALUES (?, ?, ?)`
 	row, err := r.db.Exec(query, reaction.Post.ID, reaction.User.ID, reaction.Type)
@@ -56,6 +46,46 @@ func (r *reactionRepo) CreatePostReaction(reaction *models.Reaction) error {
 	}
 
 	return err
+}
+
+func (r *reactionRepo) GetPostReaction(reaction *models.Reaction) (*models.Reaction, error) {
+	query := `SELECT * FROM reactions_posts WHERE user_id = ? AND post_id = ?`
+
+	row := r.db.QueryRow(query, reaction.User.ID, reaction.Post.ID)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	user := &models.User{}
+	post := &models.Post{}
+	react := &models.Reaction{User: user, Post: post}
+
+	if err := row.Scan(&react.ID, &react.Post.ID, &react.User.ID, &react.Type); err != nil {
+		return nil, err
+	}
+
+	return react, nil
+}
+
+func (r *reactionRepo) UpdatePostReaction(reaction *models.Reaction) error {
+	query := `UPDATE reactions_posts
+			SET type = ?
+			WHERE user_id = ? AND post_id = ?`
+
+	_, err := r.db.Exec(query, reaction.Type, reaction.User.ID, reaction.Post.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *reactionRepo) DeletePostReaction(reaction *models.Reaction) error {
+	query := `DELETE FROM reactions_posts WHERE post_id = ? AND user_id = ?`
+	if _, err := r.db.Exec(query, reaction.Post.ID, reaction.User.ID); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *reactionRepo) GetPostLikes(post_id int) (int, error) {
@@ -78,6 +108,22 @@ func (r *reactionRepo) GetPostDislikes(post_id int) (int, error) {
 	}
 
 	return dislikes, nil
+}
+
+// comment
+func (r *reactionRepo) CreateCommentReaction(reaction *models.Reaction) (int, error) {
+	query := `INSERT INTO reactions_comments (comment_id, user_id, type) VALUES (?, ?, ?)`
+	row, err := r.db.Exec(query, reaction.Comment.ID, reaction.User.ID, reaction.Type)
+	if err != nil {
+		return 0, nil
+	}
+
+	id, err := row.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), err
 }
 
 func (r *reactionRepo) GetCommentLikes(comment_id int) (int, error) {
@@ -108,28 +154,4 @@ func (r *reactionRepo) DeleteCommentReaction(comment_id int) error {
 		return err
 	}
 	return nil
-}
-
-func (r *reactionRepo) DeletePostReaction(reaction *models.Reaction) error {
-	query := `DELETE FROM reactions_comments WHERE post_id = ? AND user_id = ?`
-	if _, err := r.db.Exec(query, reaction.Post.ID, reaction.User.ID); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *reactionRepo) GetReactionOfPost(reaction *models.Reaction) (*models.Reaction, error) {
-	query := `SELECT * FROM reactions_posts WHERE user_id = ? AND post_id = ?`
-
-	row := r.db.QueryRow(query, reaction.User.ID, reaction.Post.ID)
-	if row.Err() != nil {
-		return nil, row.Err()
-	}
-
-	react := &models.Reaction{}
-	if err := row.Scan(&react.ID, &react.Post.ID, &react.User.ID, &react.Type); err != nil {
-		return nil, err
-	}
-
-	return react, nil
 }

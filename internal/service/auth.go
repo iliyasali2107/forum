@@ -57,9 +57,10 @@ func (as *authService) Signup(v *validator.Validator, user *models.User) error {
 	if err != nil {
 		return ErrInternalServer
 	}
-
+	//TODO: UNIQUE constraint failed: users.name
 	_, err = as.ur.CreateUser(user)
 	if err != nil {
+		fmt.Println(err)
 		return ErrInternalServer
 	}
 
@@ -69,13 +70,12 @@ func (as *authService) Signup(v *validator.Validator, user *models.User) error {
 func (as *authService) Login(user *models.User) error {
 	u, err := as.ur.GetUserByEmail(user.Email)
 	if err != nil {
-		fmt.Println(err)
 		return ErrUserNotFound
 	}
 
 	ok, err := u.Password.Matches(user.Password.Plaintext)
 	if err != nil || !ok {
-		return ErrInvalidPassword
+		return err
 	}
 
 	sessionToken := uuid.NewString()
@@ -100,14 +100,11 @@ func (as *authService) Logout(user *models.User) error {
 	user.ID = u.ID
 
 	return as.ur.DeleteToken(*user.Token)
+
 }
 
 func (as *authService) ParseToken(token string) (*models.User, error) {
-	user, err := as.ur.GetUserByToken(token)
-	if err != nil {
-		return nil, ErrUserNotFound
-	}
-	return user, nil
+	return as.ur.GetUserByToken(token)
 }
 
 func (as *authService) DeleteToken(token string) error {

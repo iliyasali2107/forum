@@ -2,8 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
-
 	"forum/internal/models"
 )
 
@@ -54,8 +52,7 @@ func (r *postRepo) GetAllPosts() ([]*models.Post, error) {
 	posts := []*models.Post{}
 	for rows.Next() {
 		post := &models.Post{User: &models.User{}}
-		if err := rows.Scan(&post.ID, &post.User.ID, &post.Title, &post.Content, &post.Created); err != nil {
-			fmt.Println(err)
+		if err = rows.Scan(&post.ID, &post.User.ID, &post.Title, &post.Content, &post.Created); err != nil {
 			return nil, err
 		}
 		posts = append(posts, post)
@@ -93,7 +90,8 @@ func (r *postRepo) GetPost(id int) (*models.Post, error) {
 		return nil, row.Err()
 	}
 
-	post := &models.Post{}
+	user := &models.User{}
+	post := &models.Post{User: user}
 	if err := row.Scan(&post.ID, &post.User.ID, &post.Title, &post.Content, &post.Created); err != nil {
 		return nil, err
 	}

@@ -66,7 +66,20 @@ func (ps *postService) GetAllCategories() ([]*models.Category, error) {
 }
 
 func (ps *postService) GetPost(id int) (*models.Post, error) {
-	return nil, nil
+	post, err := ps.pr.GetPost(id)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := ps.ur.GetUser(post.User.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	post.User = user
+
+	return post, nil
+
 }
 
 func (ps *postService) GetAllPosts() ([]*models.Post, error) {

@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"runtime/debug"
@@ -47,6 +47,23 @@ func NewLogger(out io.Writer, minLevel Level) *Logger {
 	}
 }
 
+//func (l *Logger) Info() *log.Logger {
+//	return log.New(l.out, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+//}
+//
+//func (l *Logger) Warning() *log.Logger {
+//
+//	return log.New(l.out, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
+//}
+//
+//func (l *Logger) Error() *log.Logger {
+//	return log.New(l.out, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+//}
+//
+//func (l *Logger) Fatal() *log.Logger {
+//	return log.New(l.out, "FATAL: ", log.Ldate|log.Ltime|log.Lshortfile)
+//}
+
 func (l *Logger) PrintInfo(message string) {
 	l.print(LevelInfo, message)
 }
@@ -55,15 +72,14 @@ func (l *Logger) PrintDebug(message string) {
 	l.print(LevelDebug, message)
 }
 
-func (l *Logger) PrintError(errorString string) {
-	l.print(LevelError, errorString)
+func (l *Logger) PrintError(err error) {
+	l.print(LevelError, err.Error())
 }
 
-func (l *Logger) PrintFatal(errorString string, properties map[string]string) {
-	l.print(LevelFatal, errorString)
+func (l *Logger) PrintFatal(err error) {
+	l.print(LevelFatal, err.Error())
 	os.Exit(1)
 }
-
 func (l *Logger) print(level Level, message string) (int, error) {
 	if level < l.minLevel {
 		return 0, nil
@@ -76,28 +92,21 @@ func (l *Logger) print(level Level, message string) (int, error) {
 		Properties map[string]string `json:"properties,omitempty"`
 		Trace      string            `json:"trace,omitempty"`
 	}{
-		Level:   level.String(),
-		Time:    time.Now().UTC().Format(time.RFC3339),
+		Level: level.String(),
+
 		Message: message,
 	}
+
+	time1 := time.Now().UTC().Format(time.RFC3339)
 
 	if level >= LevelError {
 		aux.Trace = string(debug.Stack())
 	}
 
-	var line []byte
+	//outMessage := fmt.Sprintf("[%s %v] %v %v", level.String(), time1, message, aux.Trace)
+	outMessage := fmt.Sprintf("%s: [%v]: %v", level.String(), time1, message)
 
-	line, err := json.Marshal(aux)
-	if err != nil {
-		line = []byte(LevelError.String() + ": unable to marshal log message" + err.Error())
-	}
-
-	l.mu.Lock()
-	defer l.mu.Unlock()
+	var line = []byte(outMessage)
 
 	return l.out.Write(append(line, '\n'))
-}
-
-func (l *Logger) Write(message []byte) (n int, err error) {
-	return l.print(LevelError, string(message))
 }

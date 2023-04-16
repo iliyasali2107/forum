@@ -9,5 +9,6 @@ type Post struct {
 	Content    string
 	Created    time.Time
 	Categories []string
-	//Categories []Category
+	Likes      int
+	Dislikes   int
 }
