@@ -29,5 +29,16 @@ Likes:
 <hr>
 Dislike:
 <a href="/posts/dislike/{{.ID}}">{{ .Dislikes }}</a>
+
+<hr>
+
+<!-- tipa range of comments and button reply-->
+
+Add Comment:
+<form action="/posts/comment/create" method="POST">
+    <textarea name="content" placeholder="Content..."></textarea>
+    <button type="submit">add</button>
+</form>
+
 </body>
 </html>

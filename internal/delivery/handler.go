@@ -3,17 +3,15 @@ package delivery
 import (
 	"errors"
 	"fmt"
+	"forum/internal/models"
+	"forum/internal/service"
+	"forum/pkg/logger"
+	"forum/pkg/validator"
 	"html/template"
 	"net/http"
 	"os"
 	"strconv"
 	"sync"
-
-	"forum/internal/models"
-	"forum/internal/service"
-	"forum/pkg/validator"
-
-	"forum/pkg/logger"
 )
 
 type Handler struct {
@@ -57,7 +55,7 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		err := h.tmpl.ExecuteTemplate(w, "signu.html", nil)
+		err := h.tmpl.ExecuteTemplate(w, "signup.html", nil)
 		if err != nil {
 			h.logger.PrintError(err)
 			h.ResponseServerError(w)
@@ -342,7 +340,6 @@ func (h *Handler) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 		h.ResponseBadRequest(w)
 		return
 	}
-
 }
 
 func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
@@ -441,5 +438,39 @@ func (h *Handler) DislikePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) CommentHandler(w http.ResponseWriter, r *http.Request) {
-	panic("Aliya")
+	// id, err := GetIdFromShortURL(r.URL.Path)
+	// if err != nil {
+	// 	h.logger.PrintError(err)
+	// 	h.ResponseNotFound(w)
+	// 	return
+	// }
+
+	// post, err := h.Service.PostService.GetPost(id)
+	// if err != nil {
+	// 	h.logger.PrintError(err)
+	// 	h.ResponseServerError(w)
+	// 	return
+	// }
+	// user := h.contextGetUser(r)
+
+	// comment, err := h.Service.CommentService.
+}
+
+func (h *Handler) CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
+	// id, err := GetIdFromURL(r.URL.Path)
+	// if err != nil {
+	// 	h.logger.PrintError(err)
+	// 	h.ResponseNotFound(w)
+	// 	return
+	// }
+
+	// post, err := h.Service.PostService.GetPost(id)
+	// if err != nil {
+	// 	h.logger.PrintError(err)
+	// 	h.ResponseServerError(w)
+	// 	return
+	// }
+	// user := h.contextGetUser(r)
+
+	// http.Redirect(w, r, "/posts/"+strconv.Itoa(post.ID), http.StatusSeeOther)
 }
