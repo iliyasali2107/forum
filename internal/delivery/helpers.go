@@ -2,12 +2,11 @@ package delivery
 
 import (
 	"fmt"
+	"forum/pkg/validator"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
-
-	"forum/pkg/validator"
 )
 
 type envelope map[string]interface{}
