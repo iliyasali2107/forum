@@ -33,9 +33,10 @@ Dislike:
 <hr>
 
 <!-- tipa range of comments and button reply-->
+<!-- hidden id of comment -->
 
 Add Comment:
-<form action="/posts/comment/create" method="POST">
+<form action="/posts/comment/create/{{.ID}}" method="POST">
     <textarea name="content" placeholder="Content..."></textarea>
     <button type="submit">add</button>
 </form>

@@ -256,10 +256,16 @@ func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		http.Redirect(w, r, "/posts", http.StatusSeeOther)
+	default:
+		h.logger.PrintError(fmt.Errorf("create-post: method not allowed"))
+		h.ResponseMethodNotAllowed(w)
+		return
 	}
 }
 
 func (h *Handler) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
+	// ??? method not allowed
+
 	if r.URL.Path != "/posts" {
 		h.logger.PrintError(fmt.Errorf("handler: listPost: not found"))
 		h.ResponseNotFound(w)
@@ -374,6 +380,9 @@ func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
 	post.Likes = likes
 	post.Dislikes = dislikes
 
+	// TODO:
+	// comments, err := h.Service.CommentService.GetPostComments(id)
+
 	err = h.tmpl.ExecuteTemplate(w, "post.html", post)
 	if err != nil {
 		h.logger.PrintError(err)
@@ -383,6 +392,8 @@ func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) LikePost(w http.ResponseWriter, r *http.Request) {
+	// ??? method not allowed
+
 	id, err := GetIdFromURL(r.URL.Path)
 	if err != nil {
 		h.logger.PrintError(err)
@@ -411,6 +422,8 @@ func (h *Handler) LikePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) DislikePost(w http.ResponseWriter, r *http.Request) {
+	// ??? method not allowed
+
 	id, err := GetIdFromURL(r.URL.Path)
 	if err != nil {
 		h.logger.PrintError(err)
@@ -457,20 +470,48 @@ func (h *Handler) CommentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
-	// id, err := GetIdFromURL(r.URL.Path)
-	// if err != nil {
-	// 	h.logger.PrintError(err)
-	// 	h.ResponseNotFound(w)
-	// 	return
-	// }
+	switch r.Method {
+	case http.MethodPost:
+		id, err := GetIdFromURL2(3, r.URL.Path)
+		if err != nil {
+			h.logger.PrintError(err)
+			h.ResponseNotFound(w)
+			return
+		}
 
-	// post, err := h.Service.PostService.GetPost(id)
-	// if err != nil {
-	// 	h.logger.PrintError(err)
-	// 	h.ResponseServerError(w)
-	// 	return
-	// }
-	// user := h.contextGetUser(r)
+		post, err := h.Service.PostService.GetPost(id)
+		if err != nil {
+			h.logger.PrintError(err)
+			h.ResponseServerError(w)
+			return
+		}
 
-	// http.Redirect(w, r, "/posts/"+strconv.Itoa(post.ID), http.StatusSeeOther)
+		user := h.contextGetUser(r)
+
+		err = r.ParseForm()
+		if err != nil {
+			h.logger.PrintError(err)
+			h.ResponseBadRequest(w)
+			return
+		}
+
+		comment := &models.Comment{}
+		comment.Content = r.FormValue("content")
+		comment.User = user
+		comment.Post = post
+		// comment.Parent
+
+		err = h.Service.CommentService.CreateComment(h.validator, comment)
+		if err != nil {
+			h.logger.PrintError(err)
+			h.ResponseServerError(w)
+			return
+		}
+
+		http.Redirect(w, r, "/posts/"+strconv.Itoa(post.ID), http.StatusSeeOther)
+	default:
+		h.logger.PrintError(fmt.Errorf("signup: method not allowed"))
+		h.ResponseMethodNotAllowed(w)
+		return
+	}
 }

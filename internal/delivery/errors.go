@@ -30,7 +30,6 @@ func (h *Handler) errorResponse(w http.ResponseWriter, status int) {
 }
 
 func (h *Handler) ResponseServerError(w http.ResponseWriter) {
-	//h.logger.PrintError(fmt.Errorf(http.StatusText(http.StatusInternalServerError)))
 	h.errorResponse(w, http.StatusInternalServerError)
 }
 
