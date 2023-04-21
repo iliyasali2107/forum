@@ -3,11 +3,10 @@ package service
 import (
 	"errors"
 	"fmt"
-	"time"
-
 	"forum/internal/models"
 	"forum/internal/repository"
 	"forum/pkg/validator"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -57,7 +56,7 @@ func (as *authService) Signup(v *validator.Validator, user *models.User) error {
 	if err != nil {
 		return ErrInternalServer
 	}
-	//TODO: UNIQUE constraint failed: users.name
+	// TODO: UNIQUE constraint failed: users.name
 	_, err = as.ur.CreateUser(user)
 	if err != nil {
 		fmt.Println(err)
@@ -100,7 +99,6 @@ func (as *authService) Logout(user *models.User) error {
 	user.ID = u.ID
 
 	return as.ur.DeleteToken(*user.Token)
-
 }
 
 func (as *authService) ParseToken(token string) (*models.User, error) {
@@ -119,8 +117,6 @@ func ValidateEmail(v *validator.Validator, email string) {
 func ValidatePasswordPlaintext(v *validator.Validator, password string) {
 	v.Check(password != "", "password", "must be provided")
 	v.Check(len(password) >= 8, "password", "must be at least 8 bytes long")
-	fmt.Println(password)
-	fmt.Println(len(password))
 	v.Check(len(password) <= 72, "password", "must not be more than 500 bytes long")
 }
 

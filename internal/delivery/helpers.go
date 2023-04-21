@@ -2,12 +2,11 @@ package delivery
 
 import (
 	"fmt"
+	"forum/pkg/validator"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
-
-	"forum/pkg/validator"
 )
 
 type envelope map[string]interface{}
@@ -109,6 +108,7 @@ func (h *Handler) render(w http.ResponseWriter, name string, td any) {
 
 func GetIdFromURL(path string) (int, error) {
 	s := strings.Split(path, "/")
+
 	if len(s) <= 3 {
 		return 0, fmt.Errorf("%s", "invalid url")
 	}
@@ -136,6 +136,25 @@ func GetIdFromShortURL(path string) (int, error) {
 	}
 
 	id, err := strconv.Atoi(s[2])
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+// TODO: replace all GetIdFromURL and GetIdFromShortURL with function below
+func GetIdFromURL2(numOfWords int, path string) (int, error) {
+	s := strings.Split(path, "/")
+	if len(s) <= numOfWords+1 {
+		return 0, fmt.Errorf("%s", "invalid url")
+	}
+
+	if len(s[numOfWords+1:]) > 1 {
+		return 0, fmt.Errorf("%s", "invalid url")
+	}
+
+	id, err := strconv.Atoi(s[numOfWords+1])
 	if err != nil {
 		return 0, err
 	}

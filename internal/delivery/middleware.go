@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"forum/internal/models"
 	"net/http"
 	"time"
-
-	"forum/internal/models"
 )
+
+// TODO: signup and login for authorized user not available
 
 func (h *Handler) userIdentity(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +57,7 @@ func (h *Handler) recoverPanic(next http.HandlerFunc) http.HandlerFunc {
 
 func (h *Handler) authorized(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//user := r.Context().Value(ctxKeyUser).(*models.User)
+		// user := r.Context().Value(ctxKeyUser).(*models.User)
 		u := r.Context().Value(ctxKeyUser)
 
 		if u == nil {
@@ -65,9 +66,8 @@ func (h *Handler) authorized(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		//user := u.(*models.User)
+		// user := u.(*models.User)
 
 		next.ServeHTTP(w, r)
-
 	}
 }

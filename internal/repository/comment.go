@@ -2,7 +2,7 @@ package repository
 
 import (
 	"database/sql"
-
+	"fmt"
 	"forum/internal/models"
 )
 
@@ -43,6 +43,7 @@ func (r *commentRepo) CreateCommentWithParent(comment *models.Comment) (int, err
 }
 
 func (r *commentRepo) CreateCommentWithoutParent(comment *models.Comment) (int, error) {
+	fmt.Println(comment)
 	query := `INSERT INTO comments (user_id, post_id, content) VALUES (?, ?, ?)`
 	row, err := r.db.Exec(query, comment.User.ID, comment.Post.ID, comment.Content)
 	if err != nil {
@@ -103,7 +104,7 @@ func (r *commentRepo) GetPostComments(postID int) (*[]models.Comment, error) {
 		}
 		comments = append(comments, comment)
 	}
-
+	fmt.Println(comments)
 	return &comments, nil
 }
 

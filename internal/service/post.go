@@ -78,8 +78,12 @@ func (ps *postService) GetPost(id int) (*models.Post, error) {
 
 	post.User = user
 
-	return post, nil
+	err = ps.cr.GetCategoriesForPost(post)
+	if err != nil {
+		return nil, err
+	}
 
+	return post, nil
 }
 
 func (ps *postService) GetAllPosts() ([]*models.Post, error) {
