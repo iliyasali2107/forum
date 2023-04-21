@@ -80,6 +80,7 @@ func (l *Logger) PrintFatal(err error) {
 	l.print(LevelFatal, err.Error())
 	os.Exit(1)
 }
+
 func (l *Logger) print(level Level, message string) (int, error) {
 	if level < l.minLevel {
 		return 0, nil
