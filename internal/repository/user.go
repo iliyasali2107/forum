@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"time"
 
-	models "forum/internal/models"
+	"forum/internal/models"
 )
 
 type UserRepository interface {
@@ -31,6 +31,7 @@ func NewUserRepository(db *sql.DB) UserRepository {
 	}
 }
 
+// TODO: UNIQUE constraint failed: users.name
 func (ur *userRepo) CreateUser(user *models.User) (int, error) {
 	query := `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`
 	row, err := ur.db.Exec(query, user.Name, user.Email, user.Password.Hash)
@@ -54,7 +55,7 @@ func (ur *userRepo) GetUser(id int) (*models.User, error) {
 	}
 
 	user := &models.User{}
-	if err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password); err != nil {
+	if err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password.Hash, &user.Token, &user.Expires); err != nil {
 		return nil, err
 	}
 
@@ -71,17 +72,13 @@ func (ur *userRepo) GetAllUsers() ([]models.User, error) {
 	users := []models.User{}
 	for rows.Next() {
 		user := models.User{}
-		if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Password.Hash); err != nil {
+		if err = rows.Scan(&user.ID, &user.Name, &user.Email, &user.Password.Hash); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
 	}
 
 	return users, nil
-}
-
-func (ur *userRepo) DeleteUser(id int) error {
-	return nil
 }
 
 func (ur *userRepo) GetUserByEmail(email string) (*models.User, error) {
@@ -97,10 +94,6 @@ func (ur *userRepo) GetUserByEmail(email string) (*models.User, error) {
 	}
 
 	return user, nil
-}
-
-func (ur *userRepo) UpdateUser(*models.User) (*models.User, error) {
-	return nil, nil
 }
 
 func (ur *userRepo) GetUserByToken(token string) (*models.User, error) {
@@ -145,4 +138,12 @@ func (ur *userRepo) DeleteToken(token string) error {
 
 	_, err := ur.db.ExecContext(ctx, query, token)
 	return err
+}
+
+func (ur *userRepo) UpdateUser(*models.User) (*models.User, error) {
+	return nil, nil
+}
+
+func (ur *userRepo) DeleteUser(id int) error {
+	return nil
 }

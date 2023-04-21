@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
+	"forum/internal/delivery"
 	"forum/internal/repository"
+	"forum/internal/service"
 	"forum/pkg/sqlite"
 	"log"
 	"net/http"
-
-	"forum/internal/delivery"
-	"forum/internal/service"
 )
 
 func main() {
@@ -22,7 +21,7 @@ func main() {
 	handler := delivery.NewHandler(svc)
 	handler.InitRoutes(mux)
 
-	fmt.Println("OOKKK")
+	fmt.Println("http://localhost:8080/")
 	err = http.ListenAndServe(":8080", mux)
 	if err != nil {
 		log.Fatalln(err)

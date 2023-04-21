@@ -16,13 +16,13 @@ func (h *Handler) errorPage(w http.ResponseWriter, code int) {
 	}
 
 	if err := h.tmpl.ExecuteTemplate(w, "error.html", data); err != nil {
-		h.logger.PrintError(err.Error())
+		h.logger.PrintError(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 }
 
 func (h *Handler) logError(err error) {
-	h.logger.PrintError(err.Error())
+	h.logger.PrintError(err)
 }
 
 func (h *Handler) errorResponse(w http.ResponseWriter, status int) {
@@ -30,7 +30,6 @@ func (h *Handler) errorResponse(w http.ResponseWriter, status int) {
 }
 
 func (h *Handler) ResponseServerError(w http.ResponseWriter) {
-	h.logger.PrintError(http.StatusText(http.StatusInternalServerError))
 	h.errorResponse(w, http.StatusInternalServerError)
 }
 
@@ -67,7 +66,7 @@ func (h *Handler) ResponseInvalidAuthenticationToken(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusUnauthorized)
 }
 
-func (h *Handler) ResponseUnauthorizedRequire(w http.ResponseWriter) {
+func (h *Handler) ResponseUnauthorized(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusUnauthorized)
 }
 

@@ -3,11 +3,10 @@ package service
 import (
 	"errors"
 	"fmt"
-	"time"
-
 	"forum/internal/models"
 	"forum/internal/repository"
 	"forum/pkg/validator"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -22,13 +21,13 @@ var (
 	ErrConfirmPassword     = errors.New("password doesn't match")
 	ErrUserNotFound        = errors.New("user not found")
 	ErrUserExists          = errors.New("user already exists")
+	ErrFormValidation      = errors.New("form validation failed")
 )
 
 type AuthService interface {
-	Signup(*validator.Validator, *models.User) []error
-	Login(*validator.Validator, *models.User) error
+	Signup(*validator.Validator, *models.User) error
+	Login(*models.User) error
 	Logout(*models.User) error
-	GenerateToken(username, password string) (*models.User, error)
 	ParseToken(token string) (*models.User, error)
 	DeleteToken(token string) error
 }
@@ -43,79 +42,43 @@ func NewAuthService(userRepo repository.UserRepository) AuthService {
 	}
 }
 
-func (as *authService) GenerateToken(username, password string) (*models.User, error) {
-	return nil, nil
-}
-
-// TODO:
-func (as *authService) ParseToken(token string) (*models.User, error) {
-	user, err := as.ur.GetUserByToken(token)
-	if err != nil {
-		return nil, ErrUserNotFound
-	}
-	return user, nil
-}
-
-func (as *authService) DeleteToken(token string) error {
-	return as.ur.DeleteToken(token)
-}
-
-func (as *authService) Signup(v *validator.Validator, user *models.User) []error {
-	errs := []error{}
+func (as *authService) Signup(v *validator.Validator, user *models.User) error {
 	_, err := as.ur.GetUserByEmail(user.Email)
 	if err == nil {
-		errs = append(errs, ErrUserExists)
-		return errs
+		return ErrUserExists
+	}
+
+	if ValidateUser(v, user); !v.Valid() {
+		return ErrFormValidation
 	}
 
 	err = user.Password.Set(user.Password.Plaintext)
 	if err != nil {
-		errs = append(errs, ErrInternalServer)
-		return errs
+		return ErrInternalServer
 	}
-
-	if ValidateUser(v, user); !v.Valid() {
-		if _, ok := v.Errors["name"]; ok {
-			errs = append(errs, ErrInvalidUsername)
-		}
-
-		if _, ok := v.Errors["email"]; ok {
-			errs = append(errs, ErrInvalidEmail)
-		}
-
-		if _, ok := v.Errors["password"]; ok {
-			errs = append(errs, ErrInvalidPassword)
-		}
-	}
-	if len(errs) > 0 {
-		return errs
-	}
-
+	// TODO: UNIQUE constraint failed: users.name
 	_, err = as.ur.CreateUser(user)
 	if err != nil {
 		fmt.Println(err)
-		errs = append(errs, ErrInternalServer)
-		return errs
+		return ErrInternalServer
 	}
 
 	return nil
 }
 
-func (as *authService) Login(v *validator.Validator, user *models.User) error {
+func (as *authService) Login(user *models.User) error {
 	u, err := as.ur.GetUserByEmail(user.Email)
 	if err != nil {
-		fmt.Println(err)
 		return ErrUserNotFound
 	}
 
 	ok, err := u.Password.Matches(user.Password.Plaintext)
 	if err != nil || !ok {
-		return ErrInvalidPassword
+		return err
 	}
 
 	sessionToken := uuid.NewString()
 	expiresAt := time.Now().Add(30 * time.Minute)
-
 	user.Token = &sessionToken
 	user.Expires = &expiresAt
 	user.ID = u.ID
@@ -138,6 +101,14 @@ func (as *authService) Logout(user *models.User) error {
 	return as.ur.DeleteToken(*user.Token)
 }
 
+func (as *authService) ParseToken(token string) (*models.User, error) {
+	return as.ur.GetUserByToken(token)
+}
+
+func (as *authService) DeleteToken(token string) error {
+	return as.ur.DeleteToken(token)
+}
+
 func ValidateEmail(v *validator.Validator, email string) {
 	v.Check(email != "", "email", "must be provided")
 	v.Check(validator.Matches(email, validator.EmailRX), "email", "must be provided a valid email address")
@@ -155,11 +126,5 @@ func ValidateUser(v *validator.Validator, user *models.User) {
 
 	ValidateEmail(v, user.Email)
 
-	if user.Password.Plaintext != "" {
-		ValidatePasswordPlaintext(v, user.Password.Plaintext)
-	}
-
-	if user.Password.Hash == nil {
-		panic("missing password hash for user")
-	}
+	ValidatePasswordPlaintext(v, user.Password.Plaintext)
 }

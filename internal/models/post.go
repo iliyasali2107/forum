@@ -8,5 +8,8 @@ type Post struct {
 	Title      string
 	Content    string
 	Created    time.Time
-	Categories *[]Category
+	Categories []string
+	Comments   *[]Comment
+	Likes      int
+	Dislikes   int
 }

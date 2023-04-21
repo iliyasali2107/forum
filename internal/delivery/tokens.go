@@ -11,11 +11,6 @@ import (
 	"forum/pkg/validator"
 )
 
-const (
-	ScopeActivation     = "activation"
-	ScopeAuthentication = "authentication"
-)
-
 type Token struct {
 	Plaintext string    `json:"token"`
 	Hash      []byte    `json:"-"`

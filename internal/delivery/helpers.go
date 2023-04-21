@@ -1,45 +1,42 @@
 package delivery
 
 import (
-	"errors"
+	"fmt"
+	"forum/pkg/validator"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
-
-	"forum/pkg/validator"
-
-	"github.com/julienschmidt/httprouter"
 )
 
 type envelope map[string]interface{}
 
-func (h *Handler) readIdParam(r *http.Request) (int64, error) {
-	params := httprouter.ParamsFromContext(r.Context())
-
-	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
-	if err != nil || id < 1 {
-		return 0, errors.New("invalid id parameter")
-	}
-
-	return id, nil
-}
+//func (h *Handler) readIdParam(r *http.Request) (int64, error) {
+//	params := httprouter.ParamsFromContext(r.Context())
+//
+//	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
+//	if err != nil || id < 1 {
+//		return 0, errors.New("invalid id parameter")
+//	}
+//
+//	return id, nil
+//}
 
 // The readString() helper returns value from the query string, or the provided
 // default value if no matching key could be found.
-func (h *Handler) readString(qs url.Values, key string, defaultValue string) string {
+/*func (h *Handler) readString(qs url.Values, key string, defaultValue string) string {
 	// Extract the value for a given key from the query string. If no key exists
 	// this will return the empty string "".
 	s := qs.Get(key)
 
-	// If no keys exists (or the value is empty) then return the default value.
+	// If no keys exist (or the value is empty) then return the default value.
 	if s == "" {
 		return defaultValue
 	}
 
 	// Otherwise return the string
 	return s
-}
+}*/
 
 // The readCSV() helper reads a string value from the query string and then splits it
 // into a slice on the comma character. If no matching key could be found, it returns
@@ -91,7 +88,7 @@ func (h *Handler) background(fn func()) {
 		// Recover from any panic
 		defer func() {
 			if err := recover(); err != nil {
-				h.logger.PrintError("Error: error while recovering")
+				h.logger.PrintError(fmt.Errorf("error: error while recovering"))
 			}
 		}()
 
@@ -100,11 +97,67 @@ func (h *Handler) background(fn func()) {
 	}()
 }
 
-func (h *Handler) render(w http.ResponseWriter, name string, td *any) {
+func (h *Handler) render(w http.ResponseWriter, name string, td any) {
 	err := h.tmpl.ExecuteTemplate(w, name, td)
 	if err != nil {
 		h.logger.PrintInfo("render: " + err.Error())
 		h.ResponseServerError(w)
 		return
 	}
+}
+
+func GetIdFromURL(path string) (int, error) {
+	s := strings.Split(path, "/")
+
+	if len(s) <= 3 {
+		return 0, fmt.Errorf("%s", "invalid url")
+	}
+
+	if len(s[3:]) > 1 {
+		return 0, fmt.Errorf("%s", "invalid url")
+	}
+
+	id, err := strconv.Atoi(s[3])
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func GetIdFromShortURL(path string) (int, error) {
+	s := strings.Split(path, "/")
+	if len(s) <= 2 {
+		return 0, fmt.Errorf("%s", "invalid url")
+	}
+
+	if len(s[2:]) > 1 {
+		return 0, fmt.Errorf("%s", "invalid url")
+	}
+
+	id, err := strconv.Atoi(s[2])
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+// TODO: replace all GetIdFromURL and GetIdFromShortURL with function below
+func GetIdFromURL2(numOfWords int, path string) (int, error) {
+	s := strings.Split(path, "/")
+	if len(s) <= numOfWords+1 {
+		return 0, fmt.Errorf("%s", "invalid url")
+	}
+
+	if len(s[numOfWords+1:]) > 1 {
+		return 0, fmt.Errorf("%s", "invalid url")
+	}
+
+	id, err := strconv.Atoi(s[numOfWords+1])
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }

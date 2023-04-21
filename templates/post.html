@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<p>
+    author: {{ .User.Name }}
+</p>
+<p>
+    title: {{ .Title}}
+</p>
+<p>
+    Content: {{ .Content }}
+</p>
+<p>
+    Created: {{ .Created }}
+</p>
+    Categories:
+    {{ range .Categories }}
+    {{ . }}
+    {{ end }}
+<hr>
+Likes:
+<a href="/posts/like/{{.ID}}">{{ .Likes }}</a>
+
+<hr>
+Dislike:
+<a href="/posts/dislike/{{.ID}}">{{ .Dislikes }}</a>
+
+<hr>
+<!-- 
+Comments:
+    {{ range .Comments }}
+    {{ .Comments.Content }}
+    {{ end }} -->
+
+<!-- tipa range of comments and button reply-->
+<!-- hidden id of comment -->
+
+Add Comment:
+<form action="/posts/comment/create/{{.ID}}" method="POST">
+    <textarea name="content" placeholder="Content..."></textarea>
+    <button type="submit">add</button>
+</form>
+
+</body>
+</html>

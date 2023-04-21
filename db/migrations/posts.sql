@@ -3,6 +3,6 @@ CREATE TABLE posts (
     user_id INTEGER NOT NULL,
     title TEXT NOT NULL,
     content text NOT NULL,
-    craeted DATETIME NOT NULL,
+    created DATETIME NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );

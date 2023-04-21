@@ -7,14 +7,16 @@ type Repository struct {
 	CommentRepository
 	PostRepository
 	UserRepository
-	VoteRepository
+	ReactionRepository
+	CategoryRepository
 }
 
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
-		CommentRepository: NewCommentRepository(db),
-		PostRepository:    NewPostRepository(db),
-		UserRepository:    NewUserRepository(db),
-		VoteRepository:    NewVoteRepository(db),
+		CommentRepository:  NewCommentRepository(db),
+		PostRepository:     NewPostRepository(db),
+		UserRepository:     NewUserRepository(db),
+		ReactionRepository: NewReactionRepository(db),
+		CategoryRepository: NewCategoryRepository(db),
 	}
 }
