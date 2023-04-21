@@ -104,7 +104,7 @@ func (r *commentRepo) GetPostComments(postID int) (*[]models.Comment, error) {
 		}
 		comments = append(comments, comment)
 	}
-
+	fmt.Println(comments)
 	return &comments, nil
 }
 

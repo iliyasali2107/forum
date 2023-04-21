@@ -8,6 +8,7 @@ import (
 
 type CommentService interface {
 	CreateComment(*validator.Validator, *models.Comment) error
+	GetCommentsByPostId(int) (*[]models.Comment, error)
 }
 
 type commentService struct {
@@ -29,10 +30,19 @@ func (cs *commentService) CreateComment(v *validator.Validator, comment *models.
 
 	_, err := cs.cr.CreateCommentWithoutParent(comment)
 	if err != nil {
-		return err
+		return ErrInternalServer
 	}
 
 	return nil
+}
+
+func (cs *commentService) GetCommentsByPostId(post_id int) (*[]models.Comment, error) {
+	comments, err := cs.cr.GetPostComments(post_id)
+	if err != nil {
+		return nil, err
+	}
+
+	return comments, nil
 }
 
 func validateComment(v *validator.Validator, comment *models.Comment) {

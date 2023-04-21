@@ -17,7 +17,6 @@
 <p>
     Created: {{ .Created }}
 </p>
-<p>
     Categories:
     {{ range .Categories }}
     {{ . }}
@@ -31,6 +30,11 @@ Dislike:
 <a href="/posts/dislike/{{.ID}}">{{ .Dislikes }}</a>
 
 <hr>
+<!-- 
+Comments:
+    {{ range .Comments }}
+    {{ .Comments.Content }}
+    {{ end }} -->
 
 <!-- tipa range of comments and button reply-->
 <!-- hidden id of comment -->
