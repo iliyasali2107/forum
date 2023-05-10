@@ -20,17 +20,17 @@ func main() {
 	defer db.Close()
 
 	switch flag {
-	case "create":
+	case "up":
 		if err := migrate.CreateTable(db, "./db/migrations"); err != nil {
 			log.Fatalln(err)
 		}
 		log.Println("Successful")
-	case "drop":
+	case "down":
 		if err := sqlite.DropAllDB(db); err != nil {
 			log.Fatalln(err)
 		}
 		log.Println("Successful")
 	default:
-		log.Fatalf("%s: unknown flag. Use: 'create' or 'drop'", flag)
+		log.Fatalf("%s: unknown flag. Use: 'up' or 'down'", flag)
 	}
 }

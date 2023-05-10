@@ -3,15 +3,16 @@ package delivery
 import (
 	"errors"
 	"fmt"
-	"forum/internal/models"
-	"forum/internal/service"
-	"forum/pkg/logger"
-	"forum/pkg/validator"
 	"html/template"
 	"net/http"
 	"os"
 	"strconv"
 	"sync"
+
+	"forum/internal/models"
+	"forum/internal/service"
+	"forum/pkg/logger"
+	"forum/pkg/validator"
 )
 
 type Handler struct {
@@ -395,8 +396,17 @@ func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	comments, err := h.Service.CommentService.GetCommentsByPostId(id)
+	if err != nil {
+		h.logger.PrintError(fmt.Errorf("handler: PostHandler: GetPostDislikes"))
+		h.logger.PrintError(err)
+		h.ResponseServerError(w)
+		return
+	}
+
 	post.Likes = likes
 	post.Dislikes = dislikes
+	post.Comments = comments
 
 	// comments, err := h.Service.CommentService.GetCommentsByPostId(id)
 	// fmt.Println(comments)
@@ -418,22 +428,38 @@ func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) LikePost(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) ReactionPostHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		h.logger.PrintError(fmt.Errorf("handler: LikePost: method not allowed"))
 		h.ResponseMethodNotAllowed(w)
 		return
 	}
 
-	id, err := GetIdFromURL(r.URL.Path)
+	err := r.ParseForm()
 	if err != nil {
-		h.logger.PrintError(fmt.Errorf("handler: LikePost: GetIdFromURL"))
 		h.logger.PrintError(err)
-		h.ResponseNotFound(w)
+		h.ResponseBadRequest(w)
 		return
 	}
 
-	post, err := h.Service.PostService.GetPost(id)
+	postIDStr := r.FormValue("post_id")
+	postIDInt, err := strconv.Atoi(postIDStr)
+	if err != nil {
+		h.logger.PrintError(err)
+		h.ResponseBadRequest(w)
+		return
+	}
+
+	reactionTypeStr := r.FormValue("reaction")
+	fmt.Println(reactionTypeStr)
+	reactionTypeInt, err := strconv.Atoi(reactionTypeStr)
+	if err != nil || (reactionTypeInt != 1 && reactionTypeInt != 0) {
+		h.logger.PrintError(err)
+		h.ResponseBadRequest(w)
+		return
+	}
+
+	post, err := h.Service.PostService.GetPost(postIDInt)
 	if err != nil {
 		h.logger.PrintError(fmt.Errorf("handler: LikePost: GetPost"))
 		h.logger.PrintError(err)
@@ -442,9 +468,14 @@ func (h *Handler) LikePost(w http.ResponseWriter, r *http.Request) {
 	}
 	user := h.contextGetUser(r)
 
-	reaction := &models.Reaction{User: user, Post: post, Type: models.LikeType}
+	reaction := &models.Reaction{User: user, Post: post, Type: reactionTypeInt}
 
-	err = h.Service.ReactionService.LikePost(reaction)
+	if reactionTypeInt == 1 {
+		err = h.Service.ReactionService.LikePost(reaction)
+	} else if reactionTypeInt == 0 {
+		err = h.Service.ReactionService.DislikePost(reaction)
+	}
+
 	if err != nil {
 		h.logger.PrintError(fmt.Errorf("handler: LikePost: h.Service.ReactionService.LikePost()"))
 		h.logger.PrintError(err)
@@ -455,83 +486,13 @@ func (h *Handler) LikePost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/posts/"+strconv.Itoa(post.ID), http.StatusSeeOther)
 }
 
-func (h *Handler) DislikePost(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		h.logger.PrintError(fmt.Errorf("handler: DislikePost: method not allowed"))
-		h.ResponseMethodNotAllowed(w)
-		return
-	}
-
-	id, err := GetIdFromURL(r.URL.Path)
-	if err != nil {
-		h.logger.PrintError(fmt.Errorf("handler: DislikePost: GetIdFromURL"))
-		h.logger.PrintError(err)
-		h.ResponseNotFound(w)
-		return
-	}
-	post, err := h.Service.PostService.GetPost(id)
-	if err != nil {
-		h.logger.PrintError(fmt.Errorf("handler: DislikePost: GetPost"))
-		h.logger.PrintError(err)
-		h.ResponseServerError(w)
-		return
-	}
-	user := h.contextGetUser(r)
-
-	reaction := &models.Reaction{User: user, Post: post, Type: models.DislikeType}
-
-	err = h.Service.ReactionService.DislikePost(reaction)
-	if err != nil {
-		h.logger.PrintError(fmt.Errorf("handler: DislikePost: h.Service.ReactionService.DislikePost()"))
-		h.logger.PrintError(err)
-		h.ResponseServerError(w)
-		return
-	}
-
-	http.Redirect(w, r, "/posts/"+strconv.Itoa(post.ID), http.StatusSeeOther)
-}
-
-func (h *Handler) CommentHandler(w http.ResponseWriter, r *http.Request) {
-	// id, err := GetIdFromShortURL(r.URL.Path)
-	// if err != nil {
-	// 	h.logger.PrintError(err)
-	// 	h.ResponseNotFound(w)
-	// 	return
-	// }
-
-	// post, err := h.Service.PostService.GetPost(id)
-	// if err != nil {
-	// 	h.logger.PrintError(err)
-	// 	h.ResponseServerError(w)
-	// 	return
-	// }
-	// user := h.contextGetUser(r)
-
-	// comment, err := h.Service.CommentService.
-}
-
 func (h *Handler) CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		id, err := GetIdFromURL2(3, r.URL.Path)
-		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: comment-create: GetIdFromURL2"))
-			h.logger.PrintError(err)
-			h.ResponseNotFound(w)
-			return
-		}
-
-		post, err := h.Service.PostService.GetPost(id)
-		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: comment-create: GetPost"))
-			h.logger.PrintError(err)
-			h.ResponseServerError(w)
-			return
-		}
 
 		user := h.contextGetUser(r)
 
-		err = r.ParseForm()
+		err := r.ParseForm()
 		if err != nil {
 			h.logger.PrintError(fmt.Errorf("handler: comment-create: ParseForm"))
 			h.logger.PrintError(err)
@@ -540,10 +501,28 @@ func (h *Handler) CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		comment := &models.Comment{}
+
+		postIDStr := r.FormValue("post_id")
+		postIDInt, err := strconv.Atoi(postIDStr)
+		if err != nil {
+			h.logger.PrintError(fmt.Errorf("handler: comment-create: strconv post_id"))
+			h.logger.PrintError(err)
+			h.ResponseBadRequest(w)
+		}
+
+		parentIDStr := r.FormValue("parent_id")
+		parentIDInt, err := strconv.Atoi(parentIDStr)
+		if err != nil {
+			h.logger.PrintError(fmt.Errorf("handler: comment-create: strconv parent_id"))
+			h.logger.PrintError(err)
+			h.ResponseBadRequest(w)
+			return
+		}
+
 		comment.Content = r.FormValue("content")
-		comment.User = user
-		comment.Post = post
-		// comment.Parent
+		comment.UserID = user.ID
+		comment.PostID = postIDInt
+		comment.ParentID = parentIDInt
 
 		err = h.Service.CommentService.CreateComment(h.validator, comment)
 		if err != nil {
@@ -559,10 +538,36 @@ func (h *Handler) CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.Redirect(w, r, "/posts/"+strconv.Itoa(post.ID), http.StatusSeeOther)
+		http.Redirect(w, r, "/posts/"+strconv.Itoa(postIDInt), http.StatusSeeOther)
 	default:
 		h.logger.PrintError(fmt.Errorf("handler: comment-create: method not allowed"))
 		h.ResponseMethodNotAllowed(w)
+		return
+	}
+}
+
+func (h *Handler) ShowCommentHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		h.ResponseMethodNotAllowed(w)
+	}
+
+	commentID, err := GetIdFromURL2(2, r.URL.Path)
+	if err != nil {
+		h.ResponseNotFound(w)
+	}
+
+	comment, replies, err := h.Service.CommentService.GetComment(commentID)
+	if err != nil {
+		h.logger.PrintError(err)
+		h.ResponseServerError(w)
+		return
+	}
+
+	comment.Replies = replies
+
+	err = h.tmpl.ExecuteTemplate(w, "comment.html", comment)
+	if err != nil {
+		h.ResponseServerError(w)
 		return
 	}
 }

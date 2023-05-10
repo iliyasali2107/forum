@@ -8,7 +8,8 @@ import (
 
 type CommentService interface {
 	CreateComment(*validator.Validator, *models.Comment) error
-	GetCommentsByPostId(int) (*[]models.Comment, error)
+	GetCommentsByPostId(int) ([]*models.Comment, error)
+	GetComment(int) (*models.Comment, []*models.Comment, error)
 }
 
 type commentService struct {
@@ -28,7 +29,7 @@ func (cs *commentService) CreateComment(v *validator.Validator, comment *models.
 		return ErrFormValidation
 	}
 
-	_, err := cs.cr.CreateCommentWithoutParent(comment)
+	_, err := cs.cr.CreateComment(comment)
 	if err != nil {
 		return ErrInternalServer
 	}
@@ -36,13 +37,36 @@ func (cs *commentService) CreateComment(v *validator.Validator, comment *models.
 	return nil
 }
 
-func (cs *commentService) GetCommentsByPostId(post_id int) (*[]models.Comment, error) {
+func (cs *commentService) GetCommentsByPostId(post_id int) ([]*models.Comment, error) {
 	comments, err := cs.cr.GetPostComments(post_id)
 	if err != nil {
 		return nil, err
 	}
 
+	for _, comment := range comments {
+		replies, err := cs.cr.GetCommentRepliesCount(comment.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		comment.ReplyCount = replies
+	}
+
 	return comments, nil
+}
+
+func (cs *commentService) GetComment(commentID int) (*models.Comment, []*models.Comment, error) {
+	comment, err := cs.cr.GetComment(commentID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	replies, err := cs.cr.GetCommentReplies(commentID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return comment, replies, nil
 }
 
 func validateComment(v *validator.Validator, comment *models.Comment) {

@@ -22,26 +22,48 @@
     {{ . }}
     {{ end }}
 <hr>
-Likes:
-<a href="/posts/like/{{.ID}}">{{ .Likes }}</a>
 
-<hr>
-Dislike:
-<a href="/posts/dislike/{{.ID}}">{{ .Dislikes }}</a>
-
-<hr>
-<!-- 
 Comments:
-    {{ range .Comments }}
-    {{ .Comments.Content }}
-    {{ end }} -->
+<p>
+{{ range .Comments }}
+    {{ .Content }}
 
-<!-- tipa range of comments and button reply-->
-<!-- hidden id of comment -->
+<form action="/posts/comment" method="POST">
+    <textarea name="content" placeholder="reply..."></textarea>
+    <input type="hidden" name="post_id" value="{{ .PostID }}">
+    <input type="hidden" name="parent_id" value="{{ .ID }}">
+    <button type="submit">add</button>
+</form>
+<a href="/posts/comments/{{ .ID }}">
+    {{ .ReplyCount }} replies
+</a>
+    <hr>
+
+{{ end }}
+<hr>
+</p>
+
+Likes: {{ .Likes }}
+<form action="/posts/reaction" method="POST">
+    <input type="hidden" name="reaction" value="1">
+    <input type="hidden" name="post_id" value="{{.ID}}">
+    <button type="submit">like</button>
+</form>
+<hr>
+
+Dislike: {{ .Dislikes }}
+<form action="/posts/reaction" method="POST">
+    <input type="hidden" name="reaction" value="0">
+    <input type="hidden" name="post_id" value="{{.ID}}">
+    <button type="submit">like</button>
+</form>
+<hr>
 
 Add Comment:
-<form action="/posts/comment/create/{{.ID}}" method="POST">
-    <textarea name="content" placeholder="Content..."></textarea>
+<form action="/posts/comment" method="POST">
+    <textarea name="content" placeholder="comment..."></textarea>
+    <input type="hidden" name="post_id" value="{{ .ID }}">
+    <input type="hidden" name="parent_id" value="0">
     <button type="submit">add</button>
 </form>
 

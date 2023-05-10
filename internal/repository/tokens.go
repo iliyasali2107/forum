@@ -3,9 +3,8 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"time"
-
 	"forum/internal/models"
+	"time"
 )
 
 type TokenRepository interface {
