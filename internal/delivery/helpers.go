@@ -2,11 +2,12 @@ package delivery
 
 import (
 	"fmt"
-	"forum/pkg/validator"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"forum/pkg/validator"
 )
 
 type envelope map[string]interface{}
@@ -53,6 +54,8 @@ func (h *Handler) readCSV(qs url.Values, key string, v *validator.Validator, def
 	// Otherwise parse the value into a []string slice and return it.
 	return strings.Split(csv, ",")
 }
+
+// wefewf
 
 // The readInt() helper reads a string value from the equery string and converts it to an
 // integer before returning. If no matching key could be found it returns the provided
