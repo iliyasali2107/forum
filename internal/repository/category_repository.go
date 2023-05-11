@@ -13,19 +13,19 @@ type CategoryRepository interface {
 	GetCategoriesForPost(post *models.Post) error
 }
 
-type categoryRepo struct {
+type categoryRepository struct {
 	db *sql.DB
 }
 
 func NewCategoryRepository(db *sql.DB) CategoryRepository {
-	return &categoryRepo{
+	return &categoryRepository{
 		db: db,
 	}
 }
 
-func (r *categoryRepo) AddCategory(postID, categoryID int) error {
+func (cr *categoryRepository) AddCategory(postID, categoryID int) error {
 	query := `INSERT INTO categories_posts(post_id, category_id) VALUES (?, ?)`
-	row, err := r.db.Exec(query, postID, categoryID)
+	row, err := cr.db.Exec(query, postID, categoryID)
 	if err != nil {
 		return err
 	}
@@ -36,12 +36,11 @@ func (r *categoryRepo) AddCategory(postID, categoryID int) error {
 	}
 
 	return nil
-
 }
 
-func (r *categoryRepo) GetCategory(name string) (*models.Category, error) {
+func (cr *categoryRepository) GetCategory(name string) (*models.Category, error) {
 	query := `SELECT * FROM categories WHERE name = ?`
-	row := r.db.QueryRow(query, name)
+	row := cr.db.QueryRow(query, name)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
@@ -55,9 +54,9 @@ func (r *categoryRepo) GetCategory(name string) (*models.Category, error) {
 	return category, nil
 }
 
-func (r *categoryRepo) GetAllCategories() ([]*models.Category, error) {
+func (cr *categoryRepository) GetAllCategories() ([]*models.Category, error) {
 	query := `SELECT * FROM categories`
-	rows, err := r.db.Query(query)
+	rows, err := cr.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -75,14 +74,14 @@ func (r *categoryRepo) GetAllCategories() ([]*models.Category, error) {
 	return categories, nil
 }
 
-func (r *categoryRepo) GetCategoriesForPost(post *models.Post) error {
+func (cr *categoryRepository) GetCategoriesForPost(post *models.Post) error {
 	query := `SELECT name
 			FROM categories
 			INNER JOIN categories_posts
 			ON categories.id = categories_posts.category_id
 			WHERE post_id = ?;`
 
-	rows, err := r.db.Query(query, post.ID)
+	rows, err := cr.db.Query(query, post.ID)
 	if err != nil {
 		return err
 	}

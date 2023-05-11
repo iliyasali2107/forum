@@ -18,19 +18,19 @@ type CommentRepository interface {
 	DeleteComment(int) error                                // may be don't need
 }
 
-type commentRepo struct {
+type commentRepository struct {
 	db *sql.DB
 }
 
 func NewCommentRepository(db *sql.DB) CommentRepository {
-	return &commentRepo{
+	return &commentRepository{
 		db: db,
 	}
 }
 
-func (r *commentRepo) CreateComment(comment *models.Comment) (int, error) {
+func (cr *commentRepository) CreateComment(comment *models.Comment) (int, error) {
 	query := `INSERT INTO comments (user_id, post_id, content, parent_id) VALUES (?, ?, ?, ?)`
-	row, err := r.db.Exec(query, comment.UserID, comment.PostID, comment.Content, comment.ParentID)
+	row, err := cr.db.Exec(query, comment.UserID, comment.PostID, comment.Content, comment.ParentID)
 	if err != nil {
 		return 0, err
 	}
@@ -43,9 +43,9 @@ func (r *commentRepo) CreateComment(comment *models.Comment) (int, error) {
 	return int(id), nil
 }
 
-func (r *commentRepo) GetComment(id int) (*models.Comment, error) {
+func (cr *commentRepository) GetComment(id int) (*models.Comment, error) {
 	query := `SELECT * FROM comments WHERE id = ?`
-	row := r.db.QueryRow(query, id)
+	row := cr.db.QueryRow(query, id)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
@@ -57,9 +57,9 @@ func (r *commentRepo) GetComment(id int) (*models.Comment, error) {
 	return &comment, nil
 }
 
-func (r *commentRepo) GetAllComments() (*[]models.Comment, error) {
+func (cr *commentRepository) GetAllComments() (*[]models.Comment, error) {
 	query := `SELECT * FROM comments`
-	rows, err := r.db.Query(query)
+	rows, err := cr.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -76,9 +76,9 @@ func (r *commentRepo) GetAllComments() (*[]models.Comment, error) {
 	return &comments, nil
 }
 
-func (r *commentRepo) GetPostComments(postID int) ([]*models.Comment, error) {
+func (cr *commentRepository) GetPostComments(postID int) ([]*models.Comment, error) {
 	query := `SELECT * FROM comments WHERE post_id = ? AND parent_id = 0`
-	rows, err := r.db.Query(query, postID)
+	rows, err := cr.db.Query(query, postID)
 	if err != nil {
 		return nil, err
 	}
@@ -94,10 +94,10 @@ func (r *commentRepo) GetPostComments(postID int) ([]*models.Comment, error) {
 	return comments, nil
 }
 
-func (r *commentRepo) GetCommentRepliesCount(parentID int) (int, error) {
+func (cr *commentRepository) GetCommentRepliesCount(parentID int) (int, error) {
 	query := `SELECT count() FROM comments WHERE parent_id = ?`
 	var replies int
-	row := r.db.QueryRow(query, parentID)
+	row := cr.db.QueryRow(query, parentID)
 	if err := row.Scan(&replies); err != nil {
 		return 0, err
 	}
@@ -105,9 +105,9 @@ func (r *commentRepo) GetCommentRepliesCount(parentID int) (int, error) {
 	return replies, nil
 }
 
-func (r *commentRepo) GetCommentReplies(parentID int) ([]*models.Comment, error) {
+func (cr *commentRepository) GetCommentReplies(parentID int) ([]*models.Comment, error) {
 	query := `SELECT * FROM comments WHERE parent_id = ?`
-	rows, err := r.db.Query(query, parentID)
+	rows, err := cr.db.Query(query, parentID)
 	if err != nil {
 		return nil, err
 	}
@@ -123,9 +123,9 @@ func (r *commentRepo) GetCommentReplies(parentID int) ([]*models.Comment, error)
 	return comments, nil
 }
 
-func (r *commentRepo) GetUserComments(userID int) (*[]models.Comment, error) {
+func (cr *commentRepository) GetUserComments(userID int) (*[]models.Comment, error) {
 	query := `SELECT * FROM comments WHERE user_id = ?`
-	rows, err := r.db.Query(query, userID)
+	rows, err := cr.db.Query(query, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -142,10 +142,10 @@ func (r *commentRepo) GetUserComments(userID int) (*[]models.Comment, error) {
 	return &comments, nil
 }
 
-func (r *commentRepo) UpdateComment(*models.Comment) (*models.Comment, error) {
+func (cr *commentRepository) UpdateComment(*models.Comment) (*models.Comment, error) {
 	return nil, nil
 }
 
-func (r *commentRepo) DeleteComment(id int) error {
+func (cr *commentRepository) DeleteComment(id int) error {
 	return nil
 }
