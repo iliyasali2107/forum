@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+
 	"forum/internal/delivery"
 	"forum/internal/repository"
 	"forum/internal/service"
 	"forum/pkg/sqlite"
-	"log"
-	"net/http"
 )
 
 func main() {

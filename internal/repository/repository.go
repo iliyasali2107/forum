@@ -3,7 +3,7 @@ package repository
 import "database/sql"
 
 type Repository struct {
-	//AuthRepository
+	// AuthRepository
 	CommentRepository
 	PostRepository
 	UserRepository

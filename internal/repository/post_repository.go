@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+
 	"forum/internal/models"
 )
 
@@ -15,19 +16,19 @@ type PostRepository interface {
 	DeletePost(int) error
 }
 
-type postRepo struct {
+type postRepository struct {
 	db *sql.DB
 }
 
 func NewPostRepository(db *sql.DB) PostRepository {
-	return &postRepo{
+	return &postRepository{
 		db: db,
 	}
 }
 
-func (r *postRepo) CreatePost(post *models.Post) (int, error) {
+func (rr *postRepository) CreatePost(post *models.Post) (int, error) {
 	query := `INSERT INTO posts(user_id, title, content, created) VALUES (?, ?, ?, ?)`
-	row, err := r.db.Exec(query, post.User.ID, post.Title, post.Content, post.Created)
+	row, err := rr.db.Exec(query, post.User.ID, post.Title, post.Content, post.Created)
 	if err != nil {
 		return 0, err
 	}
@@ -42,9 +43,9 @@ func (r *postRepo) CreatePost(post *models.Post) (int, error) {
 	return int(id), nil
 }
 
-func (r *postRepo) GetAllPosts() ([]*models.Post, error) {
+func (rr *postRepository) GetAllPosts() ([]*models.Post, error) {
 	query := `SELECT * FROM posts`
-	rows, err := r.db.Query(query)
+	rows, err := rr.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -61,13 +62,13 @@ func (r *postRepo) GetAllPosts() ([]*models.Post, error) {
 	return posts, nil
 }
 
-func (r *postRepo) GetPostsByCategory(ids ...int) (*[]models.Post, error) {
+func (rr *postRepository) GetPostsByCategory(ids ...int) (*[]models.Post, error) {
 	query := `SELECT * FROM posts WHERE id IN (?`
 	for i := 0; i < len(ids); i++ {
 		query += `,?`
 	}
 	query += `)`
-	rows, err := r.db.Query(query, ids)
+	rows, err := rr.db.Query(query, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -83,9 +84,9 @@ func (r *postRepo) GetPostsByCategory(ids ...int) (*[]models.Post, error) {
 	return &posts, nil
 }
 
-func (r *postRepo) GetPost(id int) (*models.Post, error) {
+func (rr *postRepository) GetPost(id int) (*models.Post, error) {
 	query := `SELECT * FROM posts WHERE id = ?`
-	row := r.db.QueryRow(query, id)
+	row := rr.db.QueryRow(query, id)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
@@ -99,9 +100,9 @@ func (r *postRepo) GetPost(id int) (*models.Post, error) {
 	return post, nil
 }
 
-func (r *postRepo) GetAllPostsOfUser(userID int) ([]*models.Post, error) {
+func (rr *postRepository) GetAllPostsOfUser(userID int) ([]*models.Post, error) {
 	query := `SELECT * FROM posts WHERE user_id = ?`
-	rows, err := r.db.Query(query, userID)
+	rows, err := rr.db.Query(query, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -118,10 +119,10 @@ func (r *postRepo) GetAllPostsOfUser(userID int) ([]*models.Post, error) {
 	return posts, nil
 }
 
-func (r *postRepo) UpdatePost(post *models.Post) (*models.Post, error) {
+func (rr *postRepository) UpdatePost(post *models.Post) (*models.Post, error) {
 	return nil, nil
 }
 
-func (r *postRepo) DeletePost(id int) error {
+func (rr *postRepository) DeletePost(id int) error {
 	return nil
 }

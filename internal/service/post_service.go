@@ -1,10 +1,11 @@
 package service
 
 import (
+	"time"
+
 	"forum/internal/models"
 	"forum/internal/repository"
 	"forum/pkg/validator"
-	"time"
 )
 
 type PostService interface {
@@ -34,9 +35,10 @@ func NewPostService(postRepository repository.PostRepository, categoryRepository
 
 func (ps *postService) CreatePost(v *validator.Validator, post *models.Post) error {
 	post.Created = time.Now()
-	if ValidatePost(v, post); !v.Valid() {
+	if validatePost(v, post); !v.Valid() {
 		return ErrFormValidation
 	}
+
 	_, err := ps.pr.CreatePost(post)
 	if err != nil {
 		return err
@@ -139,7 +141,7 @@ func (ps *postService) GetCommentedPosts(userID int) ([]*models.Post, error) {
 	return nil, nil
 }
 
-func ValidatePost(v *validator.Validator, post *models.Post) {
+func validatePost(v *validator.Validator, post *models.Post) {
 	v.Check(post.Title != "", "title", "must be provided")
 	v.Check(len(post.Title) <= 20, "title", "must not be more than 20 chars")
 
