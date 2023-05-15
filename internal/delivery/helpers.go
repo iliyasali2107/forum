@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func (h *Handler) background(fn func()) {
+func (h *Controller) background(fn func()) {
 	// Increment the WaitGroup counter
 	h.wg.Add(1)
 
@@ -27,7 +27,7 @@ func (h *Handler) background(fn func()) {
 	}()
 }
 
-func (h *Handler) render(w http.ResponseWriter, name string, td any) {
+func (h *Controller) render(w http.ResponseWriter, name string, td any) {
 	err := h.tmpl.ExecuteTemplate(w, name, td)
 	if err != nil {
 		h.logger.PrintInfo("render: " + err.Error())

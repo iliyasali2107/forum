@@ -15,17 +15,16 @@ import (
 	"forum/pkg/validator"
 )
 
-type Handler struct {
+type Controller struct {
 	tmpl      *template.Template
 	Service   *service.Service
 	logger    *logger.Logger
-	cfg       config
 	validator *validator.Validator
 	wg        sync.WaitGroup
 }
 
-func NewHandler(service *service.Service) *Handler {
-	return &Handler{
+func NewController(service *service.Service) *Controller {
+	return &Controller{
 		tmpl:      template.Must(template.ParseGlob("./templates/*")),
 		Service:   service,
 		validator: validator.NewValidator(),
@@ -33,7 +32,7 @@ func NewHandler(service *service.Service) *Handler {
 	}
 }
 
-func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
+func (h *Controller) Home(w http.ResponseWriter, r *http.Request) {
 	posts, err := h.Service.PostService.GetAllPosts()
 	if err != nil {
 		h.logger.PrintError(err)
@@ -47,9 +46,9 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
+func (h *Controller) Signup(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/auth/signup" {
-		h.logger.PrintError(fmt.Errorf("handler: signup: not found"))
+		h.logger.PrintError(fmt.Errorf("Controller: signup: not found"))
 		h.ResponseNotFound(w)
 		return
 	}
@@ -58,7 +57,7 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		err := h.tmpl.ExecuteTemplate(w, "signup.html", nil)
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: signup: internal server error"))
+			h.logger.PrintError(fmt.Errorf("Controller: signup: internal server error"))
 			h.ResponseServerError(w)
 			return
 		}
@@ -90,15 +89,15 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
 	default:
-		h.logger.PrintError(fmt.Errorf("handler: signup: method not allowed"))
+		h.logger.PrintError(fmt.Errorf("Controller: signup: method not allowed"))
 		h.ResponseMethodNotAllowed(w)
 		return
 	}
 }
 
-func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
+func (h *Controller) Login(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/auth/login" {
-		h.logger.PrintError(fmt.Errorf("handler: login: not found"))
+		h.logger.PrintError(fmt.Errorf("Controller: login: not found"))
 		h.ResponseNotFound(w)
 		return
 	}
@@ -120,15 +119,15 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			switch err {
 			case service.ErrUserNotFound:
-				h.logger.PrintError(fmt.Errorf("handler: login: user not found"))
+				h.logger.PrintError(fmt.Errorf("Controller: login: user not found"))
 				h.ResponseBadRequest(w)
 				return
 			case service.ErrInvalidPassword:
-				h.logger.PrintError(fmt.Errorf("handler: login: password is not correct"))
+				h.logger.PrintError(fmt.Errorf("Controller: login: password is not correct"))
 				h.ResponseBadRequest(w)
 				return
 			default:
-				h.logger.PrintError(fmt.Errorf("handler: login: password is not correct"))
+				h.logger.PrintError(fmt.Errorf("Controller: login: password is not correct"))
 				h.ResponseServerError(w)
 				return
 			}
@@ -145,9 +144,9 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
+func (h *Controller) Logout(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/auth/logout" {
-		h.logger.PrintError(fmt.Errorf("handler: logout: not found"))
+		h.logger.PrintError(fmt.Errorf("Controller: logout: not found"))
 		h.ResponseNotFound(w)
 		return
 	}
@@ -155,18 +154,18 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	c, err := r.Cookie("access_token")
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {
-			h.logger.PrintError(fmt.Errorf("handler: logout: unauthorized"))
+			h.logger.PrintError(fmt.Errorf("Controller: logout: unauthorized"))
 			h.errorPage(w, http.StatusUnauthorized)
 			return
 		}
-		fmt.Println("handler: logout: " + err.Error())
+		fmt.Println("Controller: logout: " + err.Error())
 		h.ResponseServerError(w)
 		return
 	}
 
 	err = h.Service.AuthService.DeleteToken(c.Value)
 	if err != nil {
-		h.logger.PrintError(fmt.Errorf("handler: logout: couldn't delete token"))
+		h.logger.PrintError(fmt.Errorf("Controller: logout: couldn't delete token"))
 		h.ResponseServerError(w)
 		return
 	}
@@ -181,10 +180,10 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// PostsHandler TODO: invalid field messages for each field
-func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
+// PostsController TODO: invalid field messages for each field
+func (h *Controller) CreatePostController(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/posts/create" {
-		h.logger.PrintError(fmt.Errorf("handler: post-create: not found"))
+		h.logger.PrintError(fmt.Errorf("Controller: post-create: not found"))
 		h.ResponseNotFound(w)
 		return
 	}
@@ -203,7 +202,7 @@ func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: post-create: GetAllCategories error"))
+			h.logger.PrintError(fmt.Errorf("Controller: post-create: GetAllCategories error"))
 			h.logger.PrintError(err)
 			h.ResponseServerError(w)
 			return
@@ -211,7 +210,7 @@ func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 		err = h.tmpl.ExecuteTemplate(w, "create_post.html", data)
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: post-create: ExecuteTemplate error"))
+			h.logger.PrintError(fmt.Errorf("Controller: post-create: ExecuteTemplate error"))
 			h.logger.PrintError(err)
 			h.ResponseServerError(w)
 			return
@@ -219,7 +218,7 @@ func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		err := r.ParseForm()
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: post-create: ParseForm error"))
+			h.logger.PrintError(fmt.Errorf("Controller: post-create: ParseForm error"))
 			h.logger.PrintError(err)
 			h.ResponseBadRequest(w)
 			return
@@ -236,7 +235,7 @@ func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 			if err == service.ErrFormValidation {
 				categories, err := h.Service.PostService.GetAllCategories()
 				if err != nil {
-					h.logger.PrintError(fmt.Errorf("handler: post-create: CreatePost ErrFormValidation error"))
+					h.logger.PrintError(fmt.Errorf("Controller: post-create: CreatePost ErrFormValidation error"))
 					h.logger.PrintError(err)
 					h.ResponseServerError(w)
 					return
@@ -266,15 +265,15 @@ func (h *Handler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Controller) ListPostsController(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		h.logger.PrintError(fmt.Errorf("handler: listPost: method not allowed"))
+		h.logger.PrintError(fmt.Errorf("Controller: listPost: method not allowed"))
 		h.ResponseMethodNotAllowed(w)
 		return
 	}
 
 	if r.URL.Path != "/posts" {
-		h.logger.PrintError(fmt.Errorf("handler: listPost: not found"))
+		h.logger.PrintError(fmt.Errorf("Controller: listPost: not found"))
 		h.ResponseNotFound(w)
 		return
 	}
@@ -286,14 +285,14 @@ func (h *Handler) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		posts, err := h.Service.PostService.GetAllPosts()
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: listPost: GetAllPosts error"))
+			h.logger.PrintError(fmt.Errorf("Controller: listPost: GetAllPosts error"))
 			h.logger.PrintError(err)
 			h.ResponseServerError(w)
 			return
 		}
 		err = h.tmpl.ExecuteTemplate(w, "show_posts.html", posts)
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: listPost: ExecuteTemplate error"))
+			h.logger.PrintError(fmt.Errorf("Controller: listPost: ExecuteTemplate error"))
 			h.logger.PrintError(err)
 			h.ResponseServerError(w)
 			return
@@ -302,7 +301,7 @@ func (h *Handler) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if user == nil {
-		h.logger.PrintError(fmt.Errorf("handler: listPost: unauthorized"))
+		h.logger.PrintError(fmt.Errorf("Controller: listPost: unauthorized"))
 		h.ResponseUnauthorized(w)
 		return
 	}
@@ -311,7 +310,7 @@ func (h *Handler) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 	case "created":
 		posts, err := h.Service.PostService.GetCreatedPosts(user.ID)
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: listPost: created GetCreatedPosts"))
+			h.logger.PrintError(fmt.Errorf("Controller: listPost: created GetCreatedPosts"))
 			h.logger.PrintError(err)
 			h.ResponseServerError(w)
 			return
@@ -319,7 +318,7 @@ func (h *Handler) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 
 		err = h.tmpl.ExecuteTemplate(w, "show_posts.html", posts)
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: listPost: created ExecuteTemplate show_posts.html"))
+			h.logger.PrintError(fmt.Errorf("Controller: listPost: created ExecuteTemplate show_posts.html"))
 			h.logger.PrintError(err)
 			h.ResponseServerError(w)
 			return
@@ -327,7 +326,7 @@ func (h *Handler) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 	case "liked":
 		posts, err := h.Service.PostService.GetLikedPosts(user.ID)
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: listPost: liked GetLikedPosts"))
+			h.logger.PrintError(fmt.Errorf("Controller: listPost: liked GetLikedPosts"))
 			h.logger.PrintError(err)
 			h.ResponseServerError(w)
 			return
@@ -335,7 +334,7 @@ func (h *Handler) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 
 		err = h.tmpl.ExecuteTemplate(w, "show_posts.html", posts)
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: listPost: liked ExecuteTemplate show_posts.html"))
+			h.logger.PrintError(fmt.Errorf("Controller: listPost: liked ExecuteTemplate show_posts.html"))
 			h.logger.PrintError(err)
 			h.ResponseServerError(w)
 			return
@@ -343,7 +342,7 @@ func (h *Handler) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 	case "disliked":
 		posts, err := h.Service.PostService.GetDislikedPosts(user.ID)
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: listPost: disliked GetLikedPosts"))
+			h.logger.PrintError(fmt.Errorf("Controller: listPost: disliked GetLikedPosts"))
 			h.logger.PrintError(err)
 			h.ResponseServerError(w)
 			return
@@ -351,22 +350,22 @@ func (h *Handler) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 
 		err = h.tmpl.ExecuteTemplate(w, "show_posts.html", posts)
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: listPost: disliked ExecuteTemplate show_posts.html"))
+			h.logger.PrintError(fmt.Errorf("Controller: listPost: disliked ExecuteTemplate show_posts.html"))
 			h.logger.PrintError(err)
 			h.ResponseServerError(w)
 			return
 		}
 	default:
-		h.logger.PrintError(fmt.Errorf("handler: listPost: bad request"))
+		h.logger.PrintError(fmt.Errorf("Controller: listPost: bad request"))
 		h.ResponseBadRequest(w)
 		return
 	}
 }
 
-func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Controller) PostController(w http.ResponseWriter, r *http.Request) {
 	id, err := GetIdFromShortURL(r.URL.Path)
 	if err != nil {
-		h.logger.PrintError(fmt.Errorf("handler: PostHandler: not found"))
+		h.logger.PrintError(fmt.Errorf("Controller: PostController: not found"))
 		h.logger.PrintError(err)
 		h.ResponseNotFound(w)
 		return
@@ -374,7 +373,7 @@ func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
 
 	post, err := h.Service.PostService.GetPost(id)
 	if err != nil {
-		h.logger.PrintError(fmt.Errorf("handler: PostHandler: GetPost"))
+		h.logger.PrintError(fmt.Errorf("Controller: PostController: GetPost"))
 		h.logger.PrintError(err)
 		h.ResponseNotFound(w)
 		return
@@ -382,7 +381,7 @@ func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
 
 	likes, err := h.Service.ReactionService.GetPostLikes(id)
 	if err != nil {
-		h.logger.PrintError(fmt.Errorf("handler: PostHandler: GetPostLikes"))
+		h.logger.PrintError(fmt.Errorf("Controller: PostController: GetPostLikes"))
 		h.logger.PrintError(err)
 		h.ResponseServerError(w)
 		return
@@ -390,7 +389,7 @@ func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
 
 	dislikes, err := h.Service.ReactionService.GetPostDislikes(id)
 	if err != nil {
-		h.logger.PrintError(fmt.Errorf("handler: PostHandler: GetPostDislikes"))
+		h.logger.PrintError(fmt.Errorf("Controller: PostController: GetPostDislikes"))
 		h.logger.PrintError(err)
 		h.ResponseServerError(w)
 		return
@@ -398,7 +397,7 @@ func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
 
 	comments, err := h.Service.CommentService.GetCommentsByPostId(id)
 	if err != nil {
-		h.logger.PrintError(fmt.Errorf("handler: PostHandler: GetPostDislikes"))
+		h.logger.PrintError(fmt.Errorf("Controller: PostController: GetPostDislikes"))
 		h.logger.PrintError(err)
 		h.ResponseServerError(w)
 		return
@@ -411,7 +410,7 @@ func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
 	// comments, err := h.Service.CommentService.GetCommentsByPostId(id)
 	// fmt.Println(comments)
 	// if err != nil {
-	// 	h.logger.PrintError(fmt.Errorf("handler: PostHandler: GetCommentsByPostId"))
+	// 	h.logger.PrintError(fmt.Errorf("Controller: PostController: GetCommentsByPostId"))
 	// 	h.logger.PrintError(err)
 	// 	h.ResponseServerError(w)
 	// 	return
@@ -421,16 +420,16 @@ func (h *Handler) PostHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = h.tmpl.ExecuteTemplate(w, "post.html", post)
 	if err != nil {
-		h.logger.PrintError(fmt.Errorf("handler: PostHandler: ExecuteTemplate post.html"))
+		h.logger.PrintError(fmt.Errorf("Controller: PostController: ExecuteTemplate post.html"))
 		h.logger.PrintError(err)
 		h.ResponseServerError(w)
 		return
 	}
 }
 
-func (h *Handler) ReactionPostHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Controller) ReactionPostController(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		h.logger.PrintError(fmt.Errorf("handler: LikePost: method not allowed"))
+		h.logger.PrintError(fmt.Errorf("Controller: LikePost: method not allowed"))
 		h.ResponseMethodNotAllowed(w)
 		return
 	}
@@ -461,14 +460,14 @@ func (h *Handler) ReactionPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	post, err := h.Service.PostService.GetPost(postIDInt)
 	if err != nil {
-		h.logger.PrintError(fmt.Errorf("handler: LikePost: GetPost"))
+		h.logger.PrintError(fmt.Errorf("Controller: LikePost: GetPost"))
 		h.logger.PrintError(err)
 		h.ResponseServerError(w)
 		return
 	}
 	user := h.contextGetUser(r)
 
-	reaction := &models.Reaction{User: user, Post: post, Type: reactionTypeInt}
+	reaction := &models.Reaction{UserID: user.ID, PostID: postIDInt, Type: reactionTypeInt}
 
 	if reactionTypeInt == 1 {
 		err = h.Service.ReactionService.LikePost(reaction)
@@ -477,7 +476,7 @@ func (h *Handler) ReactionPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		h.logger.PrintError(fmt.Errorf("handler: LikePost: h.Service.ReactionService.LikePost()"))
+		h.logger.PrintError(fmt.Errorf("Controller: LikePost: h.Service.ReactionService.LikePost()"))
 		h.logger.PrintError(err)
 		h.ResponseServerError(w)
 		return
@@ -486,7 +485,7 @@ func (h *Handler) ReactionPostHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/posts/"+strconv.Itoa(post.ID), http.StatusSeeOther)
 }
 
-func (h *Handler) CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Controller) CreateCommentController(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 
@@ -494,7 +493,7 @@ func (h *Handler) CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 
 		err := r.ParseForm()
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: comment-create: ParseForm"))
+			h.logger.PrintError(fmt.Errorf("Controller: comment-create: ParseForm"))
 			h.logger.PrintError(err)
 			h.ResponseBadRequest(w)
 			return
@@ -505,7 +504,7 @@ func (h *Handler) CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 		postIDStr := r.FormValue("post_id")
 		postIDInt, err := strconv.Atoi(postIDStr)
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: comment-create: strconv post_id"))
+			h.logger.PrintError(fmt.Errorf("Controller: comment-create: strconv post_id"))
 			h.logger.PrintError(err)
 			h.ResponseBadRequest(w)
 		}
@@ -513,7 +512,7 @@ func (h *Handler) CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 		parentIDStr := r.FormValue("parent_id")
 		parentIDInt, err := strconv.Atoi(parentIDStr)
 		if err != nil {
-			h.logger.PrintError(fmt.Errorf("handler: comment-create: strconv parent_id"))
+			h.logger.PrintError(fmt.Errorf("Controller: comment-create: strconv parent_id"))
 			h.logger.PrintError(err)
 			h.ResponseBadRequest(w)
 			return
@@ -527,12 +526,12 @@ func (h *Handler) CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 		err = h.Service.CommentService.CreateComment(h.validator, comment)
 		if err != nil {
 			if err == service.ErrFormValidation {
-				h.logger.PrintError(fmt.Errorf("handler: comment-create: CreateComment ErrFormValidation"))
+				h.logger.PrintError(fmt.Errorf("Controller: comment-create: CreateComment ErrFormValidation"))
 				h.logger.PrintError(err)
 				h.ResponseBadRequest(w)
 				return
 			}
-			h.logger.PrintError(fmt.Errorf("handler: comment-create: CreateComment"))
+			h.logger.PrintError(fmt.Errorf("Controller: comment-create: CreateComment"))
 			h.logger.PrintError(err)
 			h.ResponseServerError(w)
 			return
@@ -540,13 +539,13 @@ func (h *Handler) CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/posts/"+strconv.Itoa(postIDInt), http.StatusSeeOther)
 	default:
-		h.logger.PrintError(fmt.Errorf("handler: comment-create: method not allowed"))
+		h.logger.PrintError(fmt.Errorf("Controller: comment-create: method not allowed"))
 		h.ResponseMethodNotAllowed(w)
 		return
 	}
 }
 
-func (h *Handler) ShowCommentHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Controller) ShowCommentController(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		h.ResponseMethodNotAllowed(w)
 	}

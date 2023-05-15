@@ -11,7 +11,7 @@ import (
 
 // TODO: signup and login for authorized user not available
 
-func (h *Handler) userIdentity(next http.HandlerFunc) http.HandlerFunc {
+func (h *Controller) userIdentity(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user *models.User
 		var err error
@@ -42,7 +42,7 @@ func (h *Handler) userIdentity(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func (h *Handler) recoverPanic(next http.HandlerFunc) http.HandlerFunc {
+func (h *Controller) recoverPanic(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
@@ -55,7 +55,7 @@ func (h *Handler) recoverPanic(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func (h *Handler) authorized(next http.HandlerFunc) http.HandlerFunc {
+func (h *Controller) authorized(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// user := r.Context().Value(ctxKeyUser).(*models.User)
 		u := r.Context().Value(ctxKeyUser)

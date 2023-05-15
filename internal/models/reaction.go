@@ -2,9 +2,9 @@ package models
 
 type Reaction struct {
 	ID      int
-	Post    *Post
+	PostID  int
 	Comment *Comment
-	User    *User
+	UserID  int
 	Type    int
 }
 

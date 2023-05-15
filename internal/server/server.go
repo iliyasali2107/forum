@@ -9,13 +9,13 @@ type Server struct {
 	Srv *http.Server
 }
 
-// func NewServer(cfg *config.Config, handler *delivery.Handler) *Server {
+// func NewServer(cfg *config.Config, handler *delivery.Controller) *Server {
 // 	mux := http.NewServeMux()
 // 	handler.InitRoutes(mux)
 // 	return &Server{
 // 		Srv: &http.Server{
 // 			Addr:           cfg.Http.Addr,
-// 			Handler:        mux,
+// 			Controller:        mux,
 // 			ReadTimeout:    1,
 // 			WriteTimeout:   1,
 // 			MaxHeaderBytes: cfg.Http.MaxHeaderBytes << 20,

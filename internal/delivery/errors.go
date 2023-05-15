@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func (h *Handler) errorPage(w http.ResponseWriter, code int) {
+func (h *Controller) errorPage(w http.ResponseWriter, code int) {
 	w.WriteHeader(code)
 
 	data := struct {
@@ -21,59 +21,59 @@ func (h *Handler) errorPage(w http.ResponseWriter, code int) {
 	}
 }
 
-func (h *Handler) logError(err error) {
+func (h *Controller) logError(err error) {
 	h.logger.PrintError(err)
 }
 
-func (h *Handler) errorResponse(w http.ResponseWriter, status int) {
+func (h *Controller) errorResponse(w http.ResponseWriter, status int) {
 	h.errorPage(w, status)
 }
 
-func (h *Handler) ResponseServerError(w http.ResponseWriter) {
+func (h *Controller) ResponseServerError(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusInternalServerError)
 }
 
-func (h *Handler) ResponseNotFound(w http.ResponseWriter) {
+func (h *Controller) ResponseNotFound(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusNotFound)
 }
 
-func (h *Handler) ResponseMethodNotAllowed(w http.ResponseWriter) {
+func (h *Controller) ResponseMethodNotAllowed(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusMethodNotAllowed)
 }
 
-func (h *Handler) ResponseBadRequest(w http.ResponseWriter) {
+func (h *Controller) ResponseBadRequest(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusBadRequest)
 }
 
-func (h *Handler) ResponseFailedValidation(w http.ResponseWriter) {
+func (h *Controller) ResponseFailedValidation(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusUnprocessableEntity)
 }
 
-func (h *Handler) ResponseEditConflict(w http.ResponseWriter) {
+func (h *Controller) ResponseEditConflict(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusConflict)
 }
 
-func (h *Handler) ResponseRateLimitExceeded(w http.ResponseWriter) {
+func (h *Controller) ResponseRateLimitExceeded(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusTooManyRequests)
 }
 
-func (h *Handler) ResponseInvalidCredentials(w http.ResponseWriter) {
+func (h *Controller) ResponseInvalidCredentials(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusUnauthorized)
 }
 
-func (h *Handler) ResponseInvalidAuthenticationToken(w http.ResponseWriter) {
+func (h *Controller) ResponseInvalidAuthenticationToken(w http.ResponseWriter) {
 	w.Header().Set("WWW-Authenticate", "Bearer")
 	h.errorResponse(w, http.StatusUnauthorized)
 }
 
-func (h *Handler) ResponseUnauthorized(w http.ResponseWriter) {
+func (h *Controller) ResponseUnauthorized(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusUnauthorized)
 }
 
-func (h *Handler) ResponseInactiveAccount(w http.ResponseWriter) {
+func (h *Controller) ResponseInactiveAccount(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusForbidden)
 }
 
-func (h *Handler) ResponseNotPermitted(w http.ResponseWriter) {
+func (h *Controller) ResponseNotPermitted(w http.ResponseWriter) {
 	h.errorResponse(w, http.StatusForbidden)
 }

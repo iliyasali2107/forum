@@ -35,7 +35,7 @@ func NewReactionRepository(db *sql.DB) ReactionRepository {
 // post
 func (rr *reactionRepository) CreatePostReaction(reaction *models.Reaction) error {
 	query := `INSERT INTO reactions_posts (post_id, user_id, type) VALUES (?, ?, ?)`
-	row, err := rr.db.Exec(query, reaction.Post.ID, reaction.User.ID, reaction.Type)
+	row, err := rr.db.Exec(query, reaction.PostID, reaction.UserID, reaction.Type)
 	if err != nil {
 		return nil
 	}
@@ -51,16 +51,14 @@ func (rr *reactionRepository) CreatePostReaction(reaction *models.Reaction) erro
 func (rr *reactionRepository) GetPostReaction(reaction *models.Reaction) (*models.Reaction, error) {
 	query := `SELECT * FROM reactions_posts WHERE user_id = ? AND post_id = ?`
 
-	row := rr.db.QueryRow(query, reaction.User.ID, reaction.Post.ID)
+	row := rr.db.QueryRow(query, reaction.UserID, reaction.PostID)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
 
-	user := &models.User{}
-	post := &models.Post{}
-	react := &models.Reaction{User: user, Post: post}
+	react := &models.Reaction{}
 
-	if err := row.Scan(&react.ID, &react.Post.ID, &react.User.ID, &react.Type); err != nil {
+	if err := row.Scan(&react.ID, &react.PostID, &react.UserID, &react.Type); err != nil {
 		return nil, err
 	}
 
@@ -72,7 +70,7 @@ func (rr *reactionRepository) UpdatePostReaction(reaction *models.Reaction) erro
 			SET type = ?
 			WHERE user_id = ? AND post_id = ?`
 
-	_, err := rr.db.Exec(query, reaction.Type, reaction.User.ID, reaction.Post.ID)
+	_, err := rr.db.Exec(query, reaction.Type, reaction.UserID, reaction.PostID)
 	if err != nil {
 		return err
 	}
@@ -82,7 +80,7 @@ func (rr *reactionRepository) UpdatePostReaction(reaction *models.Reaction) erro
 
 func (rr *reactionRepository) DeletePostReaction(reaction *models.Reaction) error {
 	query := `DELETE FROM reactions_posts WHERE post_id = ? AND user_id = ?`
-	if _, err := rr.db.Exec(query, reaction.Post.ID, reaction.User.ID); err != nil {
+	if _, err := rr.db.Exec(query, reaction.PostID, reaction.UserID); err != nil {
 		return err
 	}
 	return nil
@@ -113,7 +111,7 @@ func (rr *reactionRepository) GetPostDislikes(post_id int) (int, error) {
 // comment
 func (rr *reactionRepository) CreateCommentReaction(reaction *models.Reaction) (int, error) {
 	query := `INSERT INTO reactions_comments (comment_id, user_id, type) VALUES (?, ?, ?)`
-	row, err := rr.db.Exec(query, reaction.Comment.ID, reaction.User.ID, reaction.Type)
+	row, err := rr.db.Exec(query, reaction.Comment.ID, reaction.UserID, reaction.Type)
 	if err != nil {
 		return 0, nil
 	}
