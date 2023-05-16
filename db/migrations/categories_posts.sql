@@ -4,3 +4,4 @@ CREATE TABLE categories_posts (
     FOREIGN KEY (post_id) REFERENCES posts(id),
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
+

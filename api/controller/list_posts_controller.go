@@ -2,8 +2,9 @@ package controller
 
 import (
 	"fmt"
-	"forum/internal/usecase"
 	"net/http"
+
+	"forum/domain/usecase"
 )
 
 type ListPostsController struct {
@@ -18,7 +19,7 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 		return
 	}
 
-	if r.URL.Path != "/posts" {
+	if r.URL.Path != "/posts/all" {
 		lpc.logger.PrintError(fmt.Errorf("Controller: listPost: not found"))
 		lpc.ResponseNotFound(w)
 		return
@@ -54,7 +55,7 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 
 	switch filter[0] {
 	case "created":
-		posts, err := lpc.Service.PostService.GetCreatedPosts(user.ID)
+		posts, err := lpc.ListPostUsecase.GetCreatedPosts(user.ID)
 		if err != nil {
 			lpc.logger.PrintError(fmt.Errorf("Controller: listPost: created GetCreatedPosts"))
 			lpc.logger.PrintError(err)
@@ -70,7 +71,7 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 			return
 		}
 	case "liked":
-		posts, err := lpc.Service.PostService.GetLikedPosts(user.ID)
+		posts, err := lpc.ListPostUsecase.GetLikedPosts(user.ID)
 		if err != nil {
 			lpc.logger.PrintError(fmt.Errorf("Controller: listPost: liked GetLikedPosts"))
 			lpc.logger.PrintError(err)
@@ -86,7 +87,7 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 			return
 		}
 	case "disliked":
-		posts, err := lpc.Service.PostService.GetDislikedPosts(user.ID)
+		posts, err := lpc.ListPostUsecase.GetDislikedPosts(user.ID)
 		if err != nil {
 			lpc.logger.PrintError(fmt.Errorf("Controller: listPost: disliked GetLikedPosts"))
 			lpc.logger.PrintError(err)

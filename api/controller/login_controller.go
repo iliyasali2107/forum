@@ -2,10 +2,10 @@ package controller
 
 import (
 	"fmt"
-	"forum/internal/models"
-	"forum/internal/service"
-	"forum/internal/usecase"
 	"net/http"
+
+	"forum/domain/models"
+	"forum/domain/usecase"
 )
 
 type LoginController struct {
@@ -14,7 +14,7 @@ type LoginController struct {
 }
 
 func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/auth/login" {
+	if r.URL.Path != "/login" {
 		lc.logger.PrintError(fmt.Errorf("handler: login: not found"))
 		lc.ResponseNotFound(w)
 		return
@@ -36,11 +36,11 @@ func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		err := lc.LoginUsecase.Login(user)
 		if err != nil {
 			switch err {
-			case service.ErrUserNotFound:
+			case ErrUserNotFound:
 				lc.logger.PrintError(fmt.Errorf("handler: login: user not found"))
 				lc.ResponseBadRequest(w)
 				return
-			case service.ErrInvalidPassword:
+			case ErrInvalidPassword:
 				lc.logger.PrintError(fmt.Errorf("handler: login: password is not correct"))
 				lc.ResponseBadRequest(w)
 				return

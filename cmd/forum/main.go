@@ -1,30 +1,28 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"net/http"
+	"time"
 
-	"forum/internal/delivery"
-	"forum/internal/repository"
-	"forum/internal/service"
-	"forum/pkg/sqlite"
+	"forum/api/controller"
+	"forum/api/route"
+	"forum/bootstrap"
 )
 
 func main() {
-	mux := http.NewServeMux()
-	db, err := sqlite.Connect("./db/forum.db")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	rp := repository.NewRepository(db)
-	svc := service.NewService(rp)
-	handler := delivery.NewHandler(svc)
-	handler.InitRoutes(mux)
+	app := bootstrap.App()
 
-	fmt.Println("http://localhost:8080/")
-	err = http.ListenAndServe(":8080", mux)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	env := app.Env
+
+	db := app.DB
+
+	timeout := time.Duration(env.ContextTimeout) * time.Second
+
+	mux := http.NewServeMux()
+
+	ctrl := controller.NewController()
+
+	route.Setup(env, timeout, db, mux, ctrl)
+
+	http.ListenAndServe(env.ServerAddress, mux)
 }

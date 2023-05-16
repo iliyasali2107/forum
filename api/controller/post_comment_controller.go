@@ -2,19 +2,19 @@ package controller
 
 import (
 	"fmt"
-	"forum/internal/models"
-	"forum/internal/service"
-	"forum/internal/usecase"
 	"net/http"
 	"strconv"
+
+	"forum/domain/models"
+	"forum/domain/usecase"
 )
 
-type PostCommentController struct {
-	PostCommentUsecase usecase.PostCommentUsecase
+type CreateCommentController struct {
+	CreateCommentUsecase usecase.CreateCommentUsecase
 	Controller
 }
 
-func (pcc *PostCommentController) CreateCommentController(w http.ResponseWriter, r *http.Request) {
+func (pcc *CreateCommentController) CreateCommentController(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 
@@ -52,9 +52,9 @@ func (pcc *PostCommentController) CreateCommentController(w http.ResponseWriter,
 		comment.PostID = postIDInt
 		comment.ParentID = parentIDInt
 
-		err = pcc.PostCommentUsecase.CreateComment(pcc.validator, comment)
+		err = pcc.CreateCommentUsecase.CreateComment(pcc.validator, comment)
 		if err != nil {
-			if err == service.ErrFormValidation {
+			if err == ErrFormValidation {
 				pcc.logger.PrintError(fmt.Errorf("Controller: comment-create: CreateComment ErrFormValidation"))
 				pcc.logger.PrintError(err)
 				pcc.ResponseBadRequest(w)

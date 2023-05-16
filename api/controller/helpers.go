@@ -2,12 +2,26 @@ package controller
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"forum/internal/models"
+	"forum/domain/models"
+)
+
+var (
+	ErrInvalidEmail        = errors.New("invalid email format")
+	ErrInvalidPassword     = errors.New("invalid password")
+	ErrInvalidUsername     = errors.New("invalid username")
+	ErrInvalidUsernameLen  = errors.New("username length out of range 32")
+	ErrInvalidUsernameChar = errors.New("invalid username characters")
+	ErrInternalServer      = errors.New("internal server error")
+	ErrConfirmPassword     = errors.New("password doesn't match")
+	ErrUserNotFound        = errors.New("user not found")
+	ErrUserExists          = errors.New("user already exists")
+	ErrFormValidation      = errors.New("form validation failed")
 )
 
 // Context helpers
@@ -102,26 +116,6 @@ func (lc *Controller) ResponseInactiveAccount(w http.ResponseWriter) {
 
 func (lc *Controller) ResponseNotPermitted(w http.ResponseWriter) {
 	lc.errorResponse(w, http.StatusForbidden)
-}
-
-func (h *Controller) background(fn func()) {
-	// Increment the WaitGroup counter
-	h.wg.Add(1)
-
-	go func() {
-		// Use defer to decrement the WaitGroup counter before the goroutine returns.
-		defer h.wg.Done()
-
-		// Recover from any panic
-		defer func() {
-			if err := recover(); err != nil {
-				h.logger.PrintError(fmt.Errorf("error: error while recovering"))
-			}
-		}()
-
-		// Execute the arbitrary function that we passed as the parameter
-		fn()
-	}()
 }
 
 // render

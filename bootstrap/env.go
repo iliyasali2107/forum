@@ -4,16 +4,19 @@ import (
 	"bufio"
 	"log"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type Env struct {
-	ServerAddress  string
-	DBName         string
-	DBPath         string
-	DBDriver       string
-	Port           int
-	ContextTimeout int
+	ServerAddress   string
+	DBName          string
+	DBPath          string
+	DBDriver        string
+	Port            int
+	ContextTimeout  int
+	LoginExpireTime time.Duration
 }
 
 func NewEnv() *Env {
@@ -37,12 +40,44 @@ func NewEnv() *Env {
 		log.Fatal(err)
 	}
 
-	env.ServerAddress = envRows["SERVER_ADDRESS"].(string)
-	env.DBName = envRows["DB_NAME"].(string)
-	env.DBPath = envRows["DB_PATH"].(string)
-	env.DBDriver = envRows["DB_DRIVER"].(string)
-	env.Port = envRows["PORT"].(int)
-	env.ContextTimeout = envRows["CONTEXT_TIMEOUT"].(int)
+	serverAddress, ok := envRows["SERVER_ADDRESS"]
+	if ok {
+		env.ServerAddress = serverAddress.(string)
+	}
+
+	dbName, ok := envRows["DB_NAME"]
+	if ok {
+		env.DBName = dbName.(string)
+	}
+
+	dbPath, ok := envRows["DB_PATH"]
+	if ok {
+		env.DBPath = dbPath.(string)
+	}
+
+	dbDriver, ok := envRows["DB_DRIVER"]
+	if ok {
+		env.DBDriver = dbDriver.(string)
+	}
+
+	env.Port = 8080
+	portStr, ok := envRows["PORT"].(string)
+	portInt, err := strconv.Atoi(portStr)
+	if ok && err == nil {
+		env.Port = portInt
+	}
+
+	contextTimeoutStr, ok := envRows["CONTEXT_TIMEOUT"].(string)
+	contextTimeoutInt, err := strconv.Atoi(contextTimeoutStr)
+	if ok && err == nil {
+		env.ContextTimeout = contextTimeoutInt
+	}
+
+	expireTimeStr, ok := envRows["LOGIN_EXPIRE_TIME"].(string)
+	expireTimeDuration, err := time.ParseDuration(expireTimeStr)
+	if ok && err == nil {
+		env.LoginExpireTime = expireTimeDuration
+	}
 
 	return &env
 }

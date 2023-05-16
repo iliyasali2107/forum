@@ -2,15 +2,15 @@ package controller
 
 import (
 	"fmt"
-	"forum/internal/models"
-	"forum/internal/service"
-	"forum/internal/usecase"
 	"net/http"
+
+	"forum/domain/models"
+	"forum/domain/usecase"
 )
 
 type CreatePostController struct {
-	CreatePostUsecase    usecase.CreatePostUsecase
-	GetCategoriesUsecase usecase.GetCategoriesUsecase
+	CreatePostUsecase usecase.CreatePostUsecase
+
 	Controller
 }
 
@@ -26,7 +26,7 @@ func (cpc *CreatePostController) CreatePostController(w http.ResponseWriter, r *
 
 	switch r.Method {
 	case http.MethodGet:
-		categories, err := cpc.GetCategoriesUsecase.GetAllCategories()
+		categories, err := cpc.CreatePostUsecase.GetAllCategories()
 
 		data := struct {
 			Errors     map[string]string
@@ -66,8 +66,8 @@ func (cpc *CreatePostController) CreatePostController(w http.ResponseWriter, r *
 
 		err = cpc.CreatePostUsecase.CreatePost(cpc.validator, post)
 		if err != nil {
-			if err == service.ErrFormValidation {
-				categories, err := cpc.Service.PostService.GetAllCategories()
+			if err == ErrFormValidation {
+				categories, err := cpc.CreatePostUsecase.GetAllCategories()
 				if err != nil {
 					cpc.logger.PrintError(fmt.Errorf("Controller: post-create: CreatePost ErrFormValidation error"))
 					cpc.logger.PrintError(err)

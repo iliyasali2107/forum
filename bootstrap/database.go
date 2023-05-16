@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"log"
 	"time"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func NewSqliteDatabase(env *Env) *sql.DB {
@@ -22,5 +24,4 @@ func NewSqliteDatabase(env *Env) *sql.DB {
 	}
 
 	return db
-
 }
