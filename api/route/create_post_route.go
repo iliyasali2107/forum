@@ -11,12 +11,13 @@ import (
 	"forum/domain/usecase"
 )
 
-func NewCreatePostRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *http.ServeMux) {
+func NewCreatePostRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *http.ServeMux, ctrl *controller.Controller) {
 	pr := repository.NewPostRepository(db)
 	cr := repository.NewCategoryRepository(db)
 	cpc := controller.CreatePostController{
 		CreatePostUsecase: usecase.NewCreatePostUsecase(pr, cr, timeout),
+		Controller:        ctrl,
 	}
 
-	mux.HandleFunc("/posts/create", cpc.CreatePostController)
+	mux.HandleFunc(ctrl.Data.Endpoints.CreatePostEndpoint, ctrl.UserIdentity(ctrl.Authorized(cpc.CreatePostController)))
 }

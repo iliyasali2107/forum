@@ -6,35 +6,35 @@
 </head>
 <body>
 <p>
-    author: {{ .User.Name }}
+    author: {{ .Post.User.Name }}
 </p>
 <p>
-    title: {{ .Title}}
+    title: {{ .Post.Title}}
 </p>
 <p>
-    Content: {{ .Content }}
+    Content: {{ .Post.Content }}
 </p>
 <p>
-    Created: {{ .Created }}
+    Created: {{ .Post.Created }}
 </p>
     Categories:
-    {{ range .Categories }}
+    {{ range .Post.Categories }}
     {{ . }}
     {{ end }}
 <hr>
 
 Comments:
 <p>
-{{ range .Comments }}
+{{ range .Post.Comments }}
     {{ .Content }}
 
-<form action="/posts/comment" method="POST">
+<form action="/posts/comment/create" method="POST">
     <textarea name="content" placeholder="reply..."></textarea>
     <input type="hidden" name="post_id" value="{{ .PostID }}">
     <input type="hidden" name="parent_id" value="{{ .ID }}">
     <button type="submit">add</button>
 </form>
-<a href="/posts/comments/{{ .ID }}">
+<a href="{{ .Endpoints.CommentDetailsEndpoint }}{{ .ID }}">
     {{ .ReplyCount }} replies
 </a>
     <hr>
@@ -43,16 +43,16 @@ Comments:
 <hr>
 </p>
 
-Likes: {{ .Likes }}
-<form action="/posts/reaction" method="POST">
+Likes: {{ .Post.Likes }}
+<form action="{{ .Endpoints.CreatePostReactionEndpoint }}"method="POST">
     <input type="hidden" name="reaction" value="1">
     <input type="hidden" name="post_id" value="{{.ID}}">
     <button type="submit">like</button>
 </form>
 <hr>
 
-Dislike: {{ .Dislikes }}
-<form action="/posts/reaction" method="POST">
+Dislike: {{ .Post.Dislikes }}
+<form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
     <input type="hidden" name="reaction" value="0">
     <input type="hidden" name="post_id" value="{{.ID}}">
     <button type="submit">like</button>
@@ -60,7 +60,7 @@ Dislike: {{ .Dislikes }}
 <hr>
 
 Add Comment:
-<form action="/posts/comment" method="POST">
+<form action="{{ .Endpoints.CreateCommentEndpoint }} "method="POST">
     <textarea name="content" placeholder="comment..."></textarea>
     <input type="hidden" name="post_id" value="{{ .ID }}">
     <input type="hidden" name="parent_id" value="0">

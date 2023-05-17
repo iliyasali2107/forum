@@ -10,11 +10,11 @@ import (
 
 type LogoutConrtroller struct {
 	LogoutUsecase usecase.LogoutUsecase
-	Controller
+	*Controller
 }
 
 func (lc *LogoutConrtroller) Logout(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/logout" {
+	if r.URL.Path != lc.Data.Endpoints.LogoutEndpoint {
 		lc.logger.PrintError(fmt.Errorf("Controller: logout: not found"))
 		lc.ResponseNotFound(w)
 		return

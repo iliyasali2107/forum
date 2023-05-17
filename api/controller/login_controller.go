@@ -14,7 +14,7 @@ type LoginController struct {
 }
 
 func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/login" {
+	if r.URL.Path != lc.Data.Endpoints.LoginEndpoint {
 		lc.logger.PrintError(fmt.Errorf("handler: login: not found"))
 		lc.ResponseNotFound(w)
 		return

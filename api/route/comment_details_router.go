@@ -11,11 +11,12 @@ import (
 	"forum/domain/usecase"
 )
 
-func NewCommentDetailsRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *http.ServeMux) {
+func NewCommentDetailsRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *http.ServeMux, ctrl *controller.Controller) {
 	cr := repository.NewCommentRepository(db)
 	cdc := controller.CommentDetailsControler{
 		CommentDetailsUsecase: usecase.NewCommentDetailsUsecase(cr, timeout),
+		Controller:            ctrl,
 	}
 
-	mux.HandleFunc("/comment/", cdc.CommentDetails)
+	mux.HandleFunc(ctrl.Data.Endpoints.CommentDetailsEndpoint, cdc.CommentDetails)
 }

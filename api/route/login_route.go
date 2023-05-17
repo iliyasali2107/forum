@@ -11,11 +11,12 @@ import (
 	"forum/domain/usecase"
 )
 
-func NewLoginRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *http.ServeMux) {
+func NewLoginRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *http.ServeMux, ctrl *controller.Controller) {
 	ur := repository.NewUserRepository(db)
 	lc := controller.LoginController{
 		LoginUsecase: usecase.NewLoginUsecase(ur, env, timeout),
+		Controller:   ctrl,
 	}
 
-	mux.HandleFunc("/login", lc.Login)
+	mux.HandleFunc(ctrl.Data.Endpoints.LoginEndpoint, lc.Login)
 }

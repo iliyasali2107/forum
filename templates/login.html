@@ -5,7 +5,7 @@
     <title>Title</title>
 </head>
 <body>
-<form action="/auth/login" method="POST">
+<form action="{{ .Endpoints.LoginEndpoint }}" method="POST">
     <div>
         <input type="text" name="email" id="email" required>
         <label for="email">email</label>

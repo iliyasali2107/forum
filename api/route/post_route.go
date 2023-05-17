@@ -11,7 +11,7 @@ import (
 	"forum/domain/usecase"
 )
 
-func NewPostRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *http.ServeMux) {
+func NewPostRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *http.ServeMux, ctrl *controller.Controller) {
 	pr := repository.NewPostRepository(db)
 	ur := repository.NewUserRepository(db)
 	cr := repository.NewCategoryRepository(db)
@@ -20,7 +20,8 @@ func NewPostRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *h
 
 	pdc := controller.PostController{
 		PostDetailsUsecase: usecase.NewPostDetailsUsecase(pr, ur, cr, rr, cmr, timeout),
+		Controller:         ctrl,
 	}
 
-	mux.HandleFunc("/posts/", pdc.PostController)
+	mux.HandleFunc(ctrl.Data.Endpoints.PostDetailsEndpoint, pdc.PostController)
 }

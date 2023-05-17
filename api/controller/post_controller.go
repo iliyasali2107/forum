@@ -9,7 +9,7 @@ import (
 
 type PostController struct {
 	PostDetailsUsecase usecase.PostDetailsUsecase
-	Controller
+	*Controller
 }
 
 func (pc *PostController) PostController(w http.ResponseWriter, r *http.Request) {
@@ -67,8 +67,8 @@ func (pc *PostController) PostController(w http.ResponseWriter, r *http.Request)
 	// }
 
 	// post.Comments = comments
-
-	err = pc.tmpl.ExecuteTemplate(w, "post.html", post)
+	pc.Data.Post = post
+	err = pc.tmpl.ExecuteTemplate(w, "post.html", pc.Data)
 	if err != nil {
 		pc.logger.PrintError(fmt.Errorf("Controller: PostController: ExecuteTemplate post.html"))
 		pc.logger.PrintError(err)

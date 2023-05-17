@@ -8,16 +8,16 @@
     <title>Document</title>
 </head>
 <body>
-<a href="/auth/signup">signup</a>
-<a href="/auth/login">login</a>
-<a href="/auth/logout">logout</a>
-<a href="/posts/create">Create Post</a>
+<a href="{{ .Endpoints.SignupEndpoint }}">signup</a>
+<a href="{{ .Endpoints.LoginEndpoint }}">login</a>
+<a href="{{ .Endpoints.LogoutEndpoint }}">logout</a>
+<a href="{{ .Endpoints.CreatePostEndpoint }}">Create Post</a>
 
 
 <div>
 
     <hr>
-    {{ range . }}
+    {{ range .Posts }}
     <p>
         author: {{ .User.Name }}
     </p>

@@ -25,17 +25,17 @@ var (
 )
 
 // Context helpers
-const ctxKeyUser ctxKey = "user"
+const CtxKeyUser CtxKey = "user"
 
-type ctxKey string
+type CtxKey string
 
-func (h *Controller) contextSetUser(r *http.Request, user *models.User) *http.Request {
-	ctx := context.WithValue(r.Context(), ctxKeyUser, user)
+func (c *Controller) contextSetUser(r *http.Request, user *models.User) *http.Request {
+	ctx := context.WithValue(r.Context(), CtxKeyUser, user)
 	return r.WithContext(ctx)
 }
 
-func (h *Controller) contextGetUser(r *http.Request) *models.User {
-	user, ok := r.Context().Value(ctxKeyUser).(*models.User)
+func (c *Controller) contextGetUser(r *http.Request) *models.User {
+	user, ok := r.Context().Value(CtxKeyUser).(*models.User)
 	if !ok {
 		return nil
 	}
@@ -44,7 +44,7 @@ func (h *Controller) contextGetUser(r *http.Request) *models.User {
 }
 
 // Error Response helpers
-func (lc *Controller) errorPage(w http.ResponseWriter, code int) {
+func (c *Controller) errorPage(w http.ResponseWriter, code int) {
 	w.WriteHeader(code)
 
 	data := struct {
@@ -55,75 +55,75 @@ func (lc *Controller) errorPage(w http.ResponseWriter, code int) {
 		Message: http.StatusText(code),
 	}
 
-	if err := lc.tmpl.ExecuteTemplate(w, "error.html", data); err != nil {
-		lc.logger.PrintError(err)
+	if err := c.tmpl.ExecuteTemplate(w, "error.html", data); err != nil {
+		c.logger.PrintError(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 }
 
-func (lc *Controller) logError(err error) {
-	lc.logger.PrintError(err)
+func (c *Controller) logError(err error) {
+	c.logger.PrintError(err)
 }
 
-func (lc *Controller) errorResponse(w http.ResponseWriter, status int) {
-	lc.errorPage(w, status)
+func (c *Controller) errorResponse(w http.ResponseWriter, status int) {
+	c.errorPage(w, status)
 }
 
-func (lc *Controller) ResponseServerError(w http.ResponseWriter) {
-	lc.errorResponse(w, http.StatusInternalServerError)
+func (c *Controller) ResponseServerError(w http.ResponseWriter) {
+	c.errorResponse(w, http.StatusInternalServerError)
 }
 
-func (lc *Controller) ResponseNotFound(w http.ResponseWriter) {
-	lc.errorResponse(w, http.StatusNotFound)
+func (c *Controller) ResponseNotFound(w http.ResponseWriter) {
+	c.errorResponse(w, http.StatusNotFound)
 }
 
-func (lc *Controller) ResponseMethodNotAllowed(w http.ResponseWriter) {
-	lc.errorResponse(w, http.StatusMethodNotAllowed)
+func (c *Controller) ResponseMethodNotAllowed(w http.ResponseWriter) {
+	c.errorResponse(w, http.StatusMethodNotAllowed)
 }
 
-func (lc *Controller) ResponseBadRequest(w http.ResponseWriter) {
-	lc.errorResponse(w, http.StatusBadRequest)
+func (c *Controller) ResponseBadRequest(w http.ResponseWriter) {
+	c.errorResponse(w, http.StatusBadRequest)
 }
 
-func (lc *Controller) ResponseFailedValidation(w http.ResponseWriter) {
-	lc.errorResponse(w, http.StatusUnprocessableEntity)
+func (c *Controller) ResponseFailedValidation(w http.ResponseWriter) {
+	c.errorResponse(w, http.StatusUnprocessableEntity)
 }
 
-func (lc *Controller) ResponseEditConflict(w http.ResponseWriter) {
-	lc.errorResponse(w, http.StatusConflict)
+func (c *Controller) ResponseEditConflict(w http.ResponseWriter) {
+	c.errorResponse(w, http.StatusConflict)
 }
 
-func (lc *Controller) ResponseRateLimitExceeded(w http.ResponseWriter) {
-	lc.errorResponse(w, http.StatusTooManyRequests)
+func (c *Controller) ResponseRateLimitExceeded(w http.ResponseWriter) {
+	c.errorResponse(w, http.StatusTooManyRequests)
 }
 
-func (lc *Controller) ResponseInvalidCredentials(w http.ResponseWriter) {
-	lc.errorResponse(w, http.StatusUnauthorized)
+func (c *Controller) ResponseInvalidCredentials(w http.ResponseWriter) {
+	c.errorResponse(w, http.StatusUnauthorized)
 }
 
-func (lc *Controller) ResponseInvalidAuthenticationToken(w http.ResponseWriter) {
+func (c *Controller) ResponseInvalidAuthenticationToken(w http.ResponseWriter) {
 	w.Header().Set("WWW-Authenticate", "Bearer")
-	lc.errorResponse(w, http.StatusUnauthorized)
+	c.errorResponse(w, http.StatusUnauthorized)
 }
 
-func (lc *Controller) ResponseUnauthorized(w http.ResponseWriter) {
-	lc.errorResponse(w, http.StatusUnauthorized)
+func (c *Controller) ResponseUnauthorized(w http.ResponseWriter) {
+	c.errorResponse(w, http.StatusUnauthorized)
 }
 
-func (lc *Controller) ResponseInactiveAccount(w http.ResponseWriter) {
-	lc.errorResponse(w, http.StatusForbidden)
+func (c *Controller) ResponseInactiveAccount(w http.ResponseWriter) {
+	c.errorResponse(w, http.StatusForbidden)
 }
 
-func (lc *Controller) ResponseNotPermitted(w http.ResponseWriter) {
-	lc.errorResponse(w, http.StatusForbidden)
+func (c *Controller) ResponseNotPermitted(w http.ResponseWriter) {
+	c.errorResponse(w, http.StatusForbidden)
 }
 
 // render
-func (h *Controller) render(w http.ResponseWriter, name string, td any) {
-	err := h.tmpl.ExecuteTemplate(w, name, td)
+func (c *Controller) render(w http.ResponseWriter, name string, td any) {
+	err := c.tmpl.ExecuteTemplate(w, name, td)
 	if err != nil {
-		h.logger.PrintInfo("render: " + err.Error())
-		h.ResponseServerError(w)
+		c.logger.PrintInfo("render: " + err.Error())
+		c.ResponseServerError(w)
 		return
 	}
 }

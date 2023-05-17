@@ -9,7 +9,7 @@ import (
 
 type ListPostsController struct {
 	ListPostUsecase usecase.ListPostsUsecase
-	Controller
+	*Controller
 }
 
 func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +19,7 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 		return
 	}
 
-	if r.URL.Path != "/posts/all" {
+	if r.URL.Path != lpc.Data.Endpoints.PostsAllEndpoint {
 		lpc.logger.PrintError(fmt.Errorf("Controller: listPost: not found"))
 		lpc.ResponseNotFound(w)
 		return
@@ -37,7 +37,9 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 			lpc.ResponseServerError(w)
 			return
 		}
-		err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", posts)
+
+		lpc.Data.Posts = posts
+		err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", lpc.Data)
 		if err != nil {
 			lpc.logger.PrintError(fmt.Errorf("Controller: listPost: ExecuteTemplate error"))
 			lpc.logger.PrintError(err)
@@ -63,7 +65,8 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 			return
 		}
 
-		err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", posts)
+		lpc.Data.Posts = posts
+		err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", lpc.Data)
 		if err != nil {
 			lpc.logger.PrintError(fmt.Errorf("Controller: listPost: created ExecuteTemplate show_posts.html"))
 			lpc.logger.PrintError(err)
@@ -79,7 +82,8 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 			return
 		}
 
-		err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", posts)
+		lpc.Data.Posts = posts
+		err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", lpc.Data)
 		if err != nil {
 			lpc.logger.PrintError(fmt.Errorf("Controller: listPost: liked ExecuteTemplate show_posts.html"))
 			lpc.logger.PrintError(err)
@@ -95,7 +99,8 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 			return
 		}
 
-		err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", posts)
+		lpc.Data.Posts = posts
+		err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", lpc.Data)
 		if err != nil {
 			lpc.logger.PrintError(fmt.Errorf("Controller: listPost: disliked ExecuteTemplate show_posts.html"))
 			lpc.logger.PrintError(err)

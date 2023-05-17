@@ -14,7 +14,7 @@ type SignupController struct {
 }
 
 func (sc *SignupController) Signup(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/signup" {
+	if r.URL.Path != sc.Data.Endpoints.SignupEndpoint {
 		sc.logger.PrintError(fmt.Errorf("Controller: signup: not found"))
 		sc.ResponseNotFound(w)
 		return
@@ -54,7 +54,7 @@ func (sc *SignupController) Signup(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+		http.Redirect(w, r, sc.Data.Endpoints.LoginEndpoint, http.StatusSeeOther)
 	default:
 		sc.logger.PrintError(fmt.Errorf("Controller: signup: method not allowed"))
 		sc.ResponseMethodNotAllowed(w)

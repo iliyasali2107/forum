@@ -11,12 +11,12 @@ import (
 type CreatePostController struct {
 	CreatePostUsecase usecase.CreatePostUsecase
 
-	Controller
+	*Controller
 }
 
 // PostsController TODO: invalid field messages for each field
 func (cpc *CreatePostController) CreatePostController(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/posts/create" {
+	if r.URL.Path != cpc.Data.Endpoints.CreatePostEndpoint {
 		cpc.logger.PrintError(fmt.Errorf("Controller: post-create: not found"))
 		cpc.ResponseNotFound(w)
 		return
@@ -28,12 +28,7 @@ func (cpc *CreatePostController) CreatePostController(w http.ResponseWriter, r *
 	case http.MethodGet:
 		categories, err := cpc.CreatePostUsecase.GetAllCategories()
 
-		data := struct {
-			Errors     map[string]string
-			Categories []*models.Category
-		}{
-			Categories: categories,
-		}
+		cpc.Data.Categories = categories
 
 		if err != nil {
 			cpc.logger.PrintError(fmt.Errorf("Controller: post-create: GetAllCategories error"))
@@ -42,7 +37,7 @@ func (cpc *CreatePostController) CreatePostController(w http.ResponseWriter, r *
 			return
 		}
 
-		err = cpc.tmpl.ExecuteTemplate(w, "create_post.html", data)
+		err = cpc.tmpl.ExecuteTemplate(w, "create_post.html", cpc.Data)
 		if err != nil {
 			cpc.logger.PrintError(fmt.Errorf("Controller: post-create: ExecuteTemplate error"))
 			cpc.logger.PrintError(err)

@@ -11,7 +11,7 @@ import (
 
 type CreateCommentController struct {
 	CreateCommentUsecase usecase.CreateCommentUsecase
-	Controller
+	*Controller
 }
 
 func (pcc *CreateCommentController) CreateCommentController(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +66,7 @@ func (pcc *CreateCommentController) CreateCommentController(w http.ResponseWrite
 			return
 		}
 
-		http.Redirect(w, r, "/posts/"+strconv.Itoa(postIDInt), http.StatusSeeOther)
+		http.Redirect(w, r, pcc.Data.Endpoints.PostDetailsEndpoint+strconv.Itoa(postIDInt), http.StatusSeeOther)
 	default:
 		pcc.logger.PrintError(fmt.Errorf("Controller: comment-create: method not allowed"))
 		pcc.ResponseMethodNotAllowed(w)

@@ -6,7 +6,7 @@
 </head>
 <body>
 
-<form action="/auth/signup" method="POST">
+<form action="{{ .Endpoints.SignupEndpoint }}" method="POST">
     <div>
         <input id="name" type="text" name="name">
         <label for="name">Name</label> {{ if . }} {{ index .Errors "name" }} {{end}}
@@ -24,4 +24,4 @@
     </div>
 </form>
 </body>
-</html>
+</html>`

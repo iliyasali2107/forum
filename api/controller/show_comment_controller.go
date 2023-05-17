@@ -8,7 +8,7 @@ import (
 
 type CommentDetailsControler struct {
 	CommentDetailsUsecase usecase.CommentDetailsUsecase
-	Controller
+	*Controller
 }
 
 func (cdc *CommentDetailsControler) CommentDetails(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +30,8 @@ func (cdc *CommentDetailsControler) CommentDetails(w http.ResponseWriter, r *htt
 
 	comment.Replies = replies
 
-	err = cdc.tmpl.ExecuteTemplate(w, "comment.html", comment)
+	cdc.Data.Comment = comment
+	err = cdc.tmpl.ExecuteTemplate(w, "comment.html", cdc.Data)
 	if err != nil {
 		cdc.ResponseServerError(w)
 		return

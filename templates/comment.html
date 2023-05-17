@@ -8,10 +8,10 @@
 </head>
 <body>
 
-    {{ .Content }}
+    {{ .Comment.Content }}
     <hr>
     <hr>
-    {{ range .Replies }}
+    {{ range .Comment.Replies }}
     <p>
         {{ .Content }}
     </p>

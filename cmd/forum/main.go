@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -20,9 +21,10 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	ctrl := controller.NewController()
+	ctrl := controller.NewController(db)
 
 	route.Setup(env, timeout, db, mux, ctrl)
 
+	fmt.Println("listening")
 	http.ListenAndServe(env.ServerAddress, mux)
 }

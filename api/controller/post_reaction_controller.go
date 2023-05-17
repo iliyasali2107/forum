@@ -11,7 +11,7 @@ import (
 
 type PostReactionController struct {
 	PostReactionUsecase usecase.PostReactionUsecase
-	Controller
+	*Controller
 }
 
 func (prc *PostReactionController) PostReactionController(w http.ResponseWriter, r *http.Request) {
@@ -69,5 +69,5 @@ func (prc *PostReactionController) PostReactionController(w http.ResponseWriter,
 		return
 	}
 
-	http.Redirect(w, r, "/posts/"+strconv.Itoa(post.ID), http.StatusSeeOther)
+	http.Redirect(w, r, prc.Data.Endpoints.PostDetailsEndpoint+strconv.Itoa(post.ID), http.StatusSeeOther)
 }
