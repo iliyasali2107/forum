@@ -57,6 +57,7 @@ func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		cookie.Expires = *user.Expires
 		cookie.Path = "/"
 		cookie.HttpOnly = true
+
 		http.SetCookie(w, &cookie)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}

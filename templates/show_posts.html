@@ -1,45 +1,48 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
+
 <body>
-<a href="{{ .Endpoints.SignupEndpoint }}">signup</a>
-<a href="{{ .Endpoints.LoginEndpoint }}">login</a>
-<a href="{{ .Endpoints.LogoutEndpoint }}">logout</a>
-<a href="{{ .Endpoints.CreatePostEndpoint }}">Create Post</a>
+    <a href="{{ .Endpoints.SignupEndpoint }}">signup</a>
+    <a href="{{ .Endpoints.LoginEndpoint }}">login</a>
+    <a href="{{ .Endpoints.LogoutEndpoint }}">logout</a>
+    <a href="{{ .Endpoints.CreatePostEndpoint }}">Create Post</a>
 
 
-<div>
+    <div>
 
-    <hr>
-    {{ range .Posts }}
-    <p>
-        author: {{ .User.Name }}
-    </p>
-    <p>
-        title: {{ .Title}}
-    </p>
-    <p>
-        Content: {{ .Content }}
-    </p>
-    <p>
-        Created: {{ .Created }}
-    </p>
-    <p>
-        Categories:
-        {{ range .Categories }}
-        {{ . }}
-        {{ end }}
-        <a href="/posts/{{.ID}}">See...</a>
-    <hr>
-    {{ end }}
-    </p>
+        <hr>
+        {{ range .Posts }}
+        <p>
+            author: {{ .User.Name }}
+        </p>
+        <p>
+            title: {{ .Title}}
+        </p>
+        <p>
+            Content: {{ .Content }}
+        </p>
+        <p>
+            Created: {{ .Created }}
+        </p>
+        <p>
+            Categories:
+            {{ range .Categories }}
+            {{ . }}
+            {{ end }}
+            <a href="{{ $.Endpoints.PostDetailsEndpoint }}{{.ID}}">See...</a>
+            <hr>
+            {{ end }}
+        </p>
 
-</div>
+    </div>
 </body>
+
 </html>

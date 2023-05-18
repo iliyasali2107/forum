@@ -86,6 +86,13 @@ func (pdu *postDetailsUsecase) GetCommentsByPostId(post_id int) ([]*models.Comme
 		}
 
 		comment.ReplyCount = replies
+
+		user, err := pdu.userRepository.GetUser(comment.UserID)
+		if err != nil {
+			return nil, err
+		}
+
+		comment.User = user
 	}
 
 	return comments, nil

@@ -2,6 +2,7 @@ package models
 
 type Comment struct {
 	ID         int
+	User       *User
 	UserID     int
 	PostID     int
 	Content    string

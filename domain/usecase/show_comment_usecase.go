@@ -10,6 +10,7 @@ import (
 
 type commentDetailsUsecase struct {
 	commentRepository repository.CommentRepository
+	userRepository    repository.UserRepository
 	ContextTimeout    time.Duration
 }
 
@@ -18,9 +19,10 @@ type CommentDetailsUsecase interface {
 	GetComment(int) (*models.Comment, []*models.Comment, error)
 }
 
-func NewCommentDetailsUsecase(commentRepositoy repository.CommentRepository, timeout time.Duration) CommentDetailsUsecase {
+func NewCommentDetailsUsecase(commentRepositoy repository.CommentRepository, userRepository repository.UserRepository, timeout time.Duration) CommentDetailsUsecase {
 	return &commentDetailsUsecase{
 		commentRepository: commentRepositoy,
+		userRepository:    userRepository,
 		ContextTimeout:    timeout,
 	}
 }
@@ -52,6 +54,15 @@ func (cdu *commentDetailsUsecase) GetComment(commentID int) (*models.Comment, []
 	replies, err := cdu.commentRepository.GetCommentReplies(commentID)
 	if err != nil {
 		return nil, nil, err
+	}
+
+	for _, reply := range replies {
+		user, err := cdu.userRepository.GetUser(reply.UserID)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		reply.User = user
 	}
 
 	return comment, replies, nil

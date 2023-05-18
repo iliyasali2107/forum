@@ -1,12 +1,14 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
+
 <body>
     <a href="{{ .Endpoints.SignupEndpoint }}">signup</a>
     <a href="{{ .Endpoints.LoginEndpoint }}">login</a>
@@ -15,10 +17,10 @@
 
     <a href="{{ .Endpoints.CreatePostEndpoint }}">Create Post</a>
 
-<div>
-   
-    <hr>
-    {{ range .Posts }}
+    <div>
+
+        <hr>
+        {{ range .Posts }}
         <p>
             author: {{ .User.Name }}
         </p>
@@ -34,12 +36,13 @@
         <p>
             Categories:
             {{ range .Categories }}
-                {{ . }}
+            {{ . }}
             {{ end }}
-    <hr>
-    {{ end }}
-    </p>
+            <hr>
+            {{ end }}
+        </p>
 
-</div>
+    </div>
 </body>
+
 </html>

@@ -13,8 +13,9 @@ import (
 
 func NewCommentDetailsRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *http.ServeMux, ctrl *controller.Controller) {
 	cr := repository.NewCommentRepository(db)
+	ur := repository.NewUserRepository(db)
 	cdc := controller.CommentDetailsControler{
-		CommentDetailsUsecase: usecase.NewCommentDetailsUsecase(cr, timeout),
+		CommentDetailsUsecase: usecase.NewCommentDetailsUsecase(cr, ur, timeout),
 		Controller:            ctrl,
 	}
 

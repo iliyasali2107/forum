@@ -53,6 +53,8 @@ func (pc *PostController) PostController(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	
+
 	post.Likes = likes
 	post.Dislikes = dislikes
 	post.Comments = comments

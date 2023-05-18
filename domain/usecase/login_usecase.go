@@ -39,7 +39,7 @@ func (lu *loginUsecase) Login(user *models.User) error {
 	}
 
 	sessionToken := uuid.NewString()
-	expiresAt := time.Now().Add(lu.Env.LoginExpireTime * time.Minute)
+	expiresAt := time.Now().Add(lu.Env.LoginExpireTime)
 	user.Token = &sessionToken
 	user.Expires = &expiresAt
 	user.ID = u.ID
