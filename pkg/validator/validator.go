@@ -1,6 +1,10 @@
 package validator
 
-import "regexp"
+import (
+	"regexp"
+
+	"forum/domain/models"
+)
 
 var EmailRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
@@ -21,9 +25,7 @@ func (v *Validator) Valid() bool {
 
 // AddError adds an error message to the map (so long as no entry already exists for the given key).
 func (v *Validator) AddError(key, message string) {
-	if _, exists := v.Errors[key]; !exists {
-		v.Errors[key] = message
-	}
+	v.Errors[key] = message
 }
 
 // Check adds an error message to the map only if a validation check is not 'ok'
@@ -57,4 +59,25 @@ func Unique(values []string) bool {
 	}
 
 	return len(values) == len(uniqueValues)
+}
+
+func CreatePostValidation(post *models.Post) map[string]string {
+	errors := make(map[string]string)
+	if post.Title == "" {
+		errors["title"] = "must be provided"
+	}
+
+	if len(post.Title) > 100 {
+		errors["title"] = "must not be more than 100 chars"
+	}
+
+	if post.Content == "" {
+		errors["content"] = "must be provided"
+	}
+
+	if len(post.Content) > 100 {
+		errors["content"] = "must not be more than 100 chars"
+	}
+
+	return errors
 }

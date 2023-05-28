@@ -15,7 +15,7 @@ type createPostUsecase struct {
 }
 
 type CreatePostUsecase interface {
-	CreatePost(*validator.Validator, *models.Post) error
+	CreatePost(*validator.Validator, *models.Post) (int, error)
 	GetAllCategories() ([]*models.Category, error)
 }
 
@@ -27,29 +27,27 @@ func NewCreatePostUsecase(postRepository repository.PostRepository, categoryRepo
 	}
 }
 
-func (cpu *createPostUsecase) CreatePost(v *validator.Validator, post *models.Post) error {
+func (cpu *createPostUsecase) CreatePost(v *validator.Validator, post *models.Post) (int, error) {
 	post.Created = time.Now()
-	if validatePost(v, post); !v.Valid() {
-		return ErrFormValidation
-	}
+	errMap := validator.CreatePostValidation(post)
 
-	_, err := cpu.postRepository.CreatePost(post)
+	postID, err := cpu.postRepository.CreatePost(post)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	for _, c := range post.Categories {
 		category, err := cpu.categoryRepository.GetCategory(c)
 		if err != nil {
-			return ErrCategoryNotFound
+			return 0, ErrCategoryNotFound
 		}
 
 		err = cpu.categoryRepository.AddCategory(post.ID, category.ID)
 		if err != nil {
-			return err
+			return 0, err
 		}
 	}
-	return err
+	return postID, err
 }
 
 func (cpu *createPostUsecase) GetAllCategories() ([]*models.Category, error) {
@@ -63,8 +61,9 @@ func (cpu *createPostUsecase) GetAllCategories() ([]*models.Category, error) {
 
 func validatePost(v *validator.Validator, post *models.Post) {
 	v.Check(post.Title != "", "title", "must be provided")
-	v.Check(len(post.Title) <= 20, "title", "must not be more than 20 chars")
+	v.Check(len(post.Title) <= 100, "title", "must not be more than 100 chars")
 
 	v.Check(post.Content != "", "content", "must be provided")
-	v.Check(len(post.Content) <= 20, "content", "must not be more than 20 chars")
+	v.Check(len(post.Content) <= 100, "content", "must not be more than 100 chars")
+
 }
