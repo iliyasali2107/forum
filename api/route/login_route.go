@@ -18,5 +18,5 @@ func NewLoginRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *
 		Controller:   ctrl,
 	}
 
-	mux.HandleFunc(ctrl.Data.Endpoints.LoginEndpoint, lc.Login)
+	mux.HandleFunc(lc.Data.Endpoints.LoginEndpoint, lc.Login)
 }

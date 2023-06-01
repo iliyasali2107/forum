@@ -19,5 +19,5 @@ func NewCreatePostRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, 
 		Controller:        ctrl,
 	}
 
-	mux.HandleFunc(ctrl.Data.Endpoints.CreatePostEndpoint, ctrl.UserIdentity(ctrl.Authorized(cpc.CreatePostController)))
+	mux.HandleFunc(cpc.Data.Endpoints.CreatePostEndpoint, cpc.UserIdentity(cpc.Authorized(cpc.CreatePostController)))
 }

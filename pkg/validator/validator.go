@@ -6,7 +6,13 @@ import (
 	"forum/domain/models"
 )
 
-var EmailRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+var (
+	EmailRX    = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	NameRX     = regexp.MustCompile(`^[a-zA-Z0-9]{3,50}$`)
+	PasswordRX = regexp.MustCompile(`[a-z]+[A-Z]+[0-9]+[@$!%*?&]+[A-Za-z\d@$!%*?&]{8,46}`)
+)
+
+// emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 
 // Validator Define a new Validator type which contains a map of validation errors.
 type Validator struct {
@@ -77,6 +83,28 @@ func CreatePostValidation(post *models.Post) map[string]string {
 
 	if len(post.Content) > 100 {
 		errors["content"] = "must not be more than 100 chars"
+	}
+
+	return errors
+}
+
+func SignupValidation(user *models.User) map[string]string {
+	errors := make(map[string]string)
+
+	if user.Name == "" {
+		errors["name"] = "must be provided"
+	}
+
+	if !NameRX.MatchString(user.Name) {
+		errors["name"] = "must be 3 to 50 chars and have alphanumeric chars"
+	}
+
+	if !EmailRX.MatchString(user.Email) {
+		errors["email"] = "must be correctly formatted"
+	}
+
+	if !PasswordRX.MatchString(user.Password.Plaintext) {
+		errors["password"] = "at least 1 upper, 1 lower, 1 digit, 1 special char & 8 to 50 chars"
 	}
 
 	return errors

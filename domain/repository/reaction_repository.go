@@ -17,6 +17,8 @@ type ReactionRepository interface {
 
 	// comment
 	CreateCommentReaction(reaction *models.Reaction) (int, error)
+	GetCommentReaction(reaction *models.Reaction) (*models.Reaction, error)
+
 	DeleteCommentReaction(int) error
 	GetCommentLikes(int) (int, error)
 	GetCommentDislikes(int) (int, error)
@@ -111,7 +113,7 @@ func (rr *reactionRepository) GetPostDislikes(post_id int) (int, error) {
 // comment
 func (rr *reactionRepository) CreateCommentReaction(reaction *models.Reaction) (int, error) {
 	query := `INSERT INTO reactions_comments (comment_id, user_id, type) VALUES (?, ?, ?)`
-	row, err := rr.db.Exec(query, reaction.Comment.ID, reaction.UserID, reaction.Type)
+	row, err := rr.db.Exec(query, reaction.CommentID, reaction.UserID, reaction.Type)
 	if err != nil {
 		return 0, nil
 	}
@@ -122,6 +124,23 @@ func (rr *reactionRepository) CreateCommentReaction(reaction *models.Reaction) (
 	}
 
 	return int(id), err
+}
+
+func (rr *reactionRepository) GetCommentReaction(reaction *models.Reaction) (*models.Reaction, error) {
+	query := `SELECT * FROM reactions_comments WHERE user_id = ? AND comment_id = ?`
+
+	row := rr.db.QueryRow(query, reaction.UserID, reaction.CommentID)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	react := &models.Reaction{}
+
+	if err := row.Scan(&react.ID, &react.CommentID, &react.UserID, &react.Type); err != nil {
+		return nil, err
+	}
+
+	return react, nil
 }
 
 func (rr *reactionRepository) GetCommentLikes(comment_id int) (int, error) {

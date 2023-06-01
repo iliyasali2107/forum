@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"forum/domain/models"
 	"forum/domain/usecase"
@@ -47,12 +48,16 @@ func (pcc *CreateCommentController) CreateCommentController(w http.ResponseWrite
 			return
 		}
 
-		comment.Content = r.FormValue("content")
+		comment.Content = strings.TrimSpace(r.FormValue("content"))
+		if comment.Content == "" {
+			pcc.ResponseBadRequest(w)
+			return
+		}
 		comment.UserID = user.ID
 		comment.PostID = postIDInt
 		comment.ParentID = parentIDInt
 
-		err = pcc.CreateCommentUsecase.CreateComment(pcc.validator, comment)
+		err = pcc.CreateCommentUsecase.CreateComment(comment)
 		if err != nil {
 			if err == ErrFormValidation {
 				pcc.logger.PrintError(fmt.Errorf("Controller: comment-create: CreateComment ErrFormValidation"))
@@ -65,8 +70,14 @@ func (pcc *CreateCommentController) CreateCommentController(w http.ResponseWrite
 			pcc.ResponseServerError(w)
 			return
 		}
+		commDetails := fmt.Sprintf("%s%d", pcc.Data.Endpoints.CommentDetailsEndpoint, comment.ParentID)
+		nextPage := r.FormValue("next")
+		if nextPage == commDetails {
+			http.Redirect(w, r, commDetails, http.StatusSeeOther)
+		} else {
+			http.Redirect(w, r, pcc.Data.Endpoints.PostDetailsEndpoint+strconv.Itoa(postIDInt), http.StatusSeeOther)
+		}
 
-		http.Redirect(w, r, pcc.Data.Endpoints.PostDetailsEndpoint+strconv.Itoa(postIDInt), http.StatusSeeOther)
 	default:
 		pcc.logger.PrintError(fmt.Errorf("Controller: comment-create: method not allowed"))
 		pcc.ResponseMethodNotAllowed(w)

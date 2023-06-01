@@ -8,6 +8,7 @@ import (
 
 	"forum/domain/models"
 	"forum/domain/usecase"
+	"forum/pkg/validator"
 )
 
 type CreatePostController struct {
@@ -59,18 +60,28 @@ func (cpc *CreatePostController) CreatePostController(w http.ResponseWriter, r *
 		post.Categories = r.Form["category"]
 		post.Title = r.FormValue("title")
 		title := strings.TrimSpace(r.FormValue("title"))
-		if title != "" {
-			post.Title = title
-		}
+		post.Title = title
 
 		content := strings.TrimSpace(r.FormValue("content"))
-		if content != "" {
-			post.Content = content
+		post.Content = content
+
+		errMap := validator.CreatePostValidation(post)
+		if len(errMap) != 0 {
+			cpc.Data.Errors = errMap
+
+			categories, err := cpc.CreatePostUsecase.GetAllCategories()
+			if err != nil {
+				cpc.ResponseServerError(w)
+				return
+			}
+			cpc.Data.Categories = categories
+			cpc.render(w, "create_post.html", cpc.Data)
+			return
 		}
 
 		post.User = user
 
-		postID, err := cpc.CreatePostUsecase.CreatePost(cpc.validator, post)
+		postID, err := cpc.CreatePostUsecase.CreatePost(post)
 		if err != nil {
 			if errors.Is(err, usecase.ErrFormValidation) {
 				categories, err := cpc.CreatePostUsecase.GetAllCategories()
@@ -81,8 +92,6 @@ func (cpc *CreatePostController) CreatePostController(w http.ResponseWriter, r *
 					return
 				}
 				cpc.Data.Categories = categories
-				cpc.Data.Errors = cpc.validator.Errors
-				cpc.validator.Errors = map[string]string{}
 
 				// cpc.ResponseBadRequest(w)
 				cpc.render(w, "create_post.html", cpc.Data)

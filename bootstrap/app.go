@@ -2,7 +2,6 @@ package bootstrap
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 type Application struct {
@@ -13,7 +12,6 @@ type Application struct {
 func App() Application {
 	app := &Application{}
 	app.Env = NewEnv()
-	fmt.Println(app.Env)
 	app.DB = NewSqliteDatabase(app.Env)
 	return *app
 }

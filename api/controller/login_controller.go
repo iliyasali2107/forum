@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"forum/domain/models"
 	"forum/domain/usecase"
@@ -30,8 +31,8 @@ func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		}
 	case http.MethodPost:
 		user := &models.User{}
-		user.Email = r.FormValue("email")
-		user.Password.Plaintext = r.FormValue("password")
+		user.Email = strings.TrimSpace(r.FormValue("email"))
+		user.Password.Plaintext = strings.TrimSpace(r.FormValue("password"))
 
 		err := lc.LoginUsecase.Login(user)
 		if err != nil {

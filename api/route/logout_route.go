@@ -18,5 +18,5 @@ func NewLogoutRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux 
 		Controller:    ctrl,
 	}
 
-	mux.HandleFunc(ctrl.Data.Endpoints.LogoutEndpoint, ctrl.UserIdentity(ctrl.Authorized(lc.Logout)))
+	mux.HandleFunc(lc.Data.Endpoints.LogoutEndpoint, lc.UserIdentity(lc.Authorized(lc.Logout)))
 }

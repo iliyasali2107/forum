@@ -19,5 +19,5 @@ func NewCommentDetailsRouter(env *bootstrap.Env, timeout time.Duration, db *sql.
 		Controller:            ctrl,
 	}
 
-	mux.HandleFunc(ctrl.Data.Endpoints.CommentDetailsEndpoint, cdc.CommentDetails)
+	mux.HandleFunc(cdc.Data.Endpoints.CommentDetailsEndpoint, cdc.CommentDetails)
 }

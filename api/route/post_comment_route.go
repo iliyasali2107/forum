@@ -19,5 +19,5 @@ func NewCommentCreateRouter(env *bootstrap.Env, timeout time.Duration, db *sql.D
 		Controller:           ctrl,
 	}
 
-	mux.HandleFunc(ctrl.Data.Endpoints.CreateCommentEndpoint, ctrl.UserIdentity(ctrl.Authorized(ccc.CreateCommentController)))
+	mux.HandleFunc(ccc.Data.Endpoints.CreateCommentEndpoint, ccc.UserIdentity(ccc.Authorized(ccc.CreateCommentController)))
 }

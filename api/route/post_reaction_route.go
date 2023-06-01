@@ -21,5 +21,5 @@ func NewPostReactionRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB
 		Controller:          ctrl,
 	}
 
-	mux.HandleFunc(ctrl.Data.Endpoints.CreatePostReactionEndpoint, ctrl.UserIdentity(ctrl.Authorized(prc.PostReactionController)))
+	mux.HandleFunc(prc.Data.Endpoints.CreatePostReactionEndpoint, prc.UserIdentity(prc.Authorized(prc.PostReactionController)))
 }

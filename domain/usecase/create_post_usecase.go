@@ -15,7 +15,7 @@ type createPostUsecase struct {
 }
 
 type CreatePostUsecase interface {
-	CreatePost(*validator.Validator, *models.Post) (int, error)
+	CreatePost(*models.Post) (int, error)
 	GetAllCategories() ([]*models.Category, error)
 }
 
@@ -27,9 +27,8 @@ func NewCreatePostUsecase(postRepository repository.PostRepository, categoryRepo
 	}
 }
 
-func (cpu *createPostUsecase) CreatePost(v *validator.Validator, post *models.Post) (int, error) {
+func (cpu *createPostUsecase) CreatePost(post *models.Post) (int, error) {
 	post.Created = time.Now()
-	errMap := validator.CreatePostValidation(post)
 
 	postID, err := cpu.postRepository.CreatePost(post)
 	if err != nil {

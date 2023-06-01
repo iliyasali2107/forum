@@ -104,6 +104,7 @@ func (pru *postReactionUsecase) DislikePost(reaction *models.Reaction) error {
 			return err
 		}
 	}
+
 	return nil
 }
 

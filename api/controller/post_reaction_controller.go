@@ -37,7 +37,6 @@ func (prc *PostReactionController) PostReactionController(w http.ResponseWriter,
 	}
 
 	reactionTypeStr := r.FormValue("reaction")
-	fmt.Println(reactionTypeStr)
 	reactionTypeInt, err := strconv.Atoi(reactionTypeStr)
 	if err != nil || (reactionTypeInt != 1 && reactionTypeInt != 0) {
 		prc.logger.PrintError(err)

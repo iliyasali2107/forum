@@ -9,13 +9,12 @@ import (
 	"forum/domain/repository"
 	"forum/domain/usecase"
 	"forum/pkg/logger"
-	"forum/pkg/validator"
 )
 
 type Controller struct {
-	tmpl         *template.Template
-	logger       *logger.Logger
-	validator    *validator.Validator
+	tmpl   *template.Template
+	logger *logger.Logger
+	// validator    *validator.Validator
 	Data         Data
 	TokenUsecase usecase.TokenUsecase
 }
@@ -41,6 +40,7 @@ type Endpoints struct {
 	CreateCommentEndpoint      string
 	CommentDetailsEndpoint     string
 	CreatePostReactionEndpoint string
+	CommentReactionEndpoint    string
 }
 
 func NewController(db *sql.DB) *Controller {
@@ -54,13 +54,14 @@ func NewController(db *sql.DB) *Controller {
 		CreateCommentEndpoint:      "/posts/comment/create",
 		CommentDetailsEndpoint:     "/posts/comment/",
 		CreatePostReactionEndpoint: "/post/reaction/create",
+		CommentReactionEndpoint:    "/comment/reaction/create",
 	}
 
 	ur := repository.NewUserRepository(db)
 
 	return &Controller{
-		tmpl:         template.Must(template.ParseGlob("./templates/*")),
-		validator:    validator.NewValidator(),
+		tmpl: template.Must(template.ParseGlob("./templates/*")),
+		// validator:    validator.NewValidator(),
 		logger:       logger.NewLogger(os.Stdout, logger.LevelInfo),
 		Data:         Data{Endpoints: endpts},
 		TokenUsecase: usecase.NewTokenUsecae(ur),

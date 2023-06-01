@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -25,6 +24,5 @@ func main() {
 
 	route.Setup(env, timeout, db, mux, ctrl)
 
-	fmt.Println("listening")
 	http.ListenAndServe(env.ServerAddress, mux)
 }

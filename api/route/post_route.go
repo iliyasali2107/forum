@@ -23,5 +23,5 @@ func NewPostRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *h
 		Controller:         ctrl,
 	}
 
-	mux.HandleFunc(ctrl.Data.Endpoints.PostDetailsEndpoint, pdc.PostController)
+	mux.HandleFunc(ctrl.Data.Endpoints.PostDetailsEndpoint, pdc.UserIdentity(pdc.PostController))
 }

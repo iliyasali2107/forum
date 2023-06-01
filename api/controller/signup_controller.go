@@ -3,9 +3,11 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"forum/domain/models"
 	"forum/domain/usecase"
+	"forum/pkg/validator"
 )
 
 type SignupController struct {
@@ -30,11 +32,18 @@ func (sc *SignupController) Signup(w http.ResponseWriter, r *http.Request) {
 		}
 	case http.MethodPost:
 		user := &models.User{}
-		user.Name = r.FormValue("name")
-		user.Email = r.FormValue("email")
-		user.Password.Plaintext = r.FormValue("password")
+		user.Name = strings.TrimSpace(r.FormValue("name"))
+		user.Email = strings.TrimSpace(r.FormValue("email"))
+		user.Password.Plaintext = strings.TrimSpace(r.FormValue("password"))
 
-		err := sc.SignupUsecase.Signup(sc.validator, user)
+		signupErrors := validator.SignupValidation(user)
+		if len(signupErrors) != 0 {
+			sc.Data.Errors = signupErrors
+			sc.render(w, "signup.html", sc.Data)
+			return
+		}
+
+		err := sc.SignupUsecase.Signup(user)
 		if err == ErrUserExists {
 			sc.logger.PrintError(err)
 			sc.ResponseEditConflict(w)
@@ -44,13 +53,6 @@ func (sc *SignupController) Signup(w http.ResponseWriter, r *http.Request) {
 		if err == ErrInternalServer {
 			sc.logger.PrintError(err)
 			sc.ResponseServerError(w)
-			return
-		}
-
-		if err == ErrFormValidation {
-			sc.ResponseBadRequest(w)
-			sc.render(w, "signup.html", sc.validator)
-			sc.validator.Errors = map[string]string{}
 			return
 		}
 

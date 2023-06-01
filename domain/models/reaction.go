@@ -3,7 +3,7 @@ package models
 type Reaction struct {
 	ID      int
 	PostID  int
-	Comment *Comment
+	CommentID int
 	UserID  int
 	Type    int
 }

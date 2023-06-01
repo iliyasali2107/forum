@@ -31,6 +31,12 @@
         {{.User.Name}}:
     <p>
         {{ .Content }}
+        likes:
+        <form action="{{ .Endpoints.CreateCommentReactionEndpoint }}" method="POST">
+            <input type="hidden" name="reaction" value="1">
+            <input type="hidden" name="post_id" value="{{.Post.ID}}">
+            <button type="submit">like</button>
+        </form>
     </p>
 
     <form action="{{ $.Endpoints.CreateCommentEndpoint }}" method="POST">

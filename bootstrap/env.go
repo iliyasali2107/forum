@@ -2,7 +2,6 @@ package bootstrap
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -76,7 +75,6 @@ func NewEnv() *Env {
 
 	expireTimeStr, ok := envRows["LOGIN_EXPIRE_TIME"].(string)
 	expireTimeDuration, err := time.ParseDuration(expireTimeStr)
-	fmt.Println(expireTimeDuration)
 	if ok && err == nil {
 		env.LoginExpireTime = expireTimeDuration
 	}

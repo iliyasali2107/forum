@@ -17,10 +17,21 @@
     {{ .User.Name }}:
     <p>
         {{ .Content }}
+        likes: {{  }}
     </p>
     <hr>
     {{ end }}
     <hr>
+
+    Add Reply:
+    <form action="{{ .Endpoints.CreateCommentEndpoint }} " method="POST">
+        <textarea name="content" placeholder="comment..."></textarea>
+        <input type="hidden" name="post_id" value="{{ .Comment.PostID }}">
+        <input type="hidden" name="next" value="{{ .Endpoints.CommentDetailsEndpoint }}{{ .Comment.ID }}">
+        <input type="hidden" name="parent_id" value="{{ .Comment.ID }}">
+        <button type="submit">add</button>
+    </form>
+
 
 </body>
 

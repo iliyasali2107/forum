@@ -9,4 +9,7 @@ type Comment struct {
 	ParentID   int
 	ReplyCount int
 	Replies    []*Comment
+	Likes      int
+	Dislikes   int
 }
+

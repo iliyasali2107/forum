@@ -14,7 +14,7 @@ type signupUsecase struct {
 }
 
 type SignupUsecase interface {
-	Signup(*validator.Validator, *models.User) error
+	Signup(*models.User) error
 }
 
 func NewSignupUsecase(userRepository repository.UserRepository, timeout time.Duration) SignupUsecase {
@@ -24,14 +24,10 @@ func NewSignupUsecase(userRepository repository.UserRepository, timeout time.Dur
 	}
 }
 
-func (su *signupUsecase) Signup(v *validator.Validator, user *models.User) error {
+func (su *signupUsecase) Signup(user *models.User) error {
 	_, err := su.userRepository.GetUserByEmail(user.Email)
 	if err == nil {
 		return ErrUserExists
-	}
-
-	if ValidateUser(v, user); !v.Valid() {
-		return ErrFormValidation
 	}
 
 	err = user.Password.Set(user.Password.Plaintext)

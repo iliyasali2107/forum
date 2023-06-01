@@ -21,5 +21,5 @@ func NewListPostsRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, m
 		Controller:      ctrl,
 	}
 
-	mux.HandleFunc(ctrl.Data.Endpoints.PostsAllEndpoint, ctrl.UserIdentity(lpc.ListPostsController))
+	mux.HandleFunc(lpc.Data.Endpoints.PostsAllEndpoint, lpc.UserIdentity(lpc.ListPostsController))
 }
