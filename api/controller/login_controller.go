@@ -7,6 +7,7 @@ import (
 
 	"forum/domain/models"
 	"forum/domain/usecase"
+	"forum/pkg/utils"
 )
 
 type LoginController struct {
@@ -33,20 +34,26 @@ func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		user := &models.User{}
 		user.Email = strings.TrimSpace(r.FormValue("email"))
 		user.Password.Plaintext = strings.TrimSpace(r.FormValue("password"))
+		fmt.Println(user.Email)
+		errors := make(map[string]string)
 
 		err := lc.LoginUsecase.Login(user)
 		if err != nil {
 			switch err {
-			case ErrUserNotFound:
-				lc.logger.PrintError(fmt.Errorf("handler: login: user not found"))
-				lc.ResponseBadRequest(w)
+			case utils.ErrUserNotFound:
+				errors["email"] = "user not found"
+				lc.Data.Errors = errors
+				w.WriteHeader(http.StatusBadRequest)
+				lc.render(w, "login.html", lc.Data)
 				return
-			case ErrInvalidPassword:
-				lc.logger.PrintError(fmt.Errorf("handler: login: password is not correct"))
-				lc.ResponseBadRequest(w)
+			case utils.ErrInvalidPassword:
+				errors["password"] = "password is not correct"
+				lc.Data.Errors = errors
+				w.WriteHeader(http.StatusBadRequest)
+				lc.render(w, "login.html", lc.Data)
 				return
 			default:
-				lc.logger.PrintError(fmt.Errorf("handler: login: password is not correct"))
+				lc.logger.PrintError(fmt.Errorf("handler: login: %w", err))
 				lc.ResponseServerError(w)
 				return
 			}

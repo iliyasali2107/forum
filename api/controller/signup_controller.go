@@ -7,6 +7,7 @@ import (
 
 	"forum/domain/models"
 	"forum/domain/usecase"
+	"forum/pkg/utils"
 	"forum/pkg/validator"
 )
 
@@ -39,18 +40,33 @@ func (sc *SignupController) Signup(w http.ResponseWriter, r *http.Request) {
 		signupErrors := validator.SignupValidation(user)
 		if len(signupErrors) != 0 {
 			sc.Data.Errors = signupErrors
+			w.WriteHeader(http.StatusBadRequest)
 			sc.render(w, "signup.html", sc.Data)
 			return
 		}
 
 		err := sc.SignupUsecase.Signup(user)
-		if err == ErrUserExists {
+		if err == utils.ErrNameIsTaken {
+			errMap := make(map[string]string)
+			errMap["name"] = "name is already in use"
+			sc.Data.Errors = errMap
 			sc.logger.PrintError(err)
-			sc.ResponseEditConflict(w)
+			w.WriteHeader(http.StatusBadRequest)
+			sc.render(w, "signup.html", sc.Data)
 			return
 		}
 
-		if err == ErrInternalServer {
+		if err == utils.ErrEmailIsTaken {
+			errMap := make(map[string]string)
+			errMap["email"] = "email is already in use"
+			sc.Data.Errors = errMap
+			sc.logger.PrintError(err)
+			w.WriteHeader(http.StatusBadRequest)
+			sc.render(w, "signup.html", sc.Data)
+			return
+		}
+
+		if err == utils.ErrInternalServer {
 			sc.logger.PrintError(err)
 			sc.ResponseServerError(w)
 			return

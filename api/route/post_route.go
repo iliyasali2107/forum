@@ -19,8 +19,9 @@ func NewPostRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *h
 	cmr := repository.NewCommentRepository(db)
 
 	pdc := controller.PostController{
-		PostDetailsUsecase: usecase.NewPostDetailsUsecase(pr, ur, cr, rr, cmr, timeout),
-		Controller:         ctrl,
+		PostDetailsUsecase:     usecase.NewPostDetailsUsecase(pr, ur, cr, rr, cmr, timeout),
+		CommentReactionUsecase: usecase.NewCommentReactionUsecase(rr, timeout),
+		Controller:             ctrl,
 	}
 
 	mux.HandleFunc(ctrl.Data.Endpoints.PostDetailsEndpoint, pdc.UserIdentity(pdc.PostController))

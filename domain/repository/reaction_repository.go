@@ -18,8 +18,8 @@ type ReactionRepository interface {
 	// comment
 	CreateCommentReaction(reaction *models.Reaction) (int, error)
 	GetCommentReaction(reaction *models.Reaction) (*models.Reaction, error)
-
-	DeleteCommentReaction(int) error
+	UpdateCommentReaction(reaction *models.Reaction) error
+	DeleteCommentReaction(reaction *models.Reaction) error
 	GetCommentLikes(int) (int, error)
 	GetCommentDislikes(int) (int, error)
 }
@@ -143,9 +143,22 @@ func (rr *reactionRepository) GetCommentReaction(reaction *models.Reaction) (*mo
 	return react, nil
 }
 
+func (rr *reactionRepository) UpdateCommentReaction(reaction *models.Reaction) error {
+	query := `UPDATE reactions_comments
+			SET type = ?
+			WHERE user_id = ? AND comment_id = ?`
+
+	_, err := rr.db.Exec(query, reaction.Type, reaction.UserID, reaction.CommentID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (rr *reactionRepository) GetCommentLikes(comment_id int) (int, error) {
 	query := `SELECT count() FROM reactions_comments WHERE comment_id = ? AND type = 1`
-	var likes int
+	likes := 0
 	row := rr.db.QueryRow(query, comment_id)
 	if err := row.Scan(&likes); err != nil {
 		return 0, err
@@ -156,7 +169,7 @@ func (rr *reactionRepository) GetCommentLikes(comment_id int) (int, error) {
 
 func (rr *reactionRepository) GetCommentDislikes(comment_id int) (int, error) {
 	query := `SELECT count() FROM reactions_comments WHERE comment_id = ? AND type = 0`
-	var dislikes int
+	dislikes := 0
 	row := rr.db.QueryRow(query, comment_id)
 	if err := row.Scan(&dislikes); err != nil {
 		return 0, err
@@ -165,9 +178,9 @@ func (rr *reactionRepository) GetCommentDislikes(comment_id int) (int, error) {
 	return dislikes, nil
 }
 
-func (rr *reactionRepository) DeleteCommentReaction(comment_id int) error {
-	query := `DELETE FROM reactions_comments WHERE comment_id = ?`
-	if _, err := rr.db.Exec(query, comment_id); err != nil {
+func (rr *reactionRepository) DeleteCommentReaction(reaction *models.Reaction) error {
+	query := `DELETE FROM reactions_comments WHERE comment_id = ? AND user_id = ?`
+	if _, err := rr.db.Exec(query, reaction.CommentID, reaction.UserID); err != nil {
 		return err
 	}
 	return nil

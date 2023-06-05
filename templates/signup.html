@@ -8,20 +8,20 @@
 
 <form action="{{ .Endpoints.SignupEndpoint }}" method="POST">
     <div>
-        <input id="name" type="text" name="name">
-        <label for="name">Name</label> {{ if . }} {{ index .Errors "name" }} {{end}}
+        <input id="name" type="text" name="name" required>
+        <label for="name">Name</label> {{ if .Errors}} {{ index .Errors "name" }} {{end}}
     </div>
     <div>
-        <input id="email" type="text" name="email">
-        <label for="email">Email</label> {{ if . }} {{ index .Errors "email" }} {{end}}
+        <input id="email" type="text" name="email" required>
+        <label for="email">Email</label> {{ if .Errors }} {{ index .Errors "email" }} {{end}}
     </div>
     <div>
-        <input id="password" type="text" name="password">
-        <label for="password">Password</label> {{ if . }} {{ index .Errors "password" }} {{end}}
+        <input id="password" type="password" name="password" required>
+        <label for="password">Password</label> {{ if .Errors }} {{ index .Errors "password" }} {{end}}
     </div>
     <div>
         <input type="submit" value="Submit">
     </div>
 </form>
 </body>
-</html>`
+</html>

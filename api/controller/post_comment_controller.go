@@ -23,8 +23,7 @@ func (pcc *CreateCommentController) CreateCommentController(w http.ResponseWrite
 
 		err := r.ParseForm()
 		if err != nil {
-			pcc.logger.PrintError(fmt.Errorf("Controller: comment-create: ParseForm"))
-			pcc.logger.PrintError(err)
+			pcc.logger.PrintError(fmt.Errorf("error while parsing request form: %w", err))
 			pcc.ResponseBadRequest(w)
 			return
 		}
@@ -34,22 +33,22 @@ func (pcc *CreateCommentController) CreateCommentController(w http.ResponseWrite
 		postIDStr := r.FormValue("post_id")
 		postIDInt, err := strconv.Atoi(postIDStr)
 		if err != nil {
-			pcc.logger.PrintError(fmt.Errorf("Controller: comment-create: strconv post_id"))
-			pcc.logger.PrintError(err)
+			pcc.logger.PrintError(fmt.Errorf("couldn't convert post_id to int: %w", err))
 			pcc.ResponseBadRequest(w)
+			return
 		}
 
 		parentIDStr := r.FormValue("parent_id")
 		parentIDInt, err := strconv.Atoi(parentIDStr)
 		if err != nil {
-			pcc.logger.PrintError(fmt.Errorf("Controller: comment-create: strconv parent_id"))
-			pcc.logger.PrintError(err)
+			pcc.logger.PrintError(fmt.Errorf("couldn't convert parent_id to int: %w", err))
 			pcc.ResponseBadRequest(w)
 			return
 		}
 
 		comment.Content = strings.TrimSpace(r.FormValue("content"))
 		if comment.Content == "" {
+			pcc.logger.PrintError(fmt.Errorf("empty comment content is not acceptable"))
 			pcc.ResponseBadRequest(w)
 			return
 		}
@@ -59,13 +58,6 @@ func (pcc *CreateCommentController) CreateCommentController(w http.ResponseWrite
 
 		err = pcc.CreateCommentUsecase.CreateComment(comment)
 		if err != nil {
-			if err == ErrFormValidation {
-				pcc.logger.PrintError(fmt.Errorf("Controller: comment-create: CreateComment ErrFormValidation"))
-				pcc.logger.PrintError(err)
-				pcc.ResponseBadRequest(w)
-				return
-			}
-			pcc.logger.PrintError(fmt.Errorf("Controller: comment-create: CreateComment"))
 			pcc.logger.PrintError(err)
 			pcc.ResponseServerError(w)
 			return
@@ -79,7 +71,7 @@ func (pcc *CreateCommentController) CreateCommentController(w http.ResponseWrite
 		}
 
 	default:
-		pcc.logger.PrintError(fmt.Errorf("Controller: comment-create: method not allowed"))
+		pcc.logger.PrintError(fmt.Errorf("method not allowed"))
 		pcc.ResponseMethodNotAllowed(w)
 		return
 	}

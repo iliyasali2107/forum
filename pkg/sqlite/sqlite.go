@@ -3,7 +3,6 @@ package sqlite
 import (
 	"database/sql"
 	"fmt"
-	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -14,14 +13,6 @@ func Connect(path string) (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
-}
-
-func Create(nameDB string, path string) error {
-	file, err := os.Create(fmt.Sprintf("%s.sqlite", nameDB))
-	if err != nil {
-		return err
-	}
-	return file.Close()
 }
 
 func DropAllDB(db *sql.DB) error {

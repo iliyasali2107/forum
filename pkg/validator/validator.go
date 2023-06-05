@@ -7,10 +7,20 @@ import (
 )
 
 var (
-	EmailRX    = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
-	NameRX     = regexp.MustCompile(`^[a-zA-Z0-9]{3,50}$`)
-	PasswordRX = regexp.MustCompile(`[a-z]+[A-Z]+[0-9]+[@$!%*?&]+[A-Za-z\d@$!%*?&]{8,46}`)
+	EmailRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	NameRX  = regexp.MustCompile(`^[a-zA-Z0-9]{3,50}$`)
 )
+
+func isValidPassword(pass string) bool {
+	tests := []string{".{6,}", "[a-z]", "[0-9]"}
+	for _, test := range tests {
+		valid, _ := regexp.MatchString(test, pass)
+		if !valid {
+			return false
+		}
+	}
+	return true
+}
 
 // emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 
@@ -103,9 +113,10 @@ func SignupValidation(user *models.User) map[string]string {
 		errors["email"] = "must be correctly formatted"
 	}
 
-	if !PasswordRX.MatchString(user.Password.Plaintext) {
+	if !isValidPassword(user.Password.Plaintext) {
 		errors["password"] = "at least 1 upper, 1 lower, 1 digit, 1 special char & 8 to 50 chars"
 	}
 
 	return errors
 }
+

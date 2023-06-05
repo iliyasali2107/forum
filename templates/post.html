@@ -31,11 +31,19 @@
         {{.User.Name}}:
     <p>
         {{ .Content }}
-        likes:
-        <form action="{{ .Endpoints.CreateCommentReactionEndpoint }}" method="POST">
+
+        <form action="{{ $.Endpoints.CommentReactionEndpoint }}" method="POST">
             <input type="hidden" name="reaction" value="1">
-            <input type="hidden" name="post_id" value="{{.Post.ID}}">
-            <button type="submit">like</button>
+            <input type="hidden" name="post_id" value="{{ .PostID }}">
+            <input type="hidden" name="comment_id" value="{{.ID}}">
+            <button type="submit">like</button> {{ .Likes }}
+        </form>
+        
+        <form action="{{ $.Endpoints.CommentReactionEndpoint }}" method="POST">
+            <input type="hidden" name="reaction" value="0">
+            <input type="hidden" name="post_id" value="{{ .PostID }}">
+            <input type="hidden" name="comment_id" value="{{.ID}}">
+            <button type="submit">dislike</button> {{ .Dislikes }}
         </form>
     </p>
 
@@ -54,25 +62,24 @@
     <hr>
     </p>
 
-    Likes: {{ .Post.Likes }}
     <form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
         <input type="hidden" name="reaction" value="1">
         <input type="hidden" name="post_id" value="{{.Post.ID}}">
-        <button type="submit">like</button>
+        <button type="submit">like</button>{{ .Post.Likes }}
     </form>
     <hr>
 
-    Dislike: {{ .Post.Dislikes }}
+   
     <form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
         <input type="hidden" name="reaction" value="0">
         <input type="hidden" name="post_id" value="{{.Post.ID}}">
-        <button type="submit">like</button>
+        <button type="submit">dislike</button>{{ .Post.Dislikes }}
     </form>
     <hr>
 
     Add Comment:
     <form action="{{ .Endpoints.CreateCommentEndpoint }} " method="POST">
-        <textarea name="content" placeholder="comment..."></textarea>
+        <textarea name="content" placeholder="comment..." required></textarea>
         <input type="hidden" name="post_id" value="{{ .Post.ID }}">
         <input type="hidden" name="parent_id" value="0">
         <button type="submit">add</button>

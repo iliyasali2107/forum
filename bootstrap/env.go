@@ -20,7 +20,15 @@ type Env struct {
 }
 
 func NewEnv() *Env {
-	env := Env{}
+	env := Env{
+		ServerAddress:   ":8080",
+		DBName:          "forum",
+		DBPath:          "./db/forum.db",
+		DBDriver:        "sqlite3",
+		Port:            8080,
+		ContextTimeout:  2,
+		LoginExpireTime: 30 * time.Minute,
+	}
 	envRows := make(map[string]any)
 
 	file, err := os.Open("./.env")

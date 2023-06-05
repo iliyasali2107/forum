@@ -1,11 +1,11 @@
 package usecase
 
 import (
+	"fmt"
 	"time"
 
 	"forum/domain/models"
 	"forum/domain/repository"
-	"forum/pkg/validator"
 )
 
 type createPostUsecase struct {
@@ -32,37 +32,28 @@ func (cpu *createPostUsecase) CreatePost(post *models.Post) (int, error) {
 
 	postID, err := cpu.postRepository.CreatePost(post)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("couldn't cerate post: %w", err)
 	}
 
 	for _, c := range post.Categories {
 		category, err := cpu.categoryRepository.GetCategory(c)
 		if err != nil {
-			return 0, ErrCategoryNotFound
+			return 0, fmt.Errorf("couldn't get categories: %w", err)
 		}
 
 		err = cpu.categoryRepository.AddCategory(post.ID, category.ID)
 		if err != nil {
-			return 0, err
+			return 0, fmt.Errorf("couldn't add category: %w", err)
 		}
 	}
-	return postID, err
+	return postID, nil
 }
 
 func (cpu *createPostUsecase) GetAllCategories() ([]*models.Category, error) {
 	categories, err := cpu.categoryRepository.GetAllCategories()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't get all categories: %w", err)
 	}
 
 	return categories, nil
-}
-
-func validatePost(v *validator.Validator, post *models.Post) {
-	v.Check(post.Title != "", "title", "must be provided")
-	v.Check(len(post.Title) <= 100, "title", "must not be more than 100 chars")
-
-	v.Check(post.Content != "", "content", "must be provided")
-	v.Check(len(post.Content) <= 100, "content", "must not be more than 100 chars")
-
 }

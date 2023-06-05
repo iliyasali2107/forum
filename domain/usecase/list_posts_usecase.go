@@ -1,10 +1,14 @@
 package usecase
 
 import (
+	"database/sql"
+	"errors"
+	"fmt"
 	"time"
 
 	"forum/domain/models"
 	"forum/domain/repository"
+	"forum/pkg/utils"
 )
 
 type listPostsUsecase struct {
@@ -20,6 +24,8 @@ type ListPostsUsecase interface {
 	GetDislikedPosts(userID int) ([]*models.Post, error)
 	GetCreatedPosts(userID int) ([]*models.Post, error)
 	GetCommentedPosts(userID int) ([]*models.Post, error)
+	GetAllCategories() ([]*models.Category, error)
+	GetPostsByCategories(ids ...int) ([]*models.Post, error)
 }
 
 func NewListPostsUsecase(postRepository repository.PostRepository, categoryRepository repository.CategoryRepository, userRepository repository.UserRepository, timeout time.Duration) ListPostsUsecase {
@@ -34,18 +40,18 @@ func NewListPostsUsecase(postRepository repository.PostRepository, categoryRepos
 func (lpu *listPostsUsecase) GetAllPosts() ([]*models.Post, error) {
 	posts, err := lpu.postRepository.GetAllPosts()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't get all posts: %w", err)
 	}
 
 	for _, post := range posts {
 		user, err := lpu.userRepository.GetUser(post.User.ID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("couldn't get user: %w", err)
 		}
 		post.User = user
 		err = lpu.categoryRepository.GetCategoriesForPost(post)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("couldn't get categories of post: %w", err)
 		}
 	}
 
@@ -53,17 +59,62 @@ func (lpu *listPostsUsecase) GetAllPosts() ([]*models.Post, error) {
 }
 
 func (lpu *listPostsUsecase) GetLikedPosts(userID int) ([]*models.Post, error) {
-	return nil, nil
+	posts, err := lpu.postRepository.GetLikedPosts(userID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNoPosts
+		}
+		return nil, fmt.Errorf("couldn't get user's liked posts: %w", err)
+	}
+
+	return posts, nil
 }
 
 func (lpu *listPostsUsecase) GetDislikedPosts(userID int) ([]*models.Post, error) {
-	return nil, nil
+	posts, err := lpu.postRepository.GetDislikedPosts(userID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNoPosts
+		}
+		return nil, fmt.Errorf("couldn't get user's disliked posts: %w", err)
+	}
+
+	return posts, nil
 }
 
 func (lpu *listPostsUsecase) GetCreatedPosts(userID int) ([]*models.Post, error) {
-	return nil, nil
+	posts, err := lpu.postRepository.GetAllPostsOfUser(userID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNoPosts
+		}
+		return nil, fmt.Errorf("couldn't get users posts: %w", err)
+	}
+
+	return posts, nil
+}
+
+func (lpu *listPostsUsecase) GetPostsByCategories(ids ...int) ([]*models.Post, error) {
+	posts, err := lpu.postRepository.GetPostsByCategory(ids...)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, utils.ErrNoPosts
+		}
+		return nil, fmt.Errorf("couldn't get posts: %w", err)
+	}
+
+	return posts, nil
 }
 
 func (lpu *listPostsUsecase) GetCommentedPosts(userID int) ([]*models.Post, error) {
 	return nil, nil
+}
+
+func (lpu *listPostsUsecase) GetAllCategories() ([]*models.Category, error) {
+	categories, err := lpu.categoryRepository.GetAllCategories()
+	if err != nil {
+		return nil, fmt.Errorf("couldn't get categories: %w", err)
+	}
+
+	return categories, nil
 }

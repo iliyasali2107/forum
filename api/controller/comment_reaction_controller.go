@@ -15,14 +15,14 @@ type CommentReactionController struct {
 
 func (crc *CommentReactionController) CommentReactionController(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		crc.logger.PrintError(fmt.Errorf("Controller: LikeComment: method not allowed"))
+		crc.logger.PrintError(fmt.Errorf("comment_reaction: method not allowed"))
 		crc.ResponseMethodNotAllowed(w)
 		return
 	}
 
 	err := r.ParseForm()
 	if err != nil {
-		crc.logger.PrintError(err)
+		crc.logger.PrintError(fmt.Errorf("error while parsing request form: %w", err))
 		crc.ResponseBadRequest(w)
 		return
 	}
@@ -30,7 +30,7 @@ func (crc *CommentReactionController) CommentReactionController(w http.ResponseW
 	commentIDStr := r.FormValue("comment_id")
 	commentId, err := strconv.Atoi(commentIDStr)
 	if err != nil {
-		crc.logger.PrintError(err)
+		crc.logger.PrintError(fmt.Errorf("incorrect comment_id value: %w", err))
 		crc.ResponseBadRequest(w)
 		return
 	}
@@ -38,13 +38,18 @@ func (crc *CommentReactionController) CommentReactionController(w http.ResponseW
 	reactionTypeStr := r.FormValue("reaction")
 	reactionType, err := strconv.Atoi(reactionTypeStr)
 	if err != nil || (reactionType != 1 && reactionType != 0) {
-		crc.logger.PrintError(err)
+		crc.logger.PrintError(fmt.Errorf("incorrect reactionType value"))
 		crc.ResponseBadRequest(w)
 		return
 	}
 
 	postIDStr := r.FormValue("post_id")
 	postID, err := strconv.Atoi(postIDStr)
+	if err != nil {
+		crc.logger.PrintError(fmt.Errorf("incorrect post_id value: %w", err))
+		crc.ResponseBadRequest(w)
+		return
+	}
 
 	user := crc.contextGetUser(r)
 
@@ -53,18 +58,23 @@ func (crc *CommentReactionController) CommentReactionController(w http.ResponseW
 		CommentID: commentId,
 		Type:      reactionType,
 	}
-
 	if reaction.Type == 1 {
 		err = crc.CommentReactionUsecase.LikeComment(reaction)
-	} else {
+	} else if reaction.Type == 0 {
 		err = crc.CommentReactionUsecase.DislikeComment(reaction)
 	}
 
 	if err != nil {
-		crc.logger.PrintError(err)
+		crc.logger.PrintError(fmt.Errorf("comment-reaction: %w", err))
 		crc.ResponseServerError(w)
 		return
 	}
 
-	http.Redirect(w, r, crc.Data.Endpoints.PostDetailsEndpoint+strconv.Itoa(postID), http.StatusSeeOther)
+	nextPage := r.FormValue("next")
+	if nextPage == "" {
+		http.Redirect(w, r, crc.Data.Endpoints.PostDetailsEndpoint+strconv.Itoa(postID), http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, nextPage, http.StatusSeeOther)
+	}
+
 }

@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"time"
 
 	"forum/domain/models"
@@ -26,12 +27,14 @@ func NewLogoutUsecase(userRepository repository.UserRepository, timeout time.Dur
 func (lu *logoutUsecase) Logout(user *models.User) error {
 	u, err := lu.userRepository.GetUserByEmail(user.Email)
 	if err != nil {
-		return ErrUserNotFound
+		return fmt.Errorf("user not found: %w", err)
 	}
 
 	user.ID = u.ID
 
-	return lu.userRepository.DeleteToken(*user.Token)
+	return nil
+
+	// return lu.userRepository.DeleteToken(*user.Token)
 }
 
 func (lu *logoutUsecase) ParseToken(token string) (*models.User, error) {

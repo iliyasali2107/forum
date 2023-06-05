@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"time"
 
 	"forum/domain/models"
@@ -27,7 +28,7 @@ func (pcu *createCommentUsecase) CreateComment(comment *models.Comment) error {
 
 	_, err := pcu.commentRepository.CreateComment(comment)
 	if err != nil {
-		return ErrInternalServer
+		return fmt.Errorf("couldn't create comment: %w", err)
 	}
 
 	return nil

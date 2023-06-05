@@ -12,11 +12,12 @@ import (
 func Setup(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *http.ServeMux, ctrl *controller.Controller) {
 	NewCommentDetailsRouter(env, timeout, db, mux, ctrl)
 	NewCreatePostRouter(env, timeout, db, mux, ctrl)
-	NewListPostsRouter(env, timeout, db, mux, ctrl)
 	NewLoginRouter(env, timeout, db, mux, ctrl)
 	NewLogoutRouter(env, timeout, db, mux, ctrl)
 	NewCommentCreateRouter(env, timeout, db, mux, ctrl)
+	NewListPostsRouter(env, timeout, db, mux, ctrl)
 	NewPostReactionRouter(env, timeout, db, mux, ctrl)
 	NewPostRouter(env, timeout, db, mux, ctrl)
 	NewSignupRouter(env, timeout, db, mux, ctrl)
+	NewCommentReactionRouter(env, timeout, db, mux, ctrl)
 }

@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"time"
 
 	"forum/domain/models"
@@ -76,20 +77,20 @@ func (pdu *postDetailsUsecase) GetPostDislikes(postID int) (int, error) {
 func (pdu *postDetailsUsecase) GetCommentsByPostId(post_id int) ([]*models.Comment, error) {
 	comments, err := pdu.commentRepository.GetPostComments(post_id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't get post comments: %w", err)
 	}
 
 	for _, comment := range comments {
 		replies, err := pdu.commentRepository.GetCommentRepliesCount(comment.ID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("couldn't get comment repiles count: %w", err)
 		}
 
 		comment.ReplyCount = replies
 
 		user, err := pdu.userRepository.GetUser(comment.UserID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("couldn't get user: %w", err)
 		}
 
 		comment.User = user

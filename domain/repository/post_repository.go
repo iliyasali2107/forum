@@ -9,9 +9,11 @@ import (
 type PostRepository interface {
 	CreatePost(*models.Post) (int, error)
 	GetAllPosts() ([]*models.Post, error)
-	GetPostsByCategory(...int) (*[]models.Post, error)
+	GetPostsByCategory(ids ...int) ([]*models.Post, error)
 	GetPost(int) (*models.Post, error)
 	GetAllPostsOfUser(int) ([]*models.Post, error)
+	GetLikedPosts(userID int) ([]*models.Post, error)
+	GetDislikedPosts(userID int) ([]*models.Post, error)
 	UpdatePost(*models.Post) (*models.Post, error)
 	DeletePost(int) error
 }
@@ -62,26 +64,78 @@ func (rr *postRepository) GetAllPosts() ([]*models.Post, error) {
 	return posts, nil
 }
 
-func (rr *postRepository) GetPostsByCategory(ids ...int) (*[]models.Post, error) {
-	query := `SELECT * FROM posts WHERE id IN (?`
-	for i := 0; i < len(ids); i++ {
-		query += `,?`
+func (rr *postRepository) GetPostsByCategory(ids ...int) ([]*models.Post, error) {
+
+	query := `SELECT posts.id, posts.user_id, posts.title, posts.content, posts.created, users.name  FROM posts 
+	JOIN categories_posts ON posts.id=categories_posts.post_id
+	JOIN users ON users.id=posts.user_id
+	WHERE categories_posts.category_id=?`
+
+	posts := []*models.Post{}
+	for _, i := range ids {
+		rows, err := rr.db.Query(query, i)
+		if err != nil {
+			return nil, err
+
+		}
+		defer rows.Close()
+		for rows.Next() {
+			u := &models.User{}
+			post := &models.Post{User: u}
+			err := rows.Scan(&post.ID, &post.User.ID, &post.Title, &post.Content, &post.Created, &post.User.Name)
+			if err != nil {
+				return nil, err
+			}
+			posts = append(posts, post)
+		}
 	}
-	query += `)`
-	rows, err := rr.db.Query(query, ids)
+	return posts, nil
+}
+
+func (pr *postRepository) GetLikedPosts(userID int) ([]*models.Post, error) {
+	query := `SELECT posts.* FROM posts
+    INNER JOIN reactions_posts ON reactions_posts.post_id = posts.id
+    WHERE reactions_posts.user_id = ? and reactions_posts.type = 1;
+    `
+	rows, err := pr.db.Query(query, userID)
 	if err != nil {
 		return nil, err
 	}
-	posts := []models.Post{}
+	defer rows.Close()
+	posts := []*models.Post{}
 	for rows.Next() {
-		post := models.Post{}
-		if err := rows.Scan(&post.ID, &post.User.ID, &post.Title, &post.Content, &post.Created); err != nil {
+		u := &models.User{}
+		p := &models.Post{User: u}
+		err := rows.Scan(&p.ID, &p.User.ID, &p.Title, &p.Content, &p.Created)
+		if err != nil {
 			return nil, err
 		}
-		posts = append(posts, post)
+		posts = append(posts, p)
 	}
+	return posts, nil
+}
 
-	return &posts, nil
+func (pr *postRepository) GetDislikedPosts(userID int) ([]*models.Post, error) {
+	query := `SELECT posts.* FROM posts
+    INNER JOIN reactions_posts ON reactions_posts.post_id = posts.id
+    WHERE reactions_posts.user_id = ? and reactions_posts.type = 0;
+    `
+	rows, err := pr.db.Query(query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	posts := []*models.Post{}
+	for rows.Next() {
+		u := &models.User{}
+		p := &models.Post{User: u}
+		err := rows.Scan(&p.ID, &p.User.ID, &p.Title, &p.Content, &p.Created)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, p)
+	}
+	return posts, nil
 }
 
 func (rr *postRepository) GetPost(id int) (*models.Post, error) {

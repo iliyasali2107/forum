@@ -2,26 +2,12 @@ package controller
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"forum/domain/models"
-)
-
-var (
-	ErrInvalidEmail        = errors.New("invalid email format")
-	ErrInvalidPassword     = errors.New("invalid password")
-	ErrInvalidUsername     = errors.New("invalid username")
-	ErrInvalidUsernameLen  = errors.New("username length out of range 32")
-	ErrInvalidUsernameChar = errors.New("invalid username characters")
-	ErrInternalServer      = errors.New("internal server error")
-	ErrConfirmPassword     = errors.New("password doesn't match")
-	ErrUserNotFound        = errors.New("user not found")
-	ErrUserExists          = errors.New("user already exists")
-	ErrFormValidation      = errors.New("form validation failed")
 )
 
 // Context helpers
@@ -183,4 +169,18 @@ func GetIdFromURL2(numOfWords int, path string) (int, error) {
 	}
 
 	return id, nil
+}
+
+func GetFilterFromUrl(path string) (string, error) {
+	s := strings.Split(path, "/")
+	if len(s) <= 2 || len(s) > 3 {
+		return "", fmt.Errorf("invalid url")
+	}
+
+	if s[2] != "created" && s[2] != "liked" {
+		return "", fmt.Errorf("couldn't get filters")
+
+	}
+
+	return s[2], nil
 }

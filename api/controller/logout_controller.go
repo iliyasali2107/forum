@@ -34,7 +34,7 @@ func (lc *LogoutConrtroller) Logout(w http.ResponseWriter, r *http.Request) {
 
 	err = lc.LogoutUsecase.DeleteToken(c.Value)
 	if err != nil {
-		lc.logger.PrintError(fmt.Errorf("Controller: logout: couldn't delete token"))
+		lc.logger.PrintError(fmt.Errorf("Controller: logout: %w", err))
 		lc.ResponseServerError(w)
 		return
 	}

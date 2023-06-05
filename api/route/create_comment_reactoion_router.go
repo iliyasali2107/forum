@@ -11,7 +11,7 @@ import (
 	"forum/domain/usecase"
 )
 
-func NewCreateCommentReactionRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *http.ServeMux, ctrl *controller.Controller) {
+func NewCommentReactionRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *http.ServeMux, ctrl *controller.Controller) {
 	rr := repository.NewReactionRepository(db)
 
 	ccrr := controller.CommentReactionController{

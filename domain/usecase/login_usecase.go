@@ -1,11 +1,15 @@
 package usecase
 
 import (
+	"database/sql"
+	"errors"
+	"fmt"
 	"time"
 
 	"forum/bootstrap"
 	"forum/domain/models"
 	"forum/domain/repository"
+	"forum/pkg/utils"
 
 	"github.com/google/uuid"
 )
@@ -30,12 +34,15 @@ func NewLoginUsecase(userRepository repository.UserRepository, env *bootstrap.En
 func (lu *loginUsecase) Login(user *models.User) error {
 	u, err := lu.userRepository.GetUserByEmail(user.Email)
 	if err != nil {
-		return ErrUserNotFound
+		if errors.Is(err, sql.ErrNoRows) {
+			return utils.ErrUserNotFound
+		}
+		return fmt.Errorf("couldn't get user")
 	}
 
 	ok, err := u.Password.Matches(user.Password.Plaintext)
 	if err != nil || !ok {
-		return err
+		return utils.ErrInvalidPassword
 	}
 
 	sessionToken := uuid.NewString()
@@ -45,7 +52,7 @@ func (lu *loginUsecase) Login(user *models.User) error {
 	user.ID = u.ID
 	err = lu.userRepository.SaveToken(user)
 	if err != nil {
-		return err
+		return fmt.Errorf("couldn't save token: %w", err)
 	}
 
 	return nil

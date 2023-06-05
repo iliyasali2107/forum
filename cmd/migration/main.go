@@ -31,6 +31,9 @@ func main() {
 		}
 		log.Println("Successful")
 	default:
-		log.Fatalf("%s: unknown flag. Use: 'up' or 'down'", flag)
+		if err := migrate.CreateTable(db, "./db/migrations"); err != nil {
+			log.Fatalln(err)
+		}
+		log.Println("Successful")
 	}
 }

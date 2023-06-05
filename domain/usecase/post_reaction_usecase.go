@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	"forum/domain/models"
@@ -37,19 +38,19 @@ func NewPostReactionUsecase(reactionRepository repository.ReactionRepository, po
 func (pru *postReactionUsecase) GetPost(postID int) (*models.Post, error) {
 	post, err := pru.postRepository.GetPost(postID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't get post: %w", err)
 	}
 
 	user, err := pru.userRepository.GetUser(post.User.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't get user: %w", err)
 	}
 
 	post.User = user
 
 	err = pru.categoryRepository.GetCategoriesForPost(post)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't get categories of for post: %w", err)
 	}
 
 	return post, nil
@@ -61,21 +62,21 @@ func (pru *postReactionUsecase) LikePost(reaction *models.Reaction) error {
 		if err == sql.ErrNoRows {
 			err := pru.reactionRepository.CreatePostReaction(reaction)
 			if err != nil {
-				return err
+				return fmt.Errorf("couldn't create post reaction: %w", err)
 			}
 			return nil
 		}
-		return err
+		return fmt.Errorf("couldn't get dbReaction: %w", err)
 	}
 
 	switch dbReaction.Type {
 	case 1:
 		if err := pru.reactionRepository.DeletePostReaction(dbReaction); err != nil {
-			return err
+			return fmt.Errorf("couldn't delete post reaction: %w", err)
 		}
 	case 0:
 		if err := pru.reactionRepository.UpdatePostReaction(reaction); err != nil {
-			return err
+			return fmt.Errorf("couldn't update post reaction: %w", err)
 		}
 	}
 	return nil
@@ -87,21 +88,21 @@ func (pru *postReactionUsecase) DislikePost(reaction *models.Reaction) error {
 		if err == sql.ErrNoRows {
 			err = pru.reactionRepository.CreatePostReaction(reaction)
 			if err != nil {
-				return err
+				return fmt.Errorf("couldn't create post reaction: %w", err)
 			}
 			return nil
 		}
-		return err
+		return fmt.Errorf("couldn't get dbReaction: %w", err)
 	}
 
 	switch dbReaction.Type {
 	case 1:
 		if err := pru.reactionRepository.UpdatePostReaction(reaction); err != nil {
-			return err
+			return fmt.Errorf("couldn't update post reaction: %w", err)
 		}
 	case 0:
 		if err := pru.reactionRepository.DeletePostReaction(dbReaction); err != nil {
-			return err
+			return fmt.Errorf("couldn't delete post reaction: %w", err)
 		}
 	}
 
@@ -111,7 +112,7 @@ func (pru *postReactionUsecase) DislikePost(reaction *models.Reaction) error {
 func (pru *postReactionUsecase) GetPostLikes(post_id int) (int, error) {
 	likes, err := pru.reactionRepository.GetPostLikes(post_id)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("couldn't get post likes: %w", err)
 	}
 
 	return likes, nil
@@ -120,7 +121,7 @@ func (pru *postReactionUsecase) GetPostLikes(post_id int) (int, error) {
 func (pru *postReactionUsecase) GetPostDislikes(post_id int) (int, error) {
 	dislikes, err := pru.reactionRepository.GetPostDislikes(post_id)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("couldn't get post dislikes: %w", err)
 	}
 
 	return dislikes, nil

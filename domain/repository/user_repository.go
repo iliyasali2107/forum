@@ -13,6 +13,7 @@ type UserRepository interface {
 	GetUser(int) (*models.User, error)
 	GetUserByEmail(string) (*models.User, error)
 	GetUserByToken(token string) (*models.User, error)
+	GetUserByName(name string) (*models.User, error)
 	GetAllUsers() ([]models.User, error)           // may be no need
 	UpdateUser(*models.User) (*models.User, error) // may be no need
 	DeleteUser(int) error                          // may be no need
@@ -84,6 +85,21 @@ func (ur *userRepo) GetAllUsers() ([]models.User, error) {
 func (ur *userRepo) GetUserByEmail(email string) (*models.User, error) {
 	query := `SELECT * FROM users WHERE email = ?`
 	row := ur.db.QueryRow(query, email)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	user := &models.User{}
+	if err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password.Hash, &user.Token, &user.Expires); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (ur *userRepo) GetUserByName(name string) (*models.User, error) {
+	query := `SELECT * FROM users WHERE name = ?`
+	row := ur.db.QueryRow(query, name)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}

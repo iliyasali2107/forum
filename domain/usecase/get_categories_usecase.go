@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"forum/domain/models"
 	"forum/domain/repository"
 )
@@ -22,7 +23,7 @@ func NewGetCategoriesUsecase(categoryRepository repository.CategoryRepository) G
 func (gcu *getCategoriesUsecase) GetAllCategories() ([]*models.Category, error) {
 	categories, err := gcu.categoryRepository.GetAllCategories()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't get all catgories: %w", err)
 	}
 
 	return categories, nil
