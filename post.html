@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="nav">
+        <div class="container">
+            <div class="nav__container">
+                <a href="" class="logo">Forum</a>
+                <div class="nav__links">
+                    <div class="nav__link">
+                        <a href=""class="link">Home</a>
+                    </div>
+                    <div class="nav__link">
+                        <a href=""class="link">Create Post</a>
+                    </div>
+                    <div class="nav__link">
+                        <a href="">Post</a>
+                    </div>
+                    <div class="nav__link">
+                        <a href="">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="posts">
+        <div class="container">
+            <div class="posts__container">
+                <div class="post__item">
+                    <div class="post__header">
+                        <div class="title__container">
+                            <h2 class="title">Title</h2>
+                            <div class="date">09.04.2023</div>
+                        </div>
+                        <div class="username">{{.User.Name}}</div>
+                    </div>
+                    <div class="content">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Illum, quae cum. Fugiat, repellat qui saepe corporis facere, rem fuga cupiditate, modi vitae necessitatibus illum in voluptatem? Enim fugiat libero repellat.</div>
+                    <div class="post__footer">
+                        <div class="reaction">
+                            <form action="/like">
+                                <input type="text"value="1"name="userid"hidden>
+                                <input type="text"value="2"name="postid"hidden>
+                                <input type="text"value="like"name="like"hidden>
+                                <p>10</p>
+                                <button type="submit">Like</button>
+                                
+                            </form>
+                            <form action="/dislike">
+                                <input type="text"value="1"name="userid"hidden>
+                                <input type="text"value="2"name="postid"hidden>
+                                <input type="text"value="dislike"name="dislike"hidden>
+                                <p>11</p>
+                                <button type="submit">Dislike</button>
+                                
+                            </form>
+                        </div>
+                        <div class="category">category</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
