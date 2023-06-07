@@ -3,6 +3,6 @@ CREATE TABLE IF NOT EXISTS categories (
     name TEXT NOT NULL UNIQUE NOT NULL
 );
 
-INSERT OR IGNORE INTO categories (name) VALUES ("basketball");
-INSERT OR IGNORE INTO categories (name) VALUES ("tennis");
-INSERT OR IGNORE INTO categories (name) VALUES ("football");
+INSERT OR IGNORE INTO categories (name) VALUES ("redf");
+INSERT OR IGNORE INTO categories (name) VALUES ("c++");
+INSERT OR IGNORE INTO categories (name) VALUES ("c--");
