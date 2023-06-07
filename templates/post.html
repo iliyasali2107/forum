@@ -1,90 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-    <p>
-        author: {{ .Post.User.Name }}
-    </p>
-    <p>
-        title: {{ .Post.Title}}
-    </p>
-    <p>
-        Content: {{ .Post.Content }}
-    </p>
-    <p>
-        Created: {{ .Post.Created }}
-    </p>
-    Categories:
-    {{ range .Post.Categories }}
-    {{ . }}
-    {{ end }}
-    <hr>
+    <nav class="nav">
+        <div class="container">
+            <div class="nav__container">
+                <a href="" class="logo">Forum</a>
+                <div class="nav__links">
+                    <div class="nav__link">
+                        <a href=""class="link">Home</a>
+                    </div>
+                    <div class="nav__link">
+                        <a href=""class="link">Create Post</a>
+                    </div>
+                    <div class="nav__link">
+                        <a href="">Post</a>
+                    </div>
+                    <div class="nav__link">
+                        <a href="">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    Comments:
-    <p>
-        {{ range .Post.Comments }}
-        {{.User.Name}}:
-    <p>
-        {{ .Content }}
-
-        <form action="{{ $.Endpoints.CommentReactionEndpoint }}" method="POST">
-            <input type="hidden" name="reaction" value="1">
-            <input type="hidden" name="post_id" value="{{ .PostID }}">
-            <input type="hidden" name="comment_id" value="{{.ID}}">
-            <button type="submit">like</button> {{ .Likes }}
-        </form>
-        
-        <form action="{{ $.Endpoints.CommentReactionEndpoint }}" method="POST">
-            <input type="hidden" name="reaction" value="0">
-            <input type="hidden" name="post_id" value="{{ .PostID }}">
-            <input type="hidden" name="comment_id" value="{{.ID}}">
-            <button type="submit">dislike</button> {{ .Dislikes }}
-        </form>
-    </p>
-
-    <form action="{{ $.Endpoints.CreateCommentEndpoint }}" method="POST">
-        <textarea name="content" placeholder="reply..."></textarea>
-        <input type="hidden" name="post_id" value="{{ .PostID }}">
-        <input type="hidden" name="parent_id" value="{{ .ID }}">
-        <button type="submit">add</button>
-    </form>
-    <a href="{{ $.Endpoints.CommentDetailsEndpoint }}{{ .ID }}">
-        {{ .ReplyCount }} replies
-    </a>
-    <hr>
-
-    {{ end }}
-    <hr>
-    </p>
-
-    <form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
-        <input type="hidden" name="reaction" value="1">
-        <input type="hidden" name="post_id" value="{{.Post.ID}}">
-        <button type="submit">like</button>{{ .Post.Likes }}
-    </form>
-    <hr>
-
-   
-    <form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
-        <input type="hidden" name="reaction" value="0">
-        <input type="hidden" name="post_id" value="{{.Post.ID}}">
-        <button type="submit">dislike</button>{{ .Post.Dislikes }}
-    </form>
-    <hr>
-
-    Add Comment:
-    <form action="{{ .Endpoints.CreateCommentEndpoint }} " method="POST">
-        <textarea name="content" placeholder="comment..." required></textarea>
-        <input type="hidden" name="post_id" value="{{ .Post.ID }}">
-        <input type="hidden" name="parent_id" value="0">
-        <button type="submit">add</button>
-    </form>
-
+    <section class="posts">
+        <div class="container">
+            <div class="posts__container">
+                <div class="post__item">
+                    <div class="post__header">
+                        <div class="title__container">
+                            <h2 class="title">Title</h2>
+                            <div class="date">09.04.2023</div>
+                        </div>
+                        <div class="username">{{.User.Name}}</div>
+                    </div>
+                    <div class="content">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Illum, quae cum. Fugiat, repellat qui saepe corporis facere, rem fuga cupiditate, modi vitae necessitatibus illum in voluptatem? Enim fugiat libero repellat.</div>
+                    <div class="post__footer">
+                        <div class="reaction">
+                            <form action="/like">
+                                <input type="text"value="1"name="userid"hidden>
+                                <input type="text"value="2"name="postid"hidden>
+                                <input type="text"value="like"name="like"hidden>
+                                <p>10</p>
+                                <button type="submit">Like</button>
+                                
+                            </form>
+                            <form action="/dislike">
+                                <input type="text"value="1"name="userid"hidden>
+                                <input type="text"value="2"name="postid"hidden>
+                                <input type="text"value="dislike"name="dislike"hidden>
+                                <p>11</p>
+                                <button type="submit">Dislike</button>
+                                
+                            </form>
+                        </div>
+                        <div class="category">category</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </body>
-
 </html>

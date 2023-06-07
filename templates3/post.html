@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+    <p>
+        author: {{ .Post.User.Name }}
+    </p>
+    <p>
+        title: {{ .Post.Title}}
+    </p>
+    <p>
+        Content: {{ .Post.Content }}
+    </p>
+    <p>
+        Created: {{ .Post.Created }}
+    </p>
+    Categories:
+    {{ range .Post.Categories }}
+    {{ . }}
+    {{ end }}
+    <hr>
+
+    Comments:
+    <p>
+        {{ range .Post.Comments }}
+        {{.User.Name}}:
+    <p>
+        {{ .Content }}
+
+        <form action="{{ $.Endpoints.CommentReactionEndpoint }}" method="POST">
+            <input type="hidden" name="reaction" value="1">
+            <input type="hidden" name="post_id" value="{{ .PostID }}">
+            <input type="hidden" name="comment_id" value="{{.ID}}">
+            <button type="submit">like</button> {{ .Likes }}
+        </form>
+        
+        <form action="{{ $.Endpoints.CommentReactionEndpoint }}" method="POST">
+            <input type="hidden" name="reaction" value="0">
+            <input type="hidden" name="post_id" value="{{ .PostID }}">
+            <input type="hidden" name="comment_id" value="{{.ID}}">
+            <button type="submit">dislike</button> {{ .Dislikes }}
+        </form>
+    </p>
+
+    <form action="{{ $.Endpoints.CreateCommentEndpoint }}" method="POST">
+        <textarea name="content" placeholder="reply..."></textarea>
+        <input type="hidden" name="post_id" value="{{ .PostID }}">
+        <input type="hidden" name="parent_id" value="{{ .ID }}">
+        <button type="submit">add</button>
+    </form>
+    <a href="{{ $.Endpoints.CommentDetailsEndpoint }}{{ .ID }}">
+        {{ .ReplyCount }} replies
+    </a>
+    <hr>
+
+    {{ end }}
+    <hr>
+    </p>
+
+    <form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
+        <input type="hidden" name="reaction" value="1">
+        <input type="hidden" name="post_id" value="{{.Post.ID}}">
+        <button type="submit">like</button>{{ .Post.Likes }}
+    </form>
+    <hr>
+
+   
+    <form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
+        <input type="hidden" name="reaction" value="0">
+        <input type="hidden" name="post_id" value="{{.Post.ID}}">
+        <button type="submit">dislike</button>{{ .Post.Dislikes }}
+    </form>
+    <hr>
+
+    Add Comment:
+    <form action="{{ .Endpoints.CreateCommentEndpoint }} " method="POST">
+        <textarea name="content" placeholder="comment..." required></textarea>
+        <input type="hidden" name="post_id" value="{{ .Post.ID }}">
+        <input type="hidden" name="parent_id" value="0">
+        <button type="submit">add</button>
+    </form>
+
+</body>
+
+</html>

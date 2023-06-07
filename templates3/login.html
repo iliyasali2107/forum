@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="{{ .Endpoints.LoginEndpoint }}" method="POST">
+    <div>
+        <input type="text" name="email" id="email" required>
+        <label for="email">email</label>{{ if .Errors}} {{ index .Errors "email" }} {{end}}
+    </div>
+    <div>
+        <input type="password" name="password" id="password" required>
+        <label for="password">password</label>{{ if .Errors}} {{ index .Errors "password" }} {{end}}
+    </div>
+    <div>
+        <input type="submit" value="Submit">
+    </div>
+</form>
+
+</body>
+</html>

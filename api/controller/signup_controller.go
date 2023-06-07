@@ -2,13 +2,12 @@ package controller
 
 import (
 	"fmt"
-	"net/http"
-	"strings"
-
 	"forum/domain/models"
 	"forum/domain/usecase"
 	"forum/pkg/utils"
 	"forum/pkg/validator"
+	"net/http"
+	"strings"
 )
 
 type SignupController struct {

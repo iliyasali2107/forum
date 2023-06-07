@@ -2,12 +2,11 @@ package controller
 
 import (
 	"fmt"
-	"net/http"
-	"strings"
-
 	"forum/domain/models"
 	"forum/domain/usecase"
 	"forum/pkg/utils"
+	"net/http"
+	"strings"
 )
 
 type LoginController struct {
@@ -34,7 +33,7 @@ func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		user := &models.User{}
 		user.Email = strings.TrimSpace(r.FormValue("email"))
 		user.Password.Plaintext = strings.TrimSpace(r.FormValue("password"))
-		fmt.Println(user.Email)
+
 		errors := make(map[string]string)
 
 		err := lc.LoginUsecase.Login(user)

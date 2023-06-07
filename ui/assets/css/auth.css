@@ -1,0 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;600&display=swap');
+
+* {
+margin: 0;
+padding: 0;
+}
+
+body {
+    font-family: 'Teko', sans-serif;
+    font-size: 20px;
+}
+
+a { 
+    text-decoration: none; 
+    color: inherit;
+}
+
+.signup, .login {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    backdrop-filter: blur(100px);
+    box-shadow:
+    inset 0 -3em 3em rgba(0,0,0,0.1),
+    0.3em 0.3em 1em rgba(0,0,0,0.3);
+    padding: 50px;
+    border-radius: 20px;
+    text-align: center;
+    width: 500px;
+    height: fit-content;
+}
+
+.input {
+    background: #fff;
+    padding: 10px;
+    border-radius: 20px;
+    display: flex;
+    gap:5px;
+    margin-bottom: 20px;
+}
+
+.input input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+}
+
+h1 {
+    color: wheat;
+    font-weight: 600;
+    font-size: 50px;
+    margin: 0;
+}
+
+.svg {
+    width: 30px;
+    height: 30px;
+}
+
+.svg svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.svg svg path {
+    fill: #333f33;
+}
+
+.background {
+    position: absolute;
+    top: 0;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+@media (max-width: 674px) {
+    .signup,.login{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        backdrop-filter: blur(100px);
+        box-shadow:
+        inset 0 -3em 3em rgba(0,0,0,0.1),
+        0.3em 0.3em 1em rgba(0,0,0,0.3);
+        padding: 50px;
+        border-radius: 20px;
+        text-align: center;
+        width: 70%;
+        height: fit-content;
+    }
+}
+
+/* ============================================================================ */
+
+.nav {
+background: #fdbe43;
+padding: 20px 0;
+}
+
+.container {
+width: 1200px;
+margin: 0 auto;
+}
+
+.nav__container, .nav__links {
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+
+.logo {
+font-size: 30px;
+color: #fff;
+font-weight: 600;
+}
+
+.nav__links {
+gap: 50px;
+}
+
+.nav__link {
+color: aliceblue;
+position: relative;
+transition: all 0.3s ease-in-out;
+}
+
+.nav__link::after {
+    position: absolute;
+    content: "";
+    top: 100%;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    background: #fff;
+    transition: all 0.3s ease-in-out;
+}
+
+.nav__link:hover::after {
+    width: 100%;
+}
+
+.posts {
+margin-top: 100px;
+}
+
+.post__item {
+background: #e4d18b;
+border-radius: 20px;
+padding: 15px;
+}
+
+.post__header, .post__footer {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 20px;
+}
+
+.content {
+margin-bottom: 20px;
+}
+
+.reaction, .reaction form {
+display: flex;
+align-items: center;
+}
+
+.date {
+font-size: 14px;
+color: #fff;
+}
+
+.title {
+    color: #3b1c07;
+}
+

@@ -3,11 +3,10 @@ package controller
 import (
 	"errors"
 	"fmt"
-	"net/http"
-	"strconv"
-
 	"forum/domain/usecase"
 	"forum/pkg/utils"
+	"net/http"
+	"strconv"
 )
 
 type ListPostsController struct {
@@ -61,7 +60,7 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 
 			lpc.Data.Categories = categories
 
-			err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", lpc.Data)
+			err = lpc.tmpl.ExecuteTemplate(w, "index.html", lpc.Data)
 			if err != nil {
 				lpc.logger.PrintError(fmt.Errorf("list-post: ExecuteTemplate error: %w", err))
 				lpc.ResponseServerError(w)

@@ -1,48 +1,72 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <!-- <link rel="stylesheet" href="../ui/assets/css/auth.css"> -->
+    <link rel="icon" type="image/png" href="/ui/assets/img/robot.png">
 </head>
-
 <body>
-    <a href="{{ .Endpoints.SignupEndpoint }}">signup</a>
-    <a href="{{ .Endpoints.LoginEndpoint }}">login</a>
-    <a href="{{ .Endpoints.LogoutEndpoint }}">logout</a>
+    <nav class="nav">
+        <div class="container">
+            <div class="nav__container">
+                <a href="" class="logo">Forum</a>
+                <div class="nav__links">
+                    <div class="nav__link">
+                        <a href=""class="link">Home</a>
+                    </div>
+                    <div class="nav__link">
+                        <a href=""class="link">Create Post</a>
+                    </div>
+                    <div class="nav__link">
+                        <a href="">Post</a>
+                    </div>
+                    <div class="nav__link">
+                        <a href="{{ .Endpoints.LogoutEndpoint }}">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-
-    <a href="{{ .Endpoints.CreatePostEndpoint }}">Create Post</a>
-
-    <div>
-
-        <hr>
-        {{ range .Posts }}
-        <p>
-            author: {{ .User.Name }}
-        </p>
-        <p>
-            title: {{ .Title}}
-        </p>
-        <p>
-            Content: {{ .Content }}
-        </p>
-        <p>
-            Created: {{ .Created }}
-        </p>
-        <p>
-            Categories:
-            {{ range .Categories }}
-            {{ . }}
-            {{ end }}
-            <hr>
-            {{ end }}
-        </p>
-
-    </div>
+    <section class="posts">
+        <div class="container">
+            <div class="posts__container">
+                <div class="post__item">
+                    <div class="post__header">
+                        <div class="title__container">
+                            <h2 class="title">Title</h2>
+                            <div class="date">09.04.2023</div>
+                        </div>
+                        <div class="username">username</div>
+                    </div>
+                    <div class="content">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Illum, quae cum. Fugiat, repellat qui saepe corporis facere, rem fuga cupiditate, modi vitae necessitatibus illum in voluptatem? Enim fugiat libero repellat.</div>
+                    <div class="post__footer">
+                        <div class="reaction">
+                            <form action="/like">
+                                <input type="text"value="1"name="userid"hidden>
+                                <input type="text"value="2"name="postid"hidden>
+                                <input type="text"value="like"name="like"hidden>
+                                <p>10</p>
+                                <button type="submit">Like</button>
+                                
+                            </form>
+                            <form action="/dislike">
+                                <input type="text"value="1"name="userid"hidden>
+                                <input type="text"value="2"name="postid"hidden>
+                                <input type="text"value="dislike"name="dislike"hidden>
+                                <p>11</p>
+                                <button type="submit">Dislike</button>
+                                
+                            </form>
+                        </div>
+                        <div class="category">category</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </body>
-
 </html>
