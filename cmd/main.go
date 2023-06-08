@@ -1,16 +1,16 @@
 package main
 
 import (
-	"net/http"
-	"time"
-
 	"forum/api/controller"
 	"forum/api/route"
 	"forum/bootstrap"
+	"net/http"
+	"time"
 )
 
 func main() {
 	app := bootstrap.App()
+	defer app.CloseDBConnection() ////////
 
 	env := app.Env
 

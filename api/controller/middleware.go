@@ -4,13 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"forum/domain/models"
 	"net/http"
 	"time"
-
-	"forum/domain/models"
 )
-
-// TODO: signup and login for authorized user not available
 
 func (ctrl *Controller) UserIdentity(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -31,6 +28,7 @@ func (ctrl *Controller) UserIdentity(next http.HandlerFunc) http.HandlerFunc {
 			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), CtxKeyUser, nil)))
 			return
 		}
+
 		if user.Expires.Before(time.Now()) {
 			if err := ctrl.TokenUsecase.DeleteToken(c.Value); err != nil {
 				ctrl.ResponseServerError(w)
@@ -42,19 +40,6 @@ func (ctrl *Controller) UserIdentity(next http.HandlerFunc) http.HandlerFunc {
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), CtxKeyUser, user)))
 	}
 }
-
-// func recoverPanic(next http.HandlerFunc) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		defer func() {
-// 			if err := recover(); err != nil {
-// 				w.Header().Set("Connection", "close")
-
-// 				controller.ResponseServerError(w)
-// 			}
-// 		}()
-// 		next.ServeHTTP(w, r)
-// 	}
-// }
 
 func (c *Controller) Authorized(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

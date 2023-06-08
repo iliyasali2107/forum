@@ -76,5 +76,4 @@ func (crc *CommentReactionController) CommentReactionController(w http.ResponseW
 	} else {
 		http.Redirect(w, r, nextPage, http.StatusSeeOther)
 	}
-
 }

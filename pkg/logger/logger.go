@@ -47,23 +47,6 @@ func NewLogger(out io.Writer, minLevel Level) *Logger {
 	}
 }
 
-//func (l *Logger) Info() *log.Logger {
-//	return log.New(l.out, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
-//}
-//
-//func (l *Logger) Warning() *log.Logger {
-//
-//	return log.New(l.out, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
-//}
-//
-//func (l *Logger) Error() *log.Logger {
-//	return log.New(l.out, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
-//}
-//
-//func (l *Logger) Fatal() *log.Logger {
-//	return log.New(l.out, "FATAL: ", log.Ldate|log.Ltime|log.Lshortfile)
-//}
-
 func (l *Logger) PrintInfo(message string) {
 	l.print(LevelInfo, message)
 }
@@ -104,10 +87,9 @@ func (l *Logger) print(level Level, message string) (int, error) {
 		aux.Trace = string(debug.Stack())
 	}
 
-	//outMessage := fmt.Sprintf("[%s %v] %v %v", level.String(), time1, message, aux.Trace)
 	outMessage := fmt.Sprintf("%s: [%v]: %v", level.String(), time1, message)
 
-	var line = []byte(outMessage)
+	line := []byte(outMessage)
 
 	return l.out.Write(append(line, '\n'))
 }

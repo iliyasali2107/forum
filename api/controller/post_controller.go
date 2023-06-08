@@ -2,9 +2,8 @@ package controller
 
 import (
 	"fmt"
-	"net/http"
-
 	"forum/domain/usecase"
+	"net/http"
 )
 
 type PostController struct {
@@ -16,7 +15,6 @@ type PostController struct {
 func (pc *PostController) PostController(w http.ResponseWriter, r *http.Request) {
 	id, err := GetIdFromShortURL(r.URL.Path)
 	if err != nil {
-
 		pc.logger.PrintError(fmt.Errorf("Controller: PostController: not found: %w", err))
 		pc.ResponseNotFound(w)
 		return
@@ -44,7 +42,6 @@ func (pc *PostController) PostController(w http.ResponseWriter, r *http.Request)
 	}
 
 	comments, err := pc.PostDetailsUsecase.GetCommentsByPostId(id)
-
 	if err != nil {
 		pc.logger.PrintError(fmt.Errorf("Controller: PostController: GetPostDislikes: %w", err))
 		pc.ResponseServerError(w)
@@ -58,7 +55,6 @@ func (pc *PostController) PostController(w http.ResponseWriter, r *http.Request)
 	for i, comment := range post.Comments {
 
 		likes, err := pc.CommentReactionUsecase.CommentLikeCount(comment.ID)
-
 		if err != nil {
 			pc.logger.PrintError(err)
 			pc.ResponseServerError(w)

@@ -7,37 +7,38 @@
     <link rel="stylesheet" href="../ui/assets/css/create_post.css">
     <link rel="icon" type="image/png" href="/ui/assets/img/robot.png">
     <script src="http://code.jquery.com/jquery-2.2.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <title>Create Post</title>
 </head>
 <body>
 
-  <nav class="nav">
-    <div class="container">
-        <div class="nav__container">
-            <a href="" class="logo">Forum</a>
-            <div class="nav__links">
-                <div class="nav__link">
-                    <a href=""class="link">Home</a>
-                </div>
-                <div class="nav__link">
-                    <a href=""class="link">Create Post</a>
-                </div>
-                <div class="nav__link">
-                    <a href="">Post</a>
-                </div>
-                <div class="nav__link">
-                    <a href="{{ .Endpoints.LogoutEndpoint }}">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</nav>
+    <!-- Navbar-->
+    <header class="header">
+      <nav class="navbar navbar-expand-lg fixed-top py-3">
+          <div class="container"><a href="{{ .Endpoints.PostsAllEndpoint }}" class="navbar-brand text-uppercase font-weight-bold">Forum</a>
+              <button type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler navbar-toggler-right"><i class="fa fa-bars"></i></button>
+              
+              <div id="navbarSupportedContent" class="collapse navbar-collapse">
+                  <ul class="navbar-nav ml-auto">
+                      <li class="nav-item active"><a href="{{ .Endpoints.PostsAllEndpoint }}" class="nav-link text-uppercase font-weight-bold">Home <span class="sr-only">(current)</span></a></li>
+                      <li class="nav-item"><a href="{{ .Endpoints.CreatePostEndpoint }}" class="nav-link text-uppercase font-weight-bold">Create Post</a></li>
+                      <li class="nav-item"><a href="{{ .Endpoints.PostDetailsEndpoint }}" class="nav-link text-uppercase font-weight-bold">Posts (change)</a></li>
+                      <li class="nav-item"><a href="{{ .Endpoints.LogoutEndpoint }}" class="nav-link text-uppercase font-weight-bold">Logout</a></li>
+                  </ul>
+              </div>
+          </div>
+      </nav>
+    </header>
 
     <form action="{{ .Endpoints.CreatePostEndpoint }}" class="login" method="POST">
         <h1>Create Post</h1>
         <p>{{ if .Errors }} {{index .Errors "title" }} {{end}}</p>
         <p>{{ if .Errors }} {{index .Errors "content" }} {{end}}</p>
-        <div class="input">
+        <div class="input1">
             <div class="svg">
                 <svg version="1.1" id="USER" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="800px" height="800px" viewBox="0 0 1800 1800" enable-background="new 0 0 1800 1800" xml:space="preserve">
                     <g>
@@ -47,7 +48,7 @@
             </div>
             <input type="text" name="title" placeholder="Title" maxlength="100" required>
         </div>
-        <div class="input">
+        <div class="input1">
             <div class="svg">
                 <svg width="800px" height="800px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <defs>
@@ -102,9 +103,9 @@
             <input name="content" maxlength="200" placeholder="Content"></textarea>
         </div>
 
-        <fieldset class="input checkbox-container">
+        <fieldset class="input1 checkboxx-containerr">
             
-            <legend>Category</legend>
+            <legend style="font-size: 14px; text-align: left; color: rgba(0, 0, 0, 0.58);">Category</legend>
             {{range .Categories }}
             <div class="checkbox-1">
                 <input type="checkbox" name="category" value="{{.Name}}" id="{{.Name}}">
@@ -112,10 +113,24 @@
             </div>
             {{end}}
         </fieldset>
-        <div class="input">
+        <div class="input1">
             <input type="submit"value="Submit">
         </div>
     </form>
     <img class="background"src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/3630ff67-8105-44c7-aa55-86bbcff6eeb4/d76237h-a164687b-ad08-43d1-889a-31dc1970818a.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzM2MzBmZjY3LTgxMDUtNDRjNy1hYTU1LTg2YmJjZmY2ZWViNFwvZDc2MjM3aC1hMTY0Njg3Yi1hZDA4LTQzZDEtODg5YS0zMWRjMTk3MDgxOGEucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.jmaSE-PZcsdEoOyx-ypeSBH6ioCXzuV91nrEEXAbW5A" alt="">
-</body>
+
+  </body>
 </html>
+
+<script>
+  $(function () {
+    $(window).on('scroll', function () {
+        if ( $(window).scrollTop() > 10 ) {
+            $('.navbar').addClass('active');
+        } else {
+            $('.navbar').removeClass('active');
+        }
+    });
+});
+
+</script>

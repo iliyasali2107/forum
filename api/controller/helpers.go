@@ -3,11 +3,10 @@ package controller
 import (
 	"context"
 	"fmt"
+	"forum/domain/models"
 	"net/http"
 	"strconv"
 	"strings"
-
-	"forum/domain/models"
 )
 
 // Context helpers
@@ -114,26 +113,6 @@ func (c *Controller) render(w http.ResponseWriter, name string, td any) {
 	}
 }
 
-// url
-func GetIdFromURL(path string) (int, error) {
-	s := strings.Split(path, "/")
-
-	if len(s) <= 3 {
-		return 0, fmt.Errorf("%s", "invalid url")
-	}
-
-	if len(s[3:]) > 1 {
-		return 0, fmt.Errorf("%s", "invalid url")
-	}
-
-	id, err := strconv.Atoi(s[3])
-	if err != nil {
-		return 0, err
-	}
-
-	return id, nil
-}
-
 func GetIdFromShortURL(path string) (int, error) {
 	s := strings.Split(path, "/")
 	if len(s) <= 2 {
@@ -169,18 +148,4 @@ func GetIdFromURL2(numOfWords int, path string) (int, error) {
 	}
 
 	return id, nil
-}
-
-func GetFilterFromUrl(path string) (string, error) {
-	s := strings.Split(path, "/")
-	if len(s) <= 2 || len(s) > 3 {
-		return "", fmt.Errorf("invalid url")
-	}
-
-	if s[2] != "created" && s[2] != "liked" {
-		return "", fmt.Errorf("couldn't get filters")
-
-	}
-
-	return s[2], nil
 }

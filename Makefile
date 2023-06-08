@@ -1,5 +1,5 @@
 server: 
-	go run ./cmd/forum/main.go
+	go run ./cmd/main.go
 
 migratedown:
 	go run ./cmd/migration/main.go down

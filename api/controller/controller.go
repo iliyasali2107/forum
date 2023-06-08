@@ -2,24 +2,21 @@ package controller
 
 import (
 	"database/sql"
-	"html/template"
-	"os"
-
 	"forum/domain/models"
 	"forum/domain/repository"
 	"forum/domain/usecase"
 	"forum/pkg/logger"
+	"html/template"
+	"os"
 )
 
 type Controller struct {
-	tmpl   *template.Template
-	logger *logger.Logger
-	// validator    *validator.Validator
+	tmpl         *template.Template
+	logger       *logger.Logger
 	Data         Data
 	TokenUsecase usecase.TokenUsecase
 }
 
-// TODO:
 type Data struct {
 	Endpoints  Endpoints
 	Post       *models.Post
@@ -60,8 +57,7 @@ func NewController(db *sql.DB) *Controller {
 	ur := repository.NewUserRepository(db)
 
 	return &Controller{
-		tmpl: template.Must(template.ParseGlob("./templates/*")),
-		// validator:    validator.NewValidator(),
+		tmpl:         template.Must(template.ParseGlob("./templates/*")),
 		logger:       logger.NewLogger(os.Stdout, logger.LevelInfo),
 		Data:         Data{Endpoints: endpts},
 		TokenUsecase: usecase.NewTokenUsecae(ur),

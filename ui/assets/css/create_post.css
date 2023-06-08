@@ -11,6 +11,10 @@ body {
     font-size: 20px;
 }
 
+.container-one {
+    flex-direction: column;
+}
+
 a { 
     text-decoration: none; 
     color: inherit;
@@ -32,7 +36,7 @@ a {
     height: fit-content;
 }
 
-.input {
+.input1 {
     background: #fff;
     padding: 10px;
     border-radius: 20px;
@@ -41,23 +45,19 @@ a {
     margin-bottom: 20px;
 }
 
-.input input {
+.input1 input {
     border: none;
     background: transparent;
     outline: none;
     width: 100%;
 }
 
-.checkbox-container {
+.checkboxx-containerr {
 	display: flex;
 	align-items: center; /* Center items vertically */
 	justify-content: center; /* Center items horizontally */
 }
 
-.checkbox-container-inner {
-  	align-items: center;
-    
-}
 
 h1 {
     color: wheat;
@@ -81,9 +81,6 @@ h1 {
     fill: #333f33;
 }
 
-legend {
-	color: rgba(0, 0, 0, 0.6);
-}
 
 .checkbox-1 {
 	color: rgba(0, 0, 0, 0.6);
@@ -114,5 +111,56 @@ legend {
         text-align: center;
         width: 70%;
         height: fit-content;
+    }
+}
+
+.navbar {
+    transition: all 0.4s;
+}
+
+.navbar .nav-link {
+    color: #fff;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+    color: rgb(215, 218, 65);
+    text-decoration: none;
+}
+
+.navbar .navbar-brand {
+    color: #fff;
+}
+
+
+/* Change navbar styling on scroll */
+.navbar.active {
+    background: #fff;
+    box-shadow: 1px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar.active .nav-link {
+    color: #555;
+}
+
+.navbar.active .nav-link:hover,
+.navbar.active .nav-link:focus {
+    color: #555;
+    text-decoration: none;
+}
+
+.navbar.active .navbar-brand {
+    color: #555;
+}
+
+
+/* Change navbar styling on small viewports */
+@media (max-width: 991.98px) {
+    .navbar {
+        background: #fff;
+    }
+
+    .navbar .navbar-brand, .navbar .nav-link {
+        color: #555;
     }
 }

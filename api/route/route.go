@@ -19,5 +19,5 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *http.Serv
 	NewPostRouter(env, timeout, db, mux, ctrl)
 	NewSignupRouter(env, timeout, db, mux, ctrl)
 	NewCommentReactionRouter(env, timeout, db, mux, ctrl)
-	NewCssRouter(env, timeout, db, mux, ctrl)
+	NewCssRouter(mux)
 }

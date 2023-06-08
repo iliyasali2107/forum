@@ -98,7 +98,7 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 
 		lpc.Data.Categories = categories
 
-		err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", lpc.Data)
+		err = lpc.tmpl.ExecuteTemplate(w, "index.html", lpc.Data)
 		if err != nil {
 			lpc.logger.PrintError(fmt.Errorf("list-post: ExecuteTemplate error: %w", err))
 			lpc.ResponseServerError(w)
@@ -120,9 +120,9 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 		posts, err := lpc.ListPostUsecase.GetCreatedPosts(user.ID)
 		if err != nil {
 			if errors.Is(err, utils.ErrNoPosts) {
-				err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", lpc.Data)
+				err = lpc.tmpl.ExecuteTemplate(w, "index.html", lpc.Data)
 				if err != nil {
-					lpc.logger.PrintError(fmt.Errorf("list-post: created ExecuteTemplate show_posts.html: %w", err))
+					lpc.logger.PrintError(fmt.Errorf("list-post: created ExecuteTemplate index.html: %w", err))
 					lpc.ResponseServerError(w)
 					return
 				}
@@ -134,9 +134,9 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 		}
 
 		lpc.Data.Posts = posts
-		err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", lpc.Data)
+		err = lpc.tmpl.ExecuteTemplate(w, "index.html", lpc.Data)
 		if err != nil {
-			lpc.logger.PrintError(fmt.Errorf("list-post: created ExecuteTemplate show_posts.html: %w", err))
+			lpc.logger.PrintError(fmt.Errorf("list-post: created ExecuteTemplate index.html: %w", err))
 			lpc.ResponseServerError(w)
 			return
 		}
@@ -144,9 +144,9 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 		posts, err := lpc.ListPostUsecase.GetLikedPosts(user.ID)
 		if err != nil {
 			if errors.Is(err, utils.ErrNoPosts) {
-				err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", lpc.Data)
+				err = lpc.tmpl.ExecuteTemplate(w, "index.html", lpc.Data)
 				if err != nil {
-					lpc.logger.PrintError(fmt.Errorf("list-post: liked ExecuteTemplate show_posts.html: %w", err))
+					lpc.logger.PrintError(fmt.Errorf("list-post: liked ExecuteTemplate index.html: %w", err))
 					lpc.ResponseServerError(w)
 					return
 				}
@@ -157,9 +157,9 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 		}
 
 		lpc.Data.Posts = posts
-		err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", lpc.Data)
+		err = lpc.tmpl.ExecuteTemplate(w, "index.html", lpc.Data)
 		if err != nil {
-			lpc.logger.PrintError(fmt.Errorf("list-post: ExecuteTemplate show_posts.html: %w", err))
+			lpc.logger.PrintError(fmt.Errorf("list-post: ExecuteTemplate index.html: %w", err))
 			lpc.ResponseServerError(w)
 			return
 		}
@@ -182,7 +182,7 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 
 		lpc.Data.Categories = categories
 
-		err = lpc.tmpl.ExecuteTemplate(w, "show_posts.html", lpc.Data)
+		err = lpc.tmpl.ExecuteTemplate(w, "index.html", lpc.Data)
 		if err != nil {
 			lpc.logger.PrintError(fmt.Errorf("list-post: ExecuteTemplate error: %w", err))
 			lpc.ResponseServerError(w)
