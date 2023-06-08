@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"forum/domain/models"
 	"net/http"
 	"time"
+
+	"forum/domain/models"
 )
 
 func (ctrl *Controller) UserIdentity(next http.HandlerFunc) http.HandlerFunc {

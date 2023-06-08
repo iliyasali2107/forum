@@ -2,10 +2,11 @@ package controller
 
 import (
 	"fmt"
-	"forum/domain/models"
-	"forum/domain/usecase"
 	"net/http"
 	"strconv"
+
+	"forum/domain/models"
+	"forum/domain/usecase"
 )
 
 type CommentReactionController struct {
@@ -52,6 +53,8 @@ func (crc *CommentReactionController) CommentReactionController(w http.ResponseW
 	}
 
 	user := crc.contextGetUser(r)
+
+	crc.Data.IsAuthorized = true
 
 	reaction := &models.Reaction{
 		UserID:    user.ID,

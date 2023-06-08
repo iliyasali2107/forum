@@ -2,11 +2,12 @@ package controller
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	"forum/domain/models"
 	"forum/domain/usecase"
 	"forum/pkg/utils"
-	"net/http"
-	"strings"
 )
 
 type LoginController struct {
@@ -20,6 +21,8 @@ func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		lc.ResponseNotFound(w)
 		return
 	}
+
+	lc.Data.IsAuthorized = true
 
 	switch r.Method {
 	case http.MethodGet:

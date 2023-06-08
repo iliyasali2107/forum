@@ -2,8 +2,9 @@ package controller
 
 import (
 	"fmt"
-	"forum/domain/usecase"
 	"net/http"
+
+	"forum/domain/usecase"
 )
 
 type PostController struct {
@@ -13,6 +14,11 @@ type PostController struct {
 }
 
 func (pc *PostController) PostController(w http.ResponseWriter, r *http.Request) {
+	user := pc.contextGetUser(r)
+	if user != nil {
+		pc.Data.IsAuthorized = true
+	}
+
 	id, err := GetIdFromShortURL(r.URL.Path)
 	if err != nil {
 		pc.logger.PrintError(fmt.Errorf("Controller: PostController: not found: %w", err))

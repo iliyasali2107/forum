@@ -23,6 +23,6 @@ func main() {
 	ctrl := controller.NewController(db)
 
 	route.Setup(env, timeout, db, mux, ctrl)
-
+	
 	http.ListenAndServe(env.ServerAddress, mux)
 }

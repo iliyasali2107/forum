@@ -2,11 +2,12 @@ package controller
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	"forum/domain/models"
 	"forum/domain/usecase"
 	"forum/pkg/validator"
-	"net/http"
-	"strings"
 )
 
 type CreatePostController struct {
@@ -24,6 +25,8 @@ func (cpc *CreatePostController) CreatePostController(w http.ResponseWriter, r *
 	}
 
 	user := cpc.contextGetUser(r)
+
+	cpc.Data.IsAuthorized = true
 
 	switch r.Method {
 	case http.MethodGet:

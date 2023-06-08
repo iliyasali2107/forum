@@ -41,6 +41,8 @@ func (pdu *postDetailsUsecase) GetPost(postID int) (*models.Post, error) {
 		return nil, err
 	}
 
+	post.CreatedStr = post.Created.Format("2006-01-02 15:04:05")
+
 	user, err := pdu.userRepository.GetUser(post.User.ID)
 	if err != nil {
 		return nil, err
@@ -81,12 +83,20 @@ func (pdu *postDetailsUsecase) GetCommentsByPostId(post_id int) ([]*models.Comme
 	}
 
 	for _, comment := range comments {
-		replies, err := pdu.commentRepository.GetCommentRepliesCount(comment.ID)
+		replies, err := pdu.commentRepository.GetCommentReplies(comment.ID)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't get comment repiles count: %w", err)
 		}
 
-		comment.ReplyCount = replies
+		for _, reply := range replies {
+			replyUser, err := pdu.userRepository.GetUser(reply.UserID)
+			if err != nil {
+				return nil, fmt.Errorf("couldn't get user: %w", err)
+			}
+			reply.User = replyUser
+		}
+
+		comment.Replies = replies
 
 		user, err := pdu.userRepository.GetUser(comment.UserID)
 		if err != nil {

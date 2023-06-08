@@ -8,6 +8,7 @@ type Post struct {
 	Title         string
 	Content       string
 	Created       time.Time
+	CreatedStr    string
 	Categories    []string
 	Comments      []*Comment
 	Likes         int

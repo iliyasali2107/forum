@@ -50,7 +50,9 @@ func (prc *PostReactionController) PostReactionController(w http.ResponseWriter,
 		prc.ResponseServerError(w)
 		return
 	}
+
 	user := prc.contextGetUser(r)
+	prc.Data.IsAuthorized = true
 
 	reaction := &models.Reaction{UserID: user.ID, PostID: postIDInt, Type: reactionTypeInt}
 	if reaction.Type == 1 {

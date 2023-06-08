@@ -2,12 +2,13 @@ package controller
 
 import (
 	"database/sql"
+	"html/template"
+	"os"
+
 	"forum/domain/models"
 	"forum/domain/repository"
 	"forum/domain/usecase"
 	"forum/pkg/logger"
-	"html/template"
-	"os"
 )
 
 type Controller struct {
@@ -18,13 +19,14 @@ type Controller struct {
 }
 
 type Data struct {
-	Endpoints  Endpoints
-	Post       *models.Post
-	Posts      []*models.Post
-	Comment    *models.Comment
-	Comments   []*models.Comment
-	Errors     map[string]string
-	Categories []*models.Category
+	Endpoints    Endpoints
+	Post         *models.Post
+	Posts        []*models.Post
+	Comment      *models.Comment
+	Comments     []*models.Comment
+	Errors       map[string]string
+	Categories   []*models.Category
+	IsAuthorized bool
 }
 
 type Endpoints struct {
@@ -35,7 +37,6 @@ type Endpoints struct {
 	PostDetailsEndpoint        string
 	PostsAllEndpoint           string
 	CreateCommentEndpoint      string
-	CommentDetailsEndpoint     string
 	CreatePostReactionEndpoint string
 	CommentReactionEndpoint    string
 }
@@ -49,7 +50,6 @@ func NewController(db *sql.DB) *Controller {
 		PostDetailsEndpoint:        "/posts/",
 		PostsAllEndpoint:           "/",
 		CreateCommentEndpoint:      "/posts/comment/create",
-		CommentDetailsEndpoint:     "/posts/comment/",
 		CreatePostReactionEndpoint: "/post/reaction/create",
 		CommentReactionEndpoint:    "/comment/reaction/create",
 	}
