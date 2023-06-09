@@ -120,7 +120,7 @@ body {
   height: 100%;
 }
 
-button{
+.sbmt {
   font-family: 'Ubuntu', sans-serif;
   position: absolute;
   top: 50%;
@@ -142,12 +142,12 @@ button{
   transition: all .35s;
 }
 
-button:hover{
+.wrapper button:hover{
   background: #8C82FC;
   color: #fff;
 }
 
-button span{
+.wrapper button span{
   opacity: 1;
   visibility: visible;
   transition: all .35s;
@@ -176,22 +176,22 @@ button span{
   transition: all .35s;
 }
 
-button.is_active{
+.wrapper button.is_active{
   width: 40px;
   height: 40px;
 }
 
-button.is_active .success{
+.wrapper button.is_active .success{
   opacity: 1;
   visibility: visible;
 }
 
-button.is_active .success svg{
+.wrapper button.is_active .success svg{
   margin-top: 50%;
   transform: translateY(-50%) rotate(720deg) scale(1);
 }
 
-button.is_active span{
+.wrapper button.is_active span{
   opacity: 0;
   visibility: hidden;
 }
@@ -201,6 +201,7 @@ button.is_active span{
   padding: 40px;
   border-radius: 6px;
   border: 1px solid #fff;
+  margin-bottom: 100px;
 }
 
 .card {
@@ -249,4 +250,15 @@ button.is_active span{
 }
 .date {
   color: grey;
+}
+
+a:hover, a:visited, a:link, a:active
+{
+  text-decoration: none !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.mainpt {
+  margin-bottom: 150px;
 }

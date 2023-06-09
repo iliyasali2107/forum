@@ -43,8 +43,8 @@
         </nav>
     </header>
 
-    <!-- For demo purpose -->
-    <div class="container">
+    <!-- Main -->
+    <div class="container mainpt">
         <div class="pt-5 text-white">
             <header class="py-5 mt-5">
                 <h1 class="display-4">Posts</h1>
@@ -68,7 +68,7 @@
                     </div>
                   {{ end }}
                   <div class="wrapper">
-                    <button class="" type="submit">
+                    <button class="sbmt" type="submit">
                       <span>Submit</span>
                       <div class="success">
                       <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"  viewBox="0 0 29.756 29.756" style="enable-background:new 0 0 29.756 29.756;" xml:space="preserve">
@@ -82,6 +82,7 @@
             </div>
 
             {{ range .Posts }}
+            <a href="{{ $.Endpoints.PostDetailsEndpoint }}{{.ID}}">
             <div class="card">
                 <div class="mails">
                   <img src="/ui/assets/img/post.png" />
@@ -101,51 +102,15 @@
                     {{ . }}
                     {{ end }}
                     </div>
-                    <a href="{{ $.Endpoints.PostDetailsEndpoint }}{{.ID}}">See...</a>
+                 
                     Created: {{.CreatedStr}}
                 </div>
               </div>
+                </a>
               {{ end }}
         </div>
     </div>
    
-    <!-- <section class="container">
-        <div class="container">
-            <div class="posts__container">
-                <div class="post__item">
-                    <div class="post__header">
-                        <div class="title__container">
-                            <h2 class="title">Title</h2>
-                            <div class="date">09.04.2023</div>
-                        </div>
-                        <div class="username">username</div>
-                    </div>
-                    <div class="content">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Illum, quae cum. Fugiat, repellat qui saepe corporis facere, rem fuga cupiditate, modi vitae necessitatibus illum in voluptatem? Enim fugiat libero repellat.</div>
-                    <div class="post__footer">
-                        <div class="reaction">
-                            <form action="/like">
-                                <input type="text"value="1"name="userid"hidden>
-                                <input type="text"value="2"name="postid"hidden>
-                                <input type="text"value="like"name="like"hidden>
-                                <p>10</p>
-                                <button type="submit">Like</button>
-                                
-                            </form>
-                            <form action="/dislike">
-                                <input type="text"value="1"name="userid"hidden>
-                                <input type="text"value="2"name="postid"hidden>
-                                <input type="text"value="dislike"name="dislike"hidden>
-                                <p>11</p>
-                                <button type="submit">Dislike</button>
-                                
-                            </form>
-                        </div>
-                        <div class="category">category</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section> -->
 </body>
 </html>
 
