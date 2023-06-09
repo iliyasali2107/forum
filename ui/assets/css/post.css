@@ -267,6 +267,9 @@ body {
   width: 5rem;
 }
 
+.blog-tags ul li {
+    background-color: #d7e0b2;
+}
 
 .blog-footer {
   border-top: 1px solid lighten(#333, 70%);

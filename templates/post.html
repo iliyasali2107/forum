@@ -68,7 +68,7 @@
       <div class="blog-tags">
         <ul>
             {{ range .Post.Categories }}
-            <li><a href="#">{{ . }}</a></li>
+            <li><a id="speechOutputLink" href="#">{{ . }}</a></li>
             {{ end }}
         </ul>
       </div>
@@ -335,7 +335,10 @@
 
 });
 
-  
+$('a#speechOutputLink').on('click', function(e) {
+    e.preventDefault();
+
+});
   </script>
 
 <script type="text/javascript" src="//use.typekit.net/wtt0gtr.js"></script>
