@@ -22,8 +22,6 @@ func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	lc.Data.IsAuthorized = true
-
 	switch r.Method {
 	case http.MethodGet:
 		err := lc.tmpl.ExecuteTemplate(w, "login.html", nil)
@@ -67,6 +65,8 @@ func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		cookie.Expires = *user.Expires
 		cookie.Path = "/"
 		cookie.HttpOnly = true
+
+		lc.Data.IsAuthorized = true
 
 		http.SetCookie(w, &cookie)
 		http.Redirect(w, r, "/", http.StatusSeeOther)

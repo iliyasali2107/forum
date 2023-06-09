@@ -46,43 +46,199 @@
 
     <!-- For demo purpose -->
     <div class="container mainpt">
+
+
+<!-- ============================================================================================================== -->
+  
+  <div class="blog-container">
+    
+    <div class="blog-header">
+      <div class="blog-author--no-cover">
+          <h3>{{ .Post.User.Name }}</h3>
+      </div>
+    </div>
+  
+    <div class="blog-body">
+      <div class="blog-title">
+        <h1>{{ .Post.Title}}</h1>
+      </div>
+      <div class="blog-summary">
+        <p>{{ .Post.Content }}</p>
+      </div>
+      <div class="blog-tags">
+        <ul>
+            {{ range .Post.Categories }}
+            <li><a href="#">{{ . }}</a></li>
+            {{ end }}
+        </ul>
+      </div>
+    </div>
+    
+    <div class="blog-footer">
+      <ul>
+        <li class="published-date">{{ .Post.CreatedStr }}</li>
+        <li class="comments"><form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
+            <input type="hidden" name="reaction" value="1">
+            <input type="hidden" name="post_id" value="{{.Post.ID}}">
+            {{ if .IsAuthorized }}
+            <button type="submit" class="button-class"><img src="/ui/assets/img/like.png" class="img-class" alt=""></button>{{ .Post.Likes }}
+            {{ end }}
+            {{ if not .IsAuthorized }}
+            <img src="/ui/assets/img/like.png" class="img-class" alt="">{{ .Post.Likes }}
+            {{ end }}
+        </form></li>
+        <li class="shares"><form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
+            <input type="hidden" name="reaction" value="0">
+            <input type="hidden" name="post_id" value="{{.Post.ID}}">
+            {{ if .IsAuthorized }}
+            <button type="submit" class="button-class"><img src="/ui/assets/img/dislike.png" class="img-class" alt=""></button> {{ .Post.Dislikes }}
+            {{ end }}
+            {{ if not .IsAuthorized }}
+            <img src="/ui/assets/img/dislike.png" class="img-class" alt="">{{ .Post.Dislikes }}
+            {{ end }}
+        </form></li>
+      </ul>
+    </div>
+  
+  </div>
+  
+  <!-- ============================================================================================================== -->
+
+
         <div class="pt-5 text-white">
 
-            <p class="">
-                Title: {{ .Post.Title}}
-            </p>
-            <p> 
-                Author: {{ .Post.User.Name }}
-            </p>
-            <p>
-                Content: {{ .Post.Content }}
-            </p>
-            <p>
-                Created: {{ .Post.CreatedStr }}
-            </p>
-            Categories:
-            {{ range .Post.Categories }}
-                {{ . }}
-            {{ end }}
+           <div class="container">
+            <div class="post-comments">
+                {{ if $.IsAuthorized }}
+              <form action="{{ $.Endpoints.CommentReactionEndpoint }}" method="POST">
+                <div class="form-group">
+                  <label for="comment">Your Comment</label>
+                  <textarea name="comment" class="form-control" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-default">Send</button>
+              </form>
+                {{ end }}
+          
+              <div class="row">
+          
+                {{ range .Post.Comments }}
+                
+                
+                <div class="media">
+                  <!-- first comment -->
+          
+                  <div class="media-heading">
+                    <button class="btn btn-default btn-xs" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseExample"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button> <span class="label label-info"></span> {{.User.Name}}:
+                  </div>
+          
+                  <div class="panel-collapse collapse in" id="collapseOne">
+          
+                    <div class="media-left">
+                      <div class="vote-wrap">
+                        <div class="save-post">
+                          <a href="#"><span class="glyphicon glyphicon-star" aria-label="Save"></span></a>
+                        </div>
+                        <div class="vote up">
+                          <i class="glyphicon glyphicon-menu-up"></i>
+                        </div>
+                        <div class="vote inactive">
+                          <i class="glyphicon glyphicon-menu-down"></i>
+                        </div>
+                      </div>
+                      <!-- vote-wrap -->
+                    </div>
+                    <!-- media-left -->
+          
+          
+                    <div class="media-body">
+                      <p>{{ .Content }}</p>
+                      <div class="comment-meta">
+                        <span><a href="#">like</a></span>
+                        <span><a href="#">dislike</a></span>
+                        <span>
+                                  <a class="" role="button" data-toggle="collapse" href="#replyCommentT" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                                </span>
+                        <div class="collapse" id="replyCommentT">
+                          <form>
+                            <div class="form-group">
+                              <label for="comment">Your Comment</label>
+                              <textarea name="comment" class="form-control" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-default">Send</button>
+                          </form>
+                        </div>
+                      </div>
+                      <!-- comment-meta -->
+                      {{ range .Replies }}
+          
+                      <div class="media">
+                        <!-- answer to the first comment -->
+          
+                        <div class="media-heading">
+                          <button class="btn btn-default btn-collapse btn-xs" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseExample"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button> <span class="label label-info"></span> {{.User.Name}}: 
+                        </div>
+          
+                        <div class="panel-collapse collapse in" id="collapseTwo">
+          
+                          <div class="media-left">
+                            <div class="vote-wrap">
+                              <div class="save-post">
+                                <a href="#"><span class="glyphicon glyphicon-star" aria-label="Save"></span></a>
+                              </div>
+                              <div class="vote up">
+                                <i class="glyphicon glyphicon-menu-up"></i>
+                              </div>
+                              <div class="vote inactive">
+                                <i class="glyphicon glyphicon-menu-down"></i>
+                              </div>
+                            </div>
+                            <!-- vote-wrap -->
+                          </div>
+                          <!-- media-left -->
+          
+                          <div class="media-body">
+                            <p>{{.Content}}</p>
+                            <div class="comment-meta">
+                                <span><a href="#">like</a></span>
+                                <span><a href="#">dislike</a></span>
+                                      <span>
+                                        <a class="" role="button" data-toggle="collapse" href="#replyCommentThree" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                                      </span>
+                              <div class="collapse" id="replyCommentThree">
+                                <form>
+                                  <div class="form-group">
+                                    <label for="comment">Your Comment</label>
+                                    <textarea name="comment" class="form-control" rows="3"></textarea>
+                                  </div>
+                                  <button type="submit" class="btn btn-default">Send</button>
+                                </form>
+                              </div>
+                            </div>
+                            <!-- comment-meta -->
+                          </div>
+                        </div>
 
-            {{ if $.IsAuthorized }}
-            <form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
-                <input type="hidden" name="reaction" value="1">
-                <input type="hidden" name="post_id" value="{{.Post.ID}}">
-                <button type="submit" class="button-class"><img src="/ui/assets/img/like.png" class="img-class" alt=""></button>{{ .Post.Likes }}
-            </form>
-            {{ end }}
-            {{ if $.IsAuthorized }}
-            <form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
-                <input type="hidden" name="reaction" value="0">
-                <input type="hidden" name="post_id" value="{{.Post.ID}}">
-                <button type="submit" class="button-class"><img src="/ui/assets/img/dislike.png" class="img-class" alt=""></button> {{ .Post.Dislikes }}
-            </form>
-            {{ end }}
-            <hr>
-        
-            Comments:
-            <hr>
+                        <!-- comments -->
+          
+                      </div>
+                      <!-- answer to the first comment -->
+                      {{ end }}
+          
+                    </div>
+                  </div>
+                  <!-- comments -->
+          
+                </div>
+                {{end}}
+                <!-- first comment -->
+              </div>
+          
+            </div>
+            <!-- post-comments -->
+          </div>
+
+          <!-- ======================================================================================= -->
+<!-- 
             <p>
                 {{ range .Post.Comments }}
                 
@@ -130,11 +286,8 @@
             </form>
             {{end}}
             
-            <hr>
-            <hr>
             {{ end }}
             
-            <hr>
             </p>
             
             {{ if .IsAuthorized}}
@@ -147,7 +300,7 @@
                     <button type="submit" class="button-class"><img src="/ui/assets/img/send.png" class="img-class button-color" alt=""></button>
                 </form>
                 </div>
-            {{end}}
+            {{end}} -->
             
         </div>
     </div>
@@ -166,5 +319,24 @@
           }
       });
   });
+
+  $('[data-toggle="collapse"]').on('click', function() {
+    var $this = $(this),
+            $parent = typeof $this.data('parent')!== 'undefined' ? $($this.data('parent')) : undefined;
+    if($parent === undefined) { /* Just toggle my  */
+        $this.find('.glyphicon').toggleClass('glyphicon-plus glyphicon-minus');
+        return true;
+    }
+
+    /* Open element will be close if parent !== undefined */
+    var currentIcon = $this.find('.glyphicon');
+    currentIcon.toggleClass('glyphicon-plus glyphicon-minus');
+    $parent.find('.glyphicon').not(currentIcon).removeClass('glyphicon-minus').addClass('glyphicon-plus');
+
+});
+
   
   </script>
+
+<script type="text/javascript" src="//use.typekit.net/wtt0gtr.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
