@@ -25,8 +25,11 @@ func (cpc *CreatePostController) CreatePostController(w http.ResponseWriter, r *
 	}
 
 	user := cpc.contextGetUser(r)
-
-	cpc.Data.IsAuthorized = true
+	if user != nil {
+		cpc.Data.IsAuthorized = true
+	} else {
+		cpc.Data.IsAuthorized = false
+	}
 
 	switch r.Method {
 	case http.MethodGet:

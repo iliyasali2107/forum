@@ -53,8 +53,11 @@ func (crc *CommentReactionController) CommentReactionController(w http.ResponseW
 	}
 
 	user := crc.contextGetUser(r)
-
-	crc.Data.IsAuthorized = true
+	if user != nil {
+		crc.Data.IsAuthorized = true
+	} else {
+		crc.Data.IsAuthorized = false
+	}
 
 	reaction := &models.Reaction{
 		UserID:    user.ID,

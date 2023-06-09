@@ -110,12 +110,14 @@
            <div class="container">
             <div class="post-comments">
                 {{ if $.IsAuthorized }}
-              <form action="{{ $.Endpoints.CommentReactionEndpoint }}" method="POST">
+              <form action="{{ $.Endpoints.CreateCommentEndpoint }}" method="POST">
                 <div class="form-group">
-                  <label for="comment">Your Comment</label>
-                  <textarea name="comment" class="form-control" rows="3"></textarea>
+                    <label for="content">Comments</label>
+                    <textarea name="content" class="form-control" rows="3" placeholder="Add Comment..." required maxlength="100"></textarea>
+                    <input type="hidden" name="post_id" value="{{ .Post.ID }}">
+                    <input type="hidden" name="parent_id" value="0">
                 </div>
-                <button type="submit" class="btn btn-default">Send</button>
+                <button type="submit" class="button-class"><img src="/ui/assets/img/send.png" class="img-class" alt="send picture"></button>
               </form>
                 {{ end }}
           
@@ -128,25 +130,12 @@
                   <!-- first comment -->
           
                   <div class="media-heading">
-                    <button class="btn btn-default btn-xs" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseExample"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button> <span class="label label-info"></span> {{.User.Name}}:
+                    <button class="btn btn-default btn-xs" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseExample"><span class="glyphicon glyphicon-minus" aria-hidden="true"><img src="/ui/assets/img/button.png" class="img-class" alt="send picture"></span></button> <span class="label label-info"></span> {{.User.Name}}:
                   </div>
           
                   <div class="panel-collapse collapse in" id="collapseOne">
           
-                    <div class="media-left">
-                      <div class="vote-wrap">
-                        <div class="save-post">
-                          <a href="#"><span class="glyphicon glyphicon-star" aria-label="Save"></span></a>
-                        </div>
-                        <div class="vote up">
-                          <i class="glyphicon glyphicon-menu-up"></i>
-                        </div>
-                        <div class="vote inactive">
-                          <i class="glyphicon glyphicon-menu-down"></i>
-                        </div>
-                      </div>
-                      <!-- vote-wrap -->
-                    </div>
+
                     <!-- media-left -->
           
           
@@ -175,7 +164,7 @@
                         <!-- answer to the first comment -->
           
                         <div class="media-heading">
-                          <button class="btn btn-default btn-collapse btn-xs" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseExample"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button> <span class="label label-info"></span> {{.User.Name}}: 
+                          <button class="btn btn-default btn-collapse btn-xs" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseExample"><span class="glyphicon glyphicon-minus" aria-hidden="true"><img src="/ui/assets/img/button.png" class="img-class" alt="send picture"></span></button> <span class="label label-info"></span> {{.User.Name}}: 
                         </div>
           
                         <div class="panel-collapse collapse in" id="collapseTwo">
@@ -201,18 +190,6 @@
                             <div class="comment-meta">
                                 <span><a href="#">like</a></span>
                                 <span><a href="#">dislike</a></span>
-                                      <span>
-                                        <a class="" role="button" data-toggle="collapse" href="#replyCommentThree" aria-expanded="false" aria-controls="collapseExample">reply</a>
-                                      </span>
-                              <div class="collapse" id="replyCommentThree">
-                                <form>
-                                  <div class="form-group">
-                                    <label for="comment">Your Comment</label>
-                                    <textarea name="comment" class="form-control" rows="3"></textarea>
-                                  </div>
-                                  <button type="submit" class="btn btn-default">Send</button>
-                                </form>
-                              </div>
                             </div>
                             <!-- comment-meta -->
                           </div>

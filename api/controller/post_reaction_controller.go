@@ -52,7 +52,11 @@ func (prc *PostReactionController) PostReactionController(w http.ResponseWriter,
 	}
 
 	user := prc.contextGetUser(r)
-	prc.Data.IsAuthorized = true
+	if user != nil {
+		prc.Data.IsAuthorized = true
+	} else {
+		prc.Data.IsAuthorized = false
+	}
 
 	reaction := &models.Reaction{UserID: user.ID, PostID: postIDInt, Type: reactionTypeInt}
 	if reaction.Type == 1 {

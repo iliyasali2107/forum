@@ -31,6 +31,8 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 	user := lpc.contextGetUser(r)
 	if user != nil {
 		lpc.Data.IsAuthorized = true
+	} else {
+		lpc.Data.IsAuthorized = false
 	}
 
 	_, ok1 := r.URL.Query()["filter"]

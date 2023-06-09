@@ -23,7 +23,12 @@ func (pcc *CreateCommentController) CreateCommentController(w http.ResponseWrite
 	}
 
 	user := pcc.contextGetUser(r)
-	pcc.Data.IsAuthorized = true
+	if user != nil {
+		pcc.Data.IsAuthorized = true
+	} else {
+		pcc.Data.IsAuthorized = false
+	}
+	
 	err := r.ParseForm()
 	if err != nil {
 		pcc.logger.PrintError(fmt.Errorf("error while parsing request form: %w", err))

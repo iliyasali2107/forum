@@ -17,6 +17,8 @@ func (pc *PostController) PostController(w http.ResponseWriter, r *http.Request)
 	user := pc.contextGetUser(r)
 	if user != nil {
 		pc.Data.IsAuthorized = true
+	} else {
+		pc.Data.IsAuthorized = false
 	}
 
 	id, err := GetIdFromShortURL(r.URL.Path)
