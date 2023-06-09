@@ -4,7 +4,7 @@
 * {
 margin: 0;
 padding: 0;
-/* border: 1px solid black; */
+border: 1px solid black;
 }
 
 body {
@@ -157,6 +157,7 @@ body {
   .post-comments .media-heading {
     font-size: 18px;
     color: rgb(250, 250, 250);
+    padding-right: 40px;
   }
   
   .post-comments .comment-meta a {
@@ -164,6 +165,10 @@ body {
     color: rgb(215, 218, 65);
     font-weight: bolder;
     margin-right: 5px;
+  }
+
+  .media-body p {
+    font-size: 24px;
   }
 
   /* ============================================================= */
