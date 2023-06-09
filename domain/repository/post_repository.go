@@ -2,8 +2,9 @@ package repository
 
 import (
 	"database/sql"
-
+	"fmt"
 	"forum/domain/models"
+	"strings"
 )
 
 type PostRepository interface {
@@ -65,29 +66,28 @@ func (rr *postRepository) GetAllPosts() ([]*models.Post, error) {
 }
 
 func (rr *postRepository) GetPostsByCategory(ids ...int) ([]*models.Post, error) {
+	postIndexes := fmt.Sprint(ids)
+	postIndexes = postIndexes[1 : len(postIndexes)-1]
 
-	query := `SELECT posts.id, posts.user_id, posts.title, posts.content, posts.created, users.name  FROM posts 
+	query := fmt.Sprintf(`SELECT DISTINCT posts.id, posts.user_id, posts.title, posts.content, posts.created, users.name  FROM posts
 	JOIN categories_posts ON posts.id=categories_posts.post_id
 	JOIN users ON users.id=posts.user_id
-	WHERE categories_posts.category_id=?`
+	WHERE categories_posts.category_id in (%s)`, strings.Join(strings.Split(postIndexes, " "), ","))
 
 	posts := []*models.Post{}
-	for _, i := range ids {
-		rows, err := rr.db.Query(query, i)
+	rows, err := rr.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		u := &models.User{}
+		post := &models.Post{User: u}
+		err := rows.Scan(&post.ID, &post.User.ID, &post.Title, &post.Content, &post.Created, &post.User.Name)
 		if err != nil {
 			return nil, err
-
 		}
-		defer rows.Close()
-		for rows.Next() {
-			u := &models.User{}
-			post := &models.Post{User: u}
-			err := rows.Scan(&post.ID, &post.User.ID, &post.Title, &post.Content, &post.Created, &post.User.Name)
-			if err != nil {
-				return nil, err
-			}
-			posts = append(posts, post)
-		}
+		posts = append(posts, post)
 	}
 	return posts, nil
 }

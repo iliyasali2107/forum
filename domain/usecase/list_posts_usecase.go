@@ -4,11 +4,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
-
 	"forum/domain/models"
 	"forum/domain/repository"
 	"forum/pkg/utils"
+	"time"
 )
 
 type listPostsUsecase struct {
