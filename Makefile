@@ -1,9 +1,7 @@
 server: 
 	go run ./cmd/main.go
 
-migratedown:
-	go run ./cmd/migration/main.go down
-
-migrateup:
-	go run ./cmd/migration/main.go up
-
+build:
+	docker build -t forum .
+run:
+	docker run -dp 8080:8080 --rm --name forum_container forum
