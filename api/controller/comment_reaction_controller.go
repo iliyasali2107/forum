@@ -2,11 +2,10 @@ package controller
 
 import (
 	"fmt"
-	"net/http"
-	"strconv"
-
 	"forum/domain/models"
 	"forum/domain/usecase"
+	"net/http"
+	"strconv"
 )
 
 type CommentReactionController struct {

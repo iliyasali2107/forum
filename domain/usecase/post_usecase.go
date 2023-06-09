@@ -2,10 +2,9 @@ package usecase
 
 import (
 	"fmt"
-	"time"
-
 	"forum/domain/models"
 	"forum/domain/repository"
+	"time"
 )
 
 type postDetailsUsecase struct {
@@ -94,6 +93,21 @@ func (pdu *postDetailsUsecase) GetCommentsByPostId(post_id int) ([]*models.Comme
 				return nil, fmt.Errorf("couldn't get user: %w", err)
 			}
 			reply.User = replyUser
+
+			likes, err := pdu.reactionRepository.GetCommentLikes(reply.ID)
+			if err != nil {
+				return nil, fmt.Errorf("couldn't get reply likes: %w", err)
+			}
+
+			reply.Likes = likes
+
+			dislikes, err := pdu.reactionRepository.GetCommentDislikes(reply.ID)
+			if err != nil {
+				return nil, fmt.Errorf("couldn't get reply dislikes: %w", err)
+			}
+
+			reply.Dislikes = dislikes
+
 		}
 
 		comment.Replies = replies

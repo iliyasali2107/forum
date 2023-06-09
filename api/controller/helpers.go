@@ -3,11 +3,10 @@ package controller
 import (
 	"context"
 	"fmt"
+	"forum/domain/models"
 	"net/http"
 	"strconv"
 	"strings"
-
-	"forum/domain/models"
 )
 
 // Context helpers

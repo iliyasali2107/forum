@@ -6,12 +6,57 @@ padding: 0;
 }
 
 body {
+    min-height: 110vh;
     font-family: 'Teko', sans-serif;
     font-size: 20px;
     background-color: #5d97a0;
     background-image: linear-gradient(135deg, #2a7a86 0%, #cde0e4 100%);
 }
 
+
+.form-group {
+    margin-bottom: 0;
+  }
+  
+  .btn-send{
+    margin-bottom: 25px;
+  }
+  
+  .mainpt {
+      margin-top: 100px;
+  }
+  
+  .first {
+    flex-direction: column;
+    
+  }
+  
+  .navbar {
+    transition: all 0.4s;
+  }
+  
+  .navbar .nav-link {
+    color: #fff;
+  }
+  
+  .navbar .nav-link:hover,
+  .navbar .nav-link:focus {
+    color: rgb(215, 218, 65);
+    text-decoration: none;
+  }
+  
+  .navbar .navbar-brand {
+    color: #fff;
+  }
+  
+  /* Change navbar styling on scroll */
+  .navbar.active {
+    background: #fff;
+    box-shadow: 1px 2px 10px rgba(55, 238, 238, 0.1);
+  }
+  
+  
+  
 a { 
     text-decoration: none; 
     color: inherit;
@@ -86,7 +131,7 @@ h1 {
         padding: 50px;
         border-radius: 20px;
         text-align: center;
-        width: 70%;
+        width: 90%;
         height: fit-content;
     }
 }

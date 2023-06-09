@@ -1,25 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;600&display=swap');
+
+* {
+margin: 0;
+padding: 0;
+}
 
 body {
-    font-family: "Poppins";
-    text-align: center;
-    font-size: 25px;
+    min-height: 110vh;
+    font-family: 'Teko', sans-serif;
+    font-size: 20px;
+    background-color: #5d97a0;
+    background-image: linear-gradient(135deg, #2a7a86 0%, #cde0e4 100%);
 }
 
-.error {
-    display: inline-block;
-    margin-top: 0;
-}
-
-.image {
-    margin-top: 5%;
-    margin-bottom: -25px;
-    display: inline-block;
-    vertical-align: bottom;
-}
-
-a {
-    border: 5px solid #f0544f;
-    background-color: #f0544f;
-    color: white;
-}

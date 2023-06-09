@@ -2,9 +2,8 @@ package controller
 
 import (
 	"fmt"
-	"net/http"
-
 	"forum/domain/usecase"
+	"net/http"
 )
 
 type PostController struct {

@@ -3,11 +3,10 @@ package controller
 import (
 	"errors"
 	"fmt"
-	"net/http"
-	"strconv"
-
 	"forum/domain/usecase"
 	"forum/pkg/utils"
+	"net/http"
+	"strconv"
 )
 
 type ListPostsController struct {

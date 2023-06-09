@@ -4,7 +4,7 @@
 * {
 margin: 0;
 padding: 0;
-border: 1px solid black;
+/* border: 1px solid black; */
 }
 
 body {
@@ -12,6 +12,14 @@ body {
   background-color: #4ca1af;
   background-image: linear-gradient(135deg, #4ca1af 0%, #c4e0e5 100%);
   box-sizing: border-box;
+}
+
+.form-group {
+  margin-bottom: 0;
+}
+
+.btn-send{
+  margin-bottom: 25px;
 }
 
 .mainpt {
@@ -143,8 +151,16 @@ body {
   }
   
   .post-comments .comment-meta {
-    border-bottom: 1px solid #eee;
     margin-bottom: 5px;
+  }
+
+  .parent{
+    text-align: left;
+  }
+
+  .child {
+    display: inline-block;
+    vertical-align: middle;
   }
   
   .post-comments .media {

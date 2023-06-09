@@ -2,10 +2,69 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../ui/assets/css/error.css">
+
+    <link rel="icon" type="image/png" href="/ui/assets/img/robot.png">
+    <script src="http://code.jquery.com/jquery-2.2.1.min.js"></script>
+    <link rel="stylesheet/less" type="text/css" href="../ui/assets/css/error.scss" /> <script src="https://cdn.jsdelivr.net/npm/less@4.1.1" ></script>
+    <title>Error page</title>
 </head>
 <body>
-    {{.Status}}
-    {{.Message}}
+
+    <h1 class="text__error">{{.Status}} {{.Message}}</h1>
+    <a href="/" class="text__link">click here to go home</a>
+    
 </body>
 </html>
+
+<script>
+
+function setCharAt(str,index,chr) {
+    if(index > str.length-1) return str;
+    return str.substr(0,index) + chr + str.substr(index+1);
+}
+
+var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-=+<>,./?[{()}]!@#$%^&*~`\|'.split('');
+
+var progress404 = 0;
+var total404 = $('.text__error').data('text').length;
+
+var progressLink = 0;
+var totalLink = $('.text__link a').data('text').length;
+
+var scrambleInterval = setInterval(function() {
+	var string404 = $('.text__error').data('text');
+	var stringLink = $('.text__link a').data('text');
+	
+	for(var i = 0; i < total404; i++) {
+		if(i >= progress404) {
+			string404 = setCharAt(string404, i, characters[Math.round(Math.random() * (characters.length - 1))]);
+		} 
+	}
+	
+	for(var i = 0; i < totalLink; i++) {
+		if(i >= progressLink) {
+			stringLink = setCharAt(stringLink, i, characters[Math.round(Math.random() * (characters.length - 1))]);
+		} 
+	}
+	
+	$('.text__error').text(string404);
+	$('.text__link a').text(stringLink);
+}, 1000 / 60);
+
+setTimeout(function() {
+	var revealInterval = setInterval(function() {
+		if(progress404 < total404) {
+			progress404++;
+		}else if(progressLink < totalLink) {
+			progressLink++;
+		}else{
+			clearInterval(revealInterval);
+			clearInterval(scrambleInterval);
+		}
+	}, 50);
+}, 1000);
+
+</script>
