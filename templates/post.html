@@ -4,94 +4,167 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-
+    <link rel="stylesheet" href="../ui/assets/css/post.css">
+    <link rel="icon" type="image/png" href="/ui/assets/img/robot.png">
+    <script src="http://code.jquery.com/jquery-2.2.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  
+    <title>Post</title>
 </head>
 <body>
-    <p>
-        author: {{ .Post.User.Name }}
-    </p>
-    <p>
-        title: {{ .Post.Title}}
-    </p>
-    <p>
-        Content: {{ .Post.Content }}
-    </p>
-    <p>
-        Created: {{ .Post.CreatedStr }}
-    </p>
-    Categories:
-    {{ range .Post.Categories }}
-    {{ . }}
-    {{ end }}
-    <hr>
 
-    Comments:
-    <p>
-        {{ range .Post.Comments }}
-        {{.User.Name}}:
-    <p>
-        {{ .Content }}
+    <!-- Navbar-->
+    <header class="header">
+        <nav class="navbar navbar-expand-lg fixed-top py-3">
+            <div class="container"><a href="{{ .Endpoints.PostsAllEndpoint }}" class="navbar-brand text-uppercase font-weight-bold">Forum</a>
+                <button type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler navbar-toggler-right"><i class="fa fa-bars"></i></button>
+                
+                <div id="navbarSupportedContent" class="collapse navbar-collapse">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item active"><a href="{{ .Endpoints.PostsAllEndpoint }}" class="nav-link text-uppercase font-weight-bold">Home <span class="sr-only">(current)</span></a></li>
+                        {{ if .IsAuthorized }}
+                        <li class="nav-item"><a href="{{ .Endpoints.CreatePostEndpoint }}" class="nav-link text-uppercase font-weight-bold">Create Post</a></li>
+                        <li class="nav-item"><a href="{{ .Endpoints.PostsAllEndpoint }}?filter=created" class="nav-link text-uppercase font-weight-bold">My Posts</a></li>
+                        <li class="nav-item"><a href="{{ .Endpoints.PostsAllEndpoint }}?filter=liked" class="nav-link text-uppercase font-weight-bold">Liked</a></li>
+                        <li class="nav-item"><a href="{{ .Endpoints.LogoutEndpoint }}" class="nav-link text-uppercase font-weight-bold">Logout</a></li>
+                        {{ end }}
+                        {{ if not .IsAuthorized }}
+                        <li class="nav-item"><a href="{{ .Endpoints.SignupEndpoint }}" class="nav-link text-uppercase font-weight-bold">Signup</a></li>
+                        <li class="nav-item"><a href="{{ .Endpoints.LoginEndpoint }}" class="nav-link text-uppercase font-weight-bold">Login</a></li>
+                        {{ end }}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
 
-        <form action="{{ $.Endpoints.CommentReactionEndpoint }}" method="POST">
-            <input type="hidden" name="reaction" value="1">
-            <input type="hidden" name="post_id" value="{{ .PostID }}">
-            <input type="hidden" name="comment_id" value="{{.ID}}">
-            <button type="submit">like</button> {{ .Likes }}
-        </form>
+    <!-- For demo purpose -->
+    <div class="container">
+        <div class="pt-5 text-white">
+
+            <p class="">
+                Title: {{ .Post.Title}}
+            </p>
+            <p> 
+                Author: {{ .Post.User.Name }}
+            </p>
+            <p>
+                Content: {{ .Post.Content }}
+            </p>
+            <p>
+                Created: {{ .Post.CreatedStr }}
+            </p>
+            Categories:
+            {{ range .Post.Categories }}
+                {{ . }}
+            {{ end }}
+
+            {{ if $.IsAuthorized }}
+            <form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
+                <input type="hidden" name="reaction" value="1">
+                <input type="hidden" name="post_id" value="{{.Post.ID}}">
+                <button type="submit" class="button-class"><img src="/ui/assets/img/like.png" class="img-class" alt=""></button>{{ .Post.Likes }}
+            </form>
+            {{ end }}
+            {{ if $.IsAuthorized }}
+            <form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
+                <input type="hidden" name="reaction" value="0">
+                <input type="hidden" name="post_id" value="{{.Post.ID}}">
+                <button type="submit" class="button-class"><img src="/ui/assets/img/dislike.png" class="img-class" alt=""></button> {{ .Post.Dislikes }}
+            </form>
+            {{ end }}
+            <hr>
         
-        <form action="{{ $.Endpoints.CommentReactionEndpoint }}" method="POST">
-            <input type="hidden" name="reaction" value="0">
-            <input type="hidden" name="post_id" value="{{ .PostID }}">
-            <input type="hidden" name="comment_id" value="{{.ID}}">
-            <button type="submit">dislike</button> {{ .Dislikes }}
-        </form>
-    </p>
+            Comments:
+            <hr>
+            <p>
+                {{ range .Post.Comments }}
+                
+                Author: {{.User.Name}}:
+            
+            <p>
+                <div class="comment-10">
+                {{ .Content }}
+            </div>
+                {{ if $.IsAuthorized }}
+                <form action="{{ $.Endpoints.CommentReactionEndpoint }}" method="POST">
+                    <input type="hidden" name="reaction" value="1">
+                    <input type="hidden" name="post_id" value="{{ .PostID }}">
+                    <input type="hidden" name="comment_id" value="{{.ID}}">
+                    <button type="submit" class="button-class"><img src="/ui/assets/img/like.png" class="img-class" alt=""></button>{{ .Likes }}
+                </form>
+                {{ end }}
 
-    {{ if $.IsAuthorized }}
-    <form action="{{ $.Endpoints.CreateCommentEndpoint }}" method="POST">
-        <textarea name="content" placeholder="reply..."></textarea>
-        <input type="hidden" name="post_id" value="{{ .PostID }}">
-        <input type="hidden" name="parent_id" value="{{ .ID }}">
-        <button type="submit">add</button>
-    </form>
-    {{end}}
-    
-        {{ range .Replies }}
-        <div>
-            {{.User.Name}}
-            {{.Content}}
+                {{ if $.IsAuthorized }}
+                <form action="{{ $.Endpoints.CommentReactionEndpoint }}" method="POST">
+                    <input type="hidden" name="reaction" value="0">
+                    <input type="hidden" name="post_id" value="{{ .PostID }}">
+                    <input type="hidden" name="comment_id" value="{{.ID}}">
+                    <button type="submit" class="button-class"><img src="/ui/assets/img/dislike.png" class="img-class" alt=""></button> {{ .Dislikes }}
+                </form>
+                {{ end }}
+            </p>
+            {{ range .Replies }}
+            <div>
+                <img src="/ui/assets/img/user.png" class="user-png" alt="">
+                {{.User.Name}}: 
+                <br>
+                <div class="comment-11">
+                    {{.Content}}
+                </div>
+            </div>
+            {{end}}
+            
+            {{ if $.IsAuthorized }}
+            <form action="{{ $.Endpoints.CreateCommentEndpoint }}" method="POST">
+                <input name="content" class="textarea-1" placeholder="reply...">
+                <input type="hidden" name="post_id" value="{{ .PostID }}">
+                <input type="hidden" name="parent_id" value="{{ .ID }}">
+                <button type="submit" class="button-class"><img src="/ui/assets/img/send.png" class="img-class" alt=""></button>
+            </form>
+            {{end}}
+            
+            <hr>
+            <hr>
+            {{ end }}
+            
+            <hr>
+            </p>
+            
+            {{ if .IsAuthorized}}
+                Add Comment:
+                <div class="last-comment">
+                <form action="{{ .Endpoints.CreateCommentEndpoint }} " method="POST">
+                    <input type="text" name="content" class="textarea-1" placeholder="comment..." required>
+                    <input type="hidden" name="post_id" value="{{ .Post.ID }}">
+                    <input type="hidden" name="parent_id" value="0">
+                    <button type="submit" class="button-class"><img src="/ui/assets/img/send.png" class="img-class button-color" alt=""></button>
+                </form>
+                </div>
+            {{end}}
+            
         </div>
-        {{end}}
-    <hr>
-
-    {{ end }}
-    <hr>
-    </p>
-
-    <form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
-        <input type="hidden" name="reaction" value="1">
-        <input type="hidden" name="post_id" value="{{.Post.ID}}">
-        <button type="submit">like</button>{{ .Post.Likes }}
-    </form>
-    <hr>
-
+    </div>
+    
    
-    <form action="{{ .Endpoints.CreatePostReactionEndpoint }}" method="POST">
-        <input type="hidden" name="reaction" value="0">
-        <input type="hidden" name="post_id" value="{{.Post.ID}}">
-        <button type="submit">dislike</button>{{ .Post.Dislikes }}
-    </form>
-    <hr>
-
-    {{ if .IsAuthorized}}
-        Add Comment:
-        <form action="{{ .Endpoints.CreateCommentEndpoint }} " method="POST">
-            <textarea name="content" placeholder="comment..." required></textarea>
-            <input type="hidden" name="post_id" value="{{ .Post.ID }}">
-            <input type="hidden" name="parent_id" value="0">
-            <button type="submit">add</button>
-        </form>
-    {{end}}
 </body>
 </html>
+
+<script>
+    $(function () {
+      $(window).on('scroll', function () {
+          if ( $(window).scrollTop() > 10 ) {
+              $('.navbar').addClass('active');
+          } else {
+              $('.navbar').removeClass('active');
+          }
+      });
+  });
+  
+  </script>

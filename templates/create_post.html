@@ -8,10 +8,12 @@
     <link rel="icon" type="image/png" href="/ui/assets/img/robot.png">
     <script src="http://code.jquery.com/jquery-2.2.1.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <title>Create Post</title>
 </head>
 <body>
@@ -24,12 +26,17 @@
               
               <div id="navbarSupportedContent" class="collapse navbar-collapse">
                   <ul class="navbar-nav ml-auto">
-                      <li class="nav-item active"><a href="{{ .Endpoints.PostsAllEndpoint }}" class="nav-link text-uppercase font-weight-bold">Home <span class="sr-only">(current)</span></a></li>
-                      {{ if .IsAuthorized }}
-                      <li class="nav-item"><a href="{{ .Endpoints.CreatePostEndpoint }}" class="nav-link text-uppercase font-weight-bold">Create Post</a></li>
-                      {{ end }}
-                      <li class="nav-item"><a href="{{ .Endpoints.PostDetailsEndpoint }}" class="nav-link text-uppercase font-weight-bold">Posts (change)</a></li>
-                      <li class="nav-item"><a href="{{ .Endpoints.LogoutEndpoint }}" class="nav-link text-uppercase font-weight-bold">Logout</a></li>
+                    <li class="nav-item active"><a href="{{ .Endpoints.PostsAllEndpoint }}" class="nav-link text-uppercase font-weight-bold">Home <span class="sr-only">(current)</span></a></li>
+                    {{ if .IsAuthorized }}
+                    <li class="nav-item"><a href="{{ .Endpoints.CreatePostEndpoint }}" class="nav-link text-uppercase font-weight-bold">Create Post</a></li>
+                    <li class="nav-item"><a href="{{ .Endpoints.PostsAllEndpoint }}?filter=created" class="nav-link text-uppercase font-weight-bold">My Posts</a></li>
+                    <li class="nav-item"><a href="{{ .Endpoints.PostsAllEndpoint }}?filter=liked" class="nav-link text-uppercase font-weight-bold">Liked</a></li>
+                    <li class="nav-item"><a href="{{ .Endpoints.LogoutEndpoint }}" class="nav-link text-uppercase font-weight-bold">Logout</a></li>
+                    {{ end }}
+                    {{ if not .IsAuthorized }}
+                    <li class="nav-item"><a href="{{ .Endpoints.SignupEndpoint }}" class="nav-link text-uppercase font-weight-bold">Signup</a></li>
+                    <li class="nav-item"><a href="{{ .Endpoints.LoginEndpoint }}" class="nav-link text-uppercase font-weight-bold">Login</a></li>
+                    {{ end }}
                   </ul>
               </div>
           </div>
@@ -42,72 +49,229 @@
         <p>{{ if .Errors }} {{index .Errors "content" }} {{end}}</p>
         <div class="input1">
             <div class="svg">
-                <svg version="1.1" id="USER" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="800px" height="800px" viewBox="0 0 1800 1800" enable-background="new 0 0 1800 1800" xml:space="preserve">
-                    <g>
-                        <path fill="#333333" d="M899.996,13.388c-488.883,0-886.611,397.732-886.611,886.615c0,297.415,147.216,561.092,372.596,722.011   c14.883,10.622,30.131,20.758,45.673,30.469c101.1,63.151,215.747,106.507,338.525,124.601   c42.384,6.248,85.723,9.529,129.816,9.529c44.084,0,87.423-3.281,129.808-9.529c122.778-18.094,237.434-61.449,338.525-124.592   c15.542-9.711,30.799-19.855,45.682-30.478c225.389-160.919,372.604-424.596,372.604-722.011   C1786.615,411.12,1388.879,13.388,899.996,13.388z M899.996,1724.407c-163.127,0-315.337-47.626-443.461-129.704   c58.621-107.8,176.409-191.24,323.694-221.345v22.277l119.594,66.448l119.932-66.431v-22.295   c147.285,30.104,265.074,113.545,323.694,221.345C1215.324,1676.781,1063.118,1724.407,899.996,1724.407z M554.979,912.854   c-15.75-5.685-27.058-20.743-27.058-38.429c0-17.69,11.308-32.751,27.058-38.44v9.194V912.854z M1238.035,845.179v-8.769   c15.144,6.001,25.896,20.758,25.896,38.001c0,17.261-10.752,32.021-25.896,38.017V845.179z M1212.461,711.77   c-2.014,9.963-4.564,19.813-7.654,29.489c-61.936-32.053-146.322-67.303-235.16-79.466   c-155.131-21.218-168.833-29.74-183.829-73.174l-12.957-37.516l-29.723,26.291c-0.894,0.789-80.681,71.251-161.344,136.272   c-11.984-42.575-13.798-86.934-5.103-130.046c27.397-135.974,156.441-234.666,306.824-234.666c23.249,0,46.749,2.365,69.859,7.017   c85.297,17.195,159.218,63.936,208.153,131.617C1210.005,554.617,1228.081,634.235,1212.461,711.77z M608.063,845.179V817.6   v-56.933c55.635-44.597,111.831-92.696,143.719-120.336c30.452,47.001,85.592,56.964,210.67,74.073   c86.504,11.833,170.369,49.166,222.49,76.398V817.6v27.579v94.646c0,159.053-129.399,288.436-288.436,288.436   c-159.044,0-288.444-129.383-288.444-288.436V845.179z M833.33,1310.867V1275.4c20.489,3.853,41.586,5.962,63.177,5.962   c24.048,0,47.505-2.534,70.154-7.281v36.786v30.843v22.649l-66.796,36.995l-66.535-36.969v-22.676V1310.867z M1387.403,1564.451   c-68.34-121.537-201.975-214.22-367.649-245.175v-61.016c119.42-46.385,206.444-158.038,217.075-290.979   c45.291-6.708,80.194-45.742,80.194-92.871c0-43.972-30.399-80.88-71.265-91.081c8.175-19.678,14.536-40.158,18.745-61.06   c18.588-92.227-2.699-186.615-59.94-265.794c-56.781-78.533-142.27-132.711-240.705-152.558   c-26.547-5.354-53.57-8.062-80.343-8.062c-84.273,0-166.412,27.106-231.29,76.333c-66.301,50.303-111.619,121.676-127.595,200.942   c-13.13,65.121-6.196,132.494,20.021,194.854l5.997,14.245c-43.156,8.487-75.838,46.576-75.838,92.192   c0,47.533,35.52,86.844,81.383,93.041c10.909,135.439,101.083,248.828,224.035,293.486v58.325   c-165.679,30.955-299.3,123.638-367.641,245.175C208.383,1414.259,75.59,1172.364,75.59,900.003   c0-454.583,369.827-824.41,824.406-824.41s824.415,369.828,824.415,824.41C1724.41,1172.364,1591.608,1414.259,1387.403,1564.451z"/>
-                    </g>
-                    </svg>
+              <svg fill="#000000" width="800px" height="800px" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+
+                <rect id="Icons" x="-128" y="-64" width="1280" height="800" style="fill:none;"/>
+                
+                <g id="Icons1" serif:id="Icons">
+                
+                <g id="Strike">
+                
+                </g>
+                
+                <g id="H1">
+                
+                </g>
+                
+                <g id="H2">
+                
+                </g>
+                
+                <g id="H3">
+                
+                </g>
+                
+                <g id="list-ul">
+                
+                </g>
+                
+                <g id="hamburger-1">
+                
+                </g>
+                
+                <g id="hamburger-2">
+                
+                </g>
+                
+                <g id="list-ol">
+                
+                </g>
+                
+                <g id="list-task">
+                
+                </g>
+                
+                <g id="trash">
+                
+                </g>
+                
+                <g id="vertical-menu">
+                
+                </g>
+                
+                <g id="horizontal-menu">
+                
+                </g>
+                
+                <g id="sidebar-2">
+                
+                </g>
+                
+                <g id="Pen">
+                
+                <path d="M56.009,51.832l0,4.2l-33.652,-0.026l4.709,-4.174l28.943,0Z" style="fill-rule:nonzero;"/>
+                
+                <path d="M48.453,8.119c1.65,0 2.506,0.129 4.753,2.011c2.294,1.922 2.707,3.42 2.803,5.088c0.102,1.795 -0.504,3.975 -2.188,5.681l-31.961,31.961c-0.52,0.475 -0.63,0.449 -0.977,0.553l-10.226,2.556c-1.472,0.299 -2.854,-1.049 -2.55,-2.549l2.557,-10.226c0.1,-0.334 0.133,-0.517 0.553,-0.977c10.696,-10.696 21.195,-21.593 32.09,-32.087c1.421,-1.335 3.497,-2.011 5.146,-2.011Zm0,4.143c-0.86,0.016 -1.698,0.371 -2.311,0.976l-31.54,31.541l-1.566,6.261l6.262,-1.565c10.544,-10.544 21.419,-20.768 31.63,-31.634c1.674,-1.825 0.444,-5.453 -2.306,-5.577c-0.056,-0.002 -0.112,-0.003 -0.169,-0.002Z" style="fill-rule:nonzero;"/>
+                
+                </g>
+                
+                <g id="Pen1" serif:id="Pen">
+                
+                </g>
+                
+                <g id="clock">
+                
+                </g>
+                
+                <g id="external-link">
+                
+                </g>
+                
+                <g id="hr">
+                
+                </g>
+                
+                <g id="info">
+                
+                </g>
+                
+                <g id="warning">
+                
+                </g>
+                
+                <g id="plus-circle">
+                
+                </g>
+                
+                <g id="minus-circle">
+                
+                </g>
+                
+                <g id="vue">
+                
+                </g>
+                
+                <g id="cog">
+                
+                </g>
+                
+                <g id="logo">
+                
+                </g>
+                
+                <g id="radio-check">
+                
+                </g>
+                
+                <g id="eye-slash">
+                
+                </g>
+                
+                <g id="eye">
+                
+                </g>
+                
+                <g id="toggle-off">
+                
+                </g>
+                
+                <g id="shredder">
+                
+                </g>
+                
+                <g id="spinner--loading--dots-" serif:id="spinner [loading, dots]">
+                
+                </g>
+                
+                <g id="react">
+                
+                </g>
+                
+                <g id="check-selected">
+                
+                </g>
+                
+                <g id="turn-off">
+                
+                </g>
+                
+                <g id="code-block">
+                
+                </g>
+                
+                <g id="user">
+                
+                </g>
+                
+                <g id="coffee-bean">
+                
+                </g>
+                
+                <g id="coffee-beans">
+                
+                <g id="coffee-bean1" serif:id="coffee-bean">
+                
+                </g>
+                
+                </g>
+                
+                <g id="coffee-bean-filled">
+                
+                </g>
+                
+                <g id="coffee-beans-filled">
+                
+                <g id="coffee-bean2" serif:id="coffee-bean">
+                
+                </g>
+                
+                </g>
+                
+                <g id="clipboard">
+                
+                </g>
+                
+                <g id="clipboard-paste">
+                
+                </g>
+                
+                <g id="clipboard-copy">
+                
+                </g>
+                
+                <g id="Layer1">
+                
+                </g>
+                
+                </g>
+                
+                </svg>
             </div>
             <input type="text" name="title" placeholder="Title" maxlength="100" required>
         </div>
         <div class="input1">
             <div class="svg">
-                <svg width="800px" height="800px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                    <defs>
-                      <clipPath id="clip-lock">
-                        <rect width="32" height="32"/>
-                      </clipPath>
-                    </defs>
-                    <g id="lock" clip-path="url(#clip-lock)">
-                      <g id="Group_2295" data-name="Group 2295" transform="translate(-156 -312)">
-                        <g id="Group_2285" data-name="Group 2285">
-                          <g id="Group_2284" data-name="Group 2284">
-                            <g id="Group_2283" data-name="Group 2283">
-                              <g id="Group_2282" data-name="Group 2282">
-                                <g id="Group_2281" data-name="Group 2281">
-                                  <g id="Group_2280" data-name="Group 2280">
-                                    <g id="Group_2279" data-name="Group 2279">
-                                      <g id="Group_2278" data-name="Group 2278">
-                                        <g id="Group_2277" data-name="Group 2277">
-                                          <path id="Path_3827" data-name="Path 3827" d="M181.668,323.543a1.2,1.2,0,0,0,.037-.289,9.705,9.705,0,1,0-19.41,0,1.257,1.257,0,0,0,.036.289,4.375,4.375,0,0,0-2.13,3.749v10.784a4.381,4.381,0,0,0,4.376,4.376h14.846a4.381,4.381,0,0,0,4.376-4.376V327.292A4.374,4.374,0,0,0,181.668,323.543ZM172,316.049a7.208,7.208,0,0,1,7.188,6.867H164.812A7.206,7.206,0,0,1,172,316.049Zm9.3,22.027a1.877,1.877,0,0,1-1.876,1.875H164.577a1.878,1.878,0,0,1-1.876-1.875V327.292a1.878,1.878,0,0,1,1.876-1.875h14.846a1.878,1.878,0,0,1,1.876,1.875Z" fill="#344952"/>
-                                        </g>
-                                      </g>
-                                    </g>
-                                  </g>
-                                </g>
-                              </g>
-                            </g>
-                          </g>
+              <svg width="800px" height="800px" viewBox="0 -4 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <title>content / 33 - content, code, css, html, html code, script icon</title>
+                <g id="Free-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+                    <g transform="translate(-303.000000, -456.000000)" id="Group" stroke="#000000" stroke-width="2">
+                        <g transform="translate(301.000000, 450.000000)" id="Shape">
+                            <polyline points="8 17 3 11.8672478 8 7">
+            
+            </polyline>
+                            <polyline points="16 17 21 11.8672478 16 7">
+            
+            </polyline>
                         </g>
-                        <g id="Group_2294" data-name="Group 2294">
-                          <g id="Group_2293" data-name="Group 2293">
-                            <g id="Group_2292" data-name="Group 2292">
-                              <g id="Group_2291" data-name="Group 2291">
-                                <g id="Group_2290" data-name="Group 2290">
-                                  <g id="Group_2289" data-name="Group 2289">
-                                    <g id="Group_2288" data-name="Group 2288">
-                                      <g id="Group_2287" data-name="Group 2287">
-                                        <g id="Group_2286" data-name="Group 2286">
-                                          <path id="Path_3828" data-name="Path 3828" d="M174.343,331.513a2.344,2.344,0,1,0-3.789,1.832l-.428,4.074a.312.312,0,0,0,.311.345h3.138a.314.314,0,0,0,.313-.313.307.307,0,0,0-.024-.118l-.42-3.988A2.328,2.328,0,0,0,174.343,331.513Z" fill="#344952"/>
-                                        </g>
-                                      </g>
-                                    </g>
-                                  </g>
-                                </g>
-                              </g>
-                            </g>
-                          </g>
-                        </g>
-                      </g>
                     </g>
-                  </svg>
+                </g>
+            </svg>
             </div>
             <input name="content" maxlength="200" placeholder="Content"></textarea>
         </div>
 
-        <fieldset class="input1 checkboxx-containerr">
+        <fieldset class="input checkboxx-containerr">
             
-            <legend style="font-size: 14px; text-align: left; color: rgba(0, 0, 0, 0.58);">Category</legend>
             {{range .Categories }}
             <div class="checkbox-1">
                 <input type="checkbox" name="category" value="{{.Name}}" id="{{.Name}}">
@@ -115,11 +279,11 @@
             </div>
             {{end}}
         </fieldset>
-        <div class="input1">
+        <div class="input1 margin-input">
             <input type="submit"value="Submit">
         </div>
     </form>
-    <img class="background"src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/3630ff67-8105-44c7-aa55-86bbcff6eeb4/d76237h-a164687b-ad08-43d1-889a-31dc1970818a.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzM2MzBmZjY3LTgxMDUtNDRjNy1hYTU1LTg2YmJjZmY2ZWViNFwvZDc2MjM3aC1hMTY0Njg3Yi1hZDA4LTQzZDEtODg5YS0zMWRjMTk3MDgxOGEucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.jmaSE-PZcsdEoOyx-ypeSBH6ioCXzuV91nrEEXAbW5A" alt="">
+    <!-- <img class="background"src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/3630ff67-8105-44c7-aa55-86bbcff6eeb4/d76237h-a164687b-ad08-43d1-889a-31dc1970818a.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzM2MzBmZjY3LTgxMDUtNDRjNy1hYTU1LTg2YmJjZmY2ZWViNFwvZDc2MjM3aC1hMTY0Njg3Yi1hZDA4LTQzZDEtODg5YS0zMWRjMTk3MDgxOGEucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.jmaSE-PZcsdEoOyx-ypeSBH6ioCXzuV91nrEEXAbW5A" alt=""> -->
 
   </body>
 </html>

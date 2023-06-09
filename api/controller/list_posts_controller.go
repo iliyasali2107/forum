@@ -3,10 +3,11 @@ package controller
 import (
 	"errors"
 	"fmt"
-	"forum/domain/usecase"
-	"forum/pkg/utils"
 	"net/http"
 	"strconv"
+
+	"forum/domain/usecase"
+	"forum/pkg/utils"
 )
 
 type ListPostsController struct {
@@ -28,6 +29,9 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 	}
 
 	user := lpc.contextGetUser(r)
+	if user != nil {
+		lpc.Data.IsAuthorized = true
+	}
 
 	_, ok1 := r.URL.Query()["filter"]
 	_, ok2 := r.URL.Query()["category_filter"]
@@ -134,6 +138,14 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 		}
 
 		lpc.Data.Posts = posts
+
+		categories, err := lpc.ListPostUsecase.GetAllCategories()
+		if err != nil {
+			lpc.logger.PrintError(fmt.Errorf("list-post: %w", err))
+			lpc.ResponseServerError(w)
+		}
+
+		lpc.Data.Categories = categories
 		err = lpc.tmpl.ExecuteTemplate(w, "index.html", lpc.Data)
 		if err != nil {
 			lpc.logger.PrintError(fmt.Errorf("list-post: created ExecuteTemplate index.html: %w", err))
@@ -157,6 +169,15 @@ func (lpc *ListPostsController) ListPostsController(w http.ResponseWriter, r *ht
 		}
 
 		lpc.Data.Posts = posts
+
+		categories, err := lpc.ListPostUsecase.GetAllCategories()
+		if err != nil {
+			lpc.logger.PrintError(fmt.Errorf("list-post: %w", err))
+			lpc.ResponseServerError(w)
+		}
+
+		lpc.Data.Categories = categories
+
 		err = lpc.tmpl.ExecuteTemplate(w, "index.html", lpc.Data)
 		if err != nil {
 			lpc.logger.PrintError(fmt.Errorf("list-post: ExecuteTemplate index.html: %w", err))

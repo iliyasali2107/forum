@@ -13,6 +13,7 @@ body {
   background-image: linear-gradient(135deg, #4ca1af 0%, #c4e0e5 100%);
 }
 
+
 .first {
   flex-direction: column;
   
@@ -70,4 +71,182 @@ body {
 
 .text-small {
   font-size: 0.9rem !important;
+}
+
+.label{
+  display:block;
+
+}  
+
+.holder {
+  width:400px;
+  margin:0 auto;
+}
+.checkbox {
+  position:relative;
+  display:block;
+  width:100%;
+  height:60px;
+  overflow:hidden;
+}
+
+.check {
+  width:50px;
+  height:50px;
+  position:absolute;
+  opacity:0;
+}
+.label span {
+  position:absolute;
+  margin-top:15px;
+}
+.path1{
+  stroke-dasharray:400;
+  stroke-dashoffset:400;
+  transition:.5s all;
+}
+.path2{
+  stroke-dasharray:1800;
+  stroke-dashoffset:1800;
+  transition:.5s all;
+}
+.check:checked + label svg g path {
+  stroke-dashoffset:0;
+}
+
+.wrapper{
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+button{
+  font-family: 'Ubuntu', sans-serif;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  width: 170px;
+  height: 40px;
+  line-height: 1;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  border: 3px solid #8C82FC;
+  background: #fff;
+  color: #8C82FC;
+  border-radius: 40px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all .35s;
+}
+
+button:hover{
+  background: #8C82FC;
+  color: #fff;
+}
+
+button span{
+  opacity: 1;
+  visibility: visible;
+  transition: all .35s;
+}
+
+.success{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  border-radius: 50%;
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+  transition: all .35s;
+}
+
+.success svg{
+  width: 20px;
+  height: 20px;
+  fill: yellowgreen;
+  transform-origin: 50% 50%;
+  transform: translateY(-50%) rotate(0deg) scale(0);
+  transition: all .35s;
+}
+
+button.is_active{
+  width: 40px;
+  height: 40px;
+}
+
+button.is_active .success{
+  opacity: 1;
+  visibility: visible;
+}
+
+button.is_active .success svg{
+  margin-top: 50%;
+  transform: translateY(-50%) rotate(720deg) scale(1);
+}
+
+button.is_active span{
+  opacity: 0;
+  visibility: hidden;
+}
+
+.filter {
+  background-color: rgb(51, 117, 114);
+  padding: 40px;
+  border-radius: 6px;
+  border: 1px solid #fff;
+}
+
+.card {
+  background-color: white;
+  border-radius: 4px;
+  margin-top: 8px;
+  margin-bottom: 5px;
+  padding: 25px 25px 15px 25px;
+  transition: 0.3s;
+}
+.card:hover {
+  box-shadow: 5px 1px 20px 1px #ddd;
+  transform: scale(0.96);
+}
+
+.mail-names {
+  color: grey;
+  font-weight: bold;
+  font-size: 15px;
+  margin-left: 10px;
+}
+
+.mails {
+  display: flex;
+  align-items: center;
+}
+.mails > img {
+  width: 35px;
+  border-radius: 10px;
+}
+.mail-info {
+  margin: 10px 65px;
+  margin-left: 0px;
+  line-height: 1.7;
+  font-weight: 600;
+}
+.check1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100px;
+}
+.bottom-info {
+  display: flex;
+  justify-content: space-between;
+}
+.date {
+  color: grey;
 }

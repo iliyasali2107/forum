@@ -39,6 +39,8 @@ func (lc *LogoutConrtroller) Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	lc.Data.IsAuthorized = false
+
 	cookie := &http.Cookie{
 		Name:   "access_token",
 		Value:  "",

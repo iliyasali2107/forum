@@ -1,155 +1,127 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;600&display=swap');
+
+* {
+margin: 0;
+padding: 0;
+border: 1px solid black;
+}
+
 body {
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
+  min-height: 110vh;
+  background-color: #4ca1af;
+  background-image: linear-gradient(135deg, #4ca1af 0%, #c4e0e5 100%);
 }
 
-.container {
-    max-width: 60%;
-    margin: 0 auto;
-    padding: 20px;
+.first {
+  flex-direction: column;
+  
 }
 
-h1 {
-    color: #333;
-    text-align: center;
+.navbar {
+  transition: all 0.4s;
 }
-h2{
-    margin: 0;
+
+.navbar .nav-link {
+  color: #fff;
 }
-.post {
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  color: rgb(215, 218, 65);
+  text-decoration: none;
+}
+
+.navbar .navbar-brand {
+  color: #fff;
+}
+
+/* Change navbar styling on scroll */
+.navbar.active {
+  background: #fff;
+  box-shadow: 1px 2px 10px rgba(55, 238, 238, 0.1);
+}
+
+
+.textarea-1 {
+    border-radius: 10px;
+    background-color: rgba(112, 197, 247, 0.411);
+}
+
+
+.comment-11 {
+    border: rgb(13, 47, 85);
+    border-style: solid;
+    border-width: 0.008cm;
+    margin-bottom: 7px;
+    margin-left: 30px;
+    padding-left: 5px;
+
+}
+
+.comment-10 {
+    border: rgb(13, 47, 85);
+    border-style: solid;
+    border-width: 0.09cm;
     margin-bottom: 20px;
-}
-
-.post h2 {
-    color: #333;
-    margin-top: 0;
-}
-
-.content {
-    width: 100%;
-    color: #777;
-    line-height: 1.5;
-    margin: 10px 0 10px 0;
+    border-radius: 10px;
+    padding-left: 10px;
 
 }
 
-.post .authorname {
-    color: black;
-    font-size: 16px;
-}
-
-.post .date {
-    color: #999;
-    font-size: 12px;
-}
-
-
-details>summary {
-    list-style: none;
-    cursor: pointer;
-}
-
-details>summary::-webkit-details-marker {
-    display: none;
-}
-
-.first:not(:first-child) {
-    margin-left: 10px;
-    margin-top: 1rem;
-}
-
-.first:not(:first-child):before {
-    content: "";
-    background-color: rgb(8, 5, 5);
-    position: absolute;
-    min-height: 100%;
-    width: 1px;
-    left: -10px;
-}
-.reactions > form{
-    display: flex;
-    margin-bottom: 15px;
-}
-.first form{
-    display: flex;
-
-}
-.buttons{
-    margin-right: 5px;
-    border: none;
-    background-color: transparent;
-    height: 20px;
+.user-png {
     width: 20px;
 }
 
-.reactcount{
-    height: 25px;
-    margin: 0px 10px 0px 3px;
-}
-.user{
-    height: 40px;
-    width: 40px;
-}
-.author, .commauthor{
-    display: flex;
-    margin-bottom: 5px;
-}
-p{
-    margin: 0 0 0 5px;
-}
-.info{
-    display: grid;
-}
-.newcomment{
-    margin-bottom: 20px;
-    width: 90%;
-    outline: 0;
-    border: 0;
-    border-bottom: 2px solid rgb(105, 105, 105);
+.send{
+    border: none;
     background: transparent;
 }
-.reply{
-    outline: 0;
-    border: 0;
-    border-bottom: 1px solid rgb(105, 105, 105);
+
+.button-class{
+    border: none;
     background: transparent;
 }
-.comm{
-    margin-bottom: 40px;
-}
-.createbutton{
-    border: 0;
-    background: transparent;
-}
-.pen{
-    margin-bottom: -5px;
+
+
+.img-class {
+    width: 20px;
 }
 
-.first{
-    border-left: 1px solid rgb(105, 105, 105, 0.2);
-    padding-left: 10px;   
+.last-comment {
+    margin-bottom: 100px;
 }
 
-.categories{
-    display:flex;
+.author {
+    padding-left: 5px;
 }
 
-.categories > p{
-    font-size: 13px;
-    padding: 2px;
-    background-color: #f0544f;
-    color: white;
+.navbar.active .nav-link {
+  color: #555;
 }
 
-#replybutton > img{
-    padding-right: 2px;
+.navbar.active .nav-link:hover,
+.navbar.active .nav-link:focus {
+  color: #555;
+  text-decoration: none;
 }
 
-#replybutton{
-    display: flex;
+.navbar.active .navbar-brand {
+  color: #555;
+}
+
+
+/* Change navbar styling on small viewports */
+@media (max-width: 991.98px) {
+  .navbar {
+      background: #fff;
+  }
+
+  .navbar .navbar-brand, .navbar .nav-link {
+      color: #555;
+  }
+}
+
+.text-small {
+  font-size: 0.9rem !important;
 }

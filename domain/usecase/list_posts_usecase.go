@@ -49,6 +49,7 @@ func (lpu *listPostsUsecase) GetAllPosts() ([]*models.Post, error) {
 			return nil, fmt.Errorf("couldn't get user: %w", err)
 		}
 		post.User = user
+		post.CreatedStr = post.Created.Format("2006-01-02 15:04:05")
 		err = lpu.categoryRepository.GetCategoriesForPost(post)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't get categories of post: %w", err)
@@ -67,6 +68,20 @@ func (lpu *listPostsUsecase) GetLikedPosts(userID int) ([]*models.Post, error) {
 		return nil, fmt.Errorf("couldn't get user's liked posts: %w", err)
 	}
 
+	for _, post := range posts {
+		user, err := lpu.userRepository.GetUser(post.User.ID)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't get user: %w", err)
+		}
+
+		post.User = user
+		err = lpu.categoryRepository.GetCategoriesForPost(post)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't get categories of post: %w", err)
+		}
+		post.CreatedStr = post.Created.Format("2006-01-02 15:04:05")
+	}
+
 	return posts, nil
 }
 
@@ -77,6 +92,14 @@ func (lpu *listPostsUsecase) GetDislikedPosts(userID int) ([]*models.Post, error
 			return nil, utils.ErrNoPosts
 		}
 		return nil, fmt.Errorf("couldn't get user's disliked posts: %w", err)
+	}
+
+	for _, post := range posts {
+		err = lpu.categoryRepository.GetCategoriesForPost(post)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't get categories of post: %w", err)
+		}
+		post.CreatedStr = post.Created.Format("2006-01-02 15:04:05")
 	}
 
 	return posts, nil
@@ -91,6 +114,19 @@ func (lpu *listPostsUsecase) GetCreatedPosts(userID int) ([]*models.Post, error)
 		return nil, fmt.Errorf("couldn't get users posts: %w", err)
 	}
 
+	for _, post := range posts {
+		user, err := lpu.userRepository.GetUser(post.User.ID)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't get user: %w", err)
+		}
+		post.User = user
+		err = lpu.categoryRepository.GetCategoriesForPost(post)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't get categories of post: %w", err)
+		}
+		post.CreatedStr = post.Created.Format("2006-01-02 15:04:05")
+	}
+
 	return posts, nil
 }
 
@@ -101,6 +137,19 @@ func (lpu *listPostsUsecase) GetPostsByCategories(ids ...int) ([]*models.Post, e
 			return nil, utils.ErrNoPosts
 		}
 		return nil, fmt.Errorf("couldn't get posts: %w", err)
+	}
+
+	for _, post := range posts {
+		user, err := lpu.userRepository.GetUser(post.User.ID)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't get user: %w", err)
+		}
+		post.User = user
+		err = lpu.categoryRepository.GetCategoriesForPost(post)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't get categories of post: %w", err)
+		}
+		post.CreatedStr = post.Created.Format("2006-01-02 15:04:05")
 	}
 
 	return posts, nil
