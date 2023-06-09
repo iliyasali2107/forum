@@ -1,5 +1,10 @@
+all: build run
+
+
 server: 
 	go run ./cmd/main.go
+
+
 
 build:
 	docker build -t forum .
