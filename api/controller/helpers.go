@@ -58,6 +58,10 @@ func (c *Controller) ResponseServerError(w http.ResponseWriter) {
 	c.errorResponse(w, http.StatusInternalServerError)
 }
 
+func (c *Controller) ResponseForbidden(w http.ResponseWriter) {
+	c.errorResponse(w, http.StatusForbidden)
+}
+
 func (c *Controller) ResponseNotFound(w http.ResponseWriter) {
 	c.errorResponse(w, http.StatusNotFound)
 }

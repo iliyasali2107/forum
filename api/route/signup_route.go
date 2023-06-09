@@ -17,5 +17,5 @@ func NewSignupRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux 
 		Controller:    ctrl,
 	}
 
-	mux.HandleFunc(sc.Data.Endpoints.SignupEndpoint, (sc.Signup))
+	mux.HandleFunc(sc.Data.Endpoints.SignupEndpoint, sc.UserIdentity(sc.NotAuthorized(sc.Signup)))
 }

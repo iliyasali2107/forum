@@ -2,13 +2,12 @@ package route
 
 import (
 	"database/sql"
-	"net/http"
-	"time"
-
 	"forum/api/controller"
 	"forum/bootstrap"
 	"forum/domain/repository"
 	"forum/domain/usecase"
+	"net/http"
+	"time"
 )
 
 func NewLoginRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *http.ServeMux, ctrl *controller.Controller) {
@@ -18,5 +17,5 @@ func NewLoginRouter(env *bootstrap.Env, timeout time.Duration, db *sql.DB, mux *
 		Controller:   ctrl,
 	}
 
-	mux.HandleFunc(lc.Data.Endpoints.LoginEndpoint, lc.Login)
+	mux.HandleFunc(lc.Data.Endpoints.LoginEndpoint, lc.UserIdentity(lc.NotAuthorized(lc.Login)))
 }

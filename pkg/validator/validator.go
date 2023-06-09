@@ -47,7 +47,7 @@ func SignupValidation(user *models.User) map[string]string {
 	}
 
 	if !isValidPassword(user.Password.Plaintext) {
-		errors["password"] = "at least 1 upper, 1 lower, 1 digit, 1 special char & 8 to 50 chars"
+		errors["password"] = "at least 1 lower, 1 digit & 6 to 50 chars"
 	}
 
 	return errors
